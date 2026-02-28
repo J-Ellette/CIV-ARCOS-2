@@ -57,3 +57,7 @@ A phase can move from **Reported Complete** to **Verified Complete** only when:
   - Implemented: Evidence Store, Assurance Cases (GSN), Code Analysis, Quality Badges, Compliance Frameworks, Analytics/Trends, Settings pages
   - Added: USWDS-styled Export Report modal (no government banner)
   - Retained stubs: Risk Map, CIV-SCAP, Federated Network, Blockchain Ledger, Platform Sync, Digital Twin, Multi-Tenant
+- 2026-02-28: UI interactive enhancements added to `civ-arcos-carbon.html`:
+  - SVG sparkline/area charts on Dashboard, Analytics, and Blockchain pages (`renderSparkline()` + `initCharts()`)
+  - Global command palette (Ctrl+K / ⌘K) with keyboard navigation and page/action shortcuts
+  - Settings persistence via localStorage (save/load/discard cycle; 12 settings inputs/toggles wired)

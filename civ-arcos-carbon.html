@@ -1636,10 +1636,75 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 .cds-trend-row__value { font-family: var(--cds-font-mono); font-size: 13px; font-weight: 600; color: var(--cds-text-primary); width: 48px; text-align: right; flex-shrink: 0; }
 .cds-trend-row__delta { font-family: var(--cds-font-mono); font-size: 11px; width: 72px; text-align: right; flex-shrink: 0; }
 
+/* --- SVG sparkline chart --- */
+.cds-chart-area { margin-top: 16px; }
+.cds-chart-area__label { font-size: 11px; font-family: var(--cds-font-mono); color: var(--cds-text-secondary); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.cds-chart-svg { display: block; width: 100%; overflow: visible; }
+.cds-chart-line { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.cds-chart-area-fill { stroke: none; opacity: 0.12; }
+.cds-chart-dot { r: 2.5; }
+.cds-chart-grid { stroke: var(--cds-border-subtle-00); stroke-width: 0.5; }
+.cds-chart-axis-label { font-size: 10px; font-family: var(--cds-font-mono); fill: var(--cds-text-helper); }
+
 /* ============================================================
    USWDS REPORT MODAL (wide)
    ============================================================ */
 .cds-modal--report { width: min(900px, 95vw); }
+
+/* --- Command Palette --- */
+.cds-cmdpal-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,0.7); display: flex; align-items: flex-start;
+  justify-content: center; padding-top: 80px;
+  opacity: 0; pointer-events: none; transition: opacity 0.15s;
+}
+.cds-cmdpal-overlay.open { opacity: 1; pointer-events: all; }
+.cds-cmdpal {
+  background: var(--cds-layer-01); border: 1px solid var(--cds-border-subtle-01);
+  border-radius: 0; width: min(560px, 92vw); box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+.cds-cmdpal__input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--cds-border-subtle-00);
+}
+.cds-cmdpal__icon { color: var(--cds-text-secondary); font-size: 16px; flex-shrink: 0; }
+.cds-cmdpal__input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--cds-text-primary); font-family: var(--cds-font-sans);
+  font-size: 15px; caret-color: var(--cds-interactive);
+}
+.cds-cmdpal__input::placeholder { color: var(--cds-text-placeholder); }
+.cds-cmdpal__kbd {
+  font-size: 11px; font-family: var(--cds-font-mono);
+  color: var(--cds-text-helper); background: var(--cds-layer-02);
+  border: 1px solid var(--cds-border-subtle-01); padding: 2px 6px; border-radius: 2px;
+}
+.cds-cmdpal__results { max-height: 340px; overflow-y: auto; }
+.cds-cmdpal__section-header {
+  padding: 8px 16px 4px; font-size: 11px; font-family: var(--cds-font-mono);
+  color: var(--cds-text-helper); text-transform: uppercase; letter-spacing: .08em;
+}
+.cds-cmdpal__item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; cursor: pointer;
+  transition: background 0.1s; font-size: 13px;
+}
+.cds-cmdpal__item:hover, .cds-cmdpal__item.focused {
+  background: var(--cds-layer-hover-01);
+}
+.cds-cmdpal__item-icon {
+  font-size: 14px; width: 20px; text-align: center;
+  color: var(--cds-text-secondary); flex-shrink: 0;
+}
+.cds-cmdpal__item-label { flex: 1; color: var(--cds-text-primary); }
+.cds-cmdpal__item-section { font-size: 11px; color: var(--cds-text-helper); }
+.cds-cmdpal__footer {
+  padding: 8px 16px; border-top: 1px solid var(--cds-border-subtle-00);
+  display: flex; gap: 16px; font-size: 11px; font-family: var(--cds-font-mono);
+  color: var(--cds-text-helper);
+}
+.cds-cmdpal__footer span { display: flex; align-items: center; gap: 4px; }
 </style>
 </head>
 <body>
@@ -1661,6 +1726,10 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
   </a>
 
   <!-- Nav links -->
+  <button class="cds-btn cds-btn--ghost" type="button" onclick="openCmdPal()" aria-label="Open command palette (Ctrl+K)" title="Command palette (Ctrl+K)" style="font-size:12px; color:var(--cds-text-secondary); padding:0 12px; height:48px; display:flex; align-items:center; gap:6px; border:none;">
+    <span>⌕</span>
+    <span style="font-family:var(--cds-font-mono); font-size:11px; opacity:0.7;">Ctrl+K</span>
+  </button>
   <nav class="cds-header__nav" aria-label="Platform">
     <span class="cds-header__menu-item active" onclick="setPage('dashboard',this)">Dashboard</span>
     <span class="cds-header__menu-item" onclick="setPage('evidence',this)">Evidence</span>
@@ -2165,6 +2234,30 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
       </div>
 
     </div><!-- end row 2 -->
+
+    <!-- ROW CHARTS: Quality Trend + Evidence Velocity -->
+    <div class="cds-grid cds-grid--2col">
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent success"></span>Quality Score — 30-Day Trend</div>
+          <span class="cds-tile-meta">daily rollup</span>
+        </div>
+        <div class="cds-chart-area">
+          <div class="cds-chart-area__label"><span>Score</span><span style="color:var(--cds-support-success); font-weight:600;">87 / 100 ↑</span></div>
+          <div id="chart-quality-trend" style="min-height:64px;"></div>
+        </div>
+      </div>
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent info"></span>Evidence Ingestion — 30-Day Velocity</div>
+          <span class="cds-tile-meta">items/day</span>
+        </div>
+        <div class="cds-chart-area">
+          <div class="cds-chart-area__label"><span>Items / day</span><span style="color:var(--cds-interactive); font-weight:600;">47 avg ↑</span></div>
+          <div id="chart-evidence-velocity" style="min-height:64px;"></div>
+        </div>
+      </div>
+    </div><!-- end chart row -->
 
     <!-- ROW 3: PLATFORM SYNC + NETWORK + ALERTS -->
     <div class="cds-grid cds-grid--3col">
@@ -3528,6 +3621,16 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
         </div>
       </div>
     </div>
+    <div class="cds-tile" style="margin-top:16px;">
+      <div class="cds-tile-header">
+        <div class="cds-tile-title"><span class="cds-tile-title-accent success"></span>Chain Height — Recent Activity</div>
+        <span class="cds-tile-meta">last 14 blocks</span>
+      </div>
+      <div class="cds-chart-area">
+        <div class="cds-chart-area__label"><span>Block height</span><span style="color:var(--cds-support-success);">#2,841 ↑</span></div>
+        <div id="chart-blockchain-height" style="min-height:56px;"></div>
+      </div>
+    </div>
   </div><!-- end blockchain page -->
 
   <!-- ======================================================
@@ -3690,6 +3793,10 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
           <div class="cds-trend-row"><span class="cds-trend-row__label">Test Pass Rate</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:100%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">100%</span><span class="cds-trend-row__delta delta-up">+0.4%</span></div>
           <div class="cds-trend-row"><span class="cds-trend-row__label">Code Smells</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:14%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">14</span><span class="cds-trend-row__delta delta-down">−3</span></div>
           <div class="cds-trend-row"><span class="cds-trend-row__label">Avg Complexity</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:42%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">8.4</span><span class="cds-trend-row__delta delta-down">−1.2</span></div>
+          <div class="cds-chart-area" style="margin-top:12px;">
+            <div class="cds-chart-area__label"><span>Quality Score trend (30 days)</span><span style="color:var(--cds-support-success);">87</span></div>
+            <div id="chart-analytics-quality" style="min-height:80px;"></div>
+          </div>
         </div>
       </div>
       <!-- Compliance trends -->
@@ -3704,6 +3811,10 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
           <div class="cds-trend-row"><span class="cds-trend-row__label">SOX ITGC</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:84%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">84%</span><span class="cds-trend-row__delta delta-up">+5%</span></div>
           <div class="cds-trend-row"><span class="cds-trend-row__label">NIST 800-53</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:67%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">67%</span><span class="cds-trend-row__delta delta-up">+8%</span></div>
           <div class="cds-trend-row"><span class="cds-trend-row__label">PCI-DSS</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:89%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">89%</span><span class="cds-trend-row__delta delta-flat">→ stable</span></div>
+          <div class="cds-chart-area" style="margin-top:12px;">
+            <div class="cds-chart-area__label"><span>Compliance avg trend (30 days)</span><span style="color:var(--cds-support-warning);">78%</span></div>
+            <div id="chart-analytics-compliance" style="min-height:80px;"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -3725,6 +3836,10 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
             </tbody>
           </table>
         </div>
+          <div class="cds-chart-area" style="margin-top:12px;">
+            <div class="cds-chart-area__label"><span>Security findings trend (30 days)</span><span style="color:var(--cds-support-error);">14 ↓</span></div>
+            <div id="chart-analytics-security" style="min-height:80px;"></div>
+          </div>
       </div>
       <!-- Evidence velocity -->
       <div class="cds-tile">
@@ -4018,8 +4133,8 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
           <p class="cds-page-header__subtitle">Platform configuration · integrations · notifications · access</p>
         </div>
         <div class="cds-page-header__actions">
-          <button class="cds-btn cds-btn--secondary" type="button">Discard</button>
-          <button class="cds-btn cds-btn--primary" type="button" onclick="toast('Settings saved','Configuration updated successfully','success')">Save Changes</button>
+          <button class="cds-btn cds-btn--secondary" type="button" onclick="discardSettings()">Discard</button>
+          <button class="cds-btn cds-btn--primary" type="button" onclick="saveSettings()">Save Changes</button>
         </div>
       </div>
     </div>
@@ -4028,19 +4143,19 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
       <div>
         <div class="cds-tile">
           <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent"></span>General</div></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Organisation Name</div><div class="cds-settings-row__label-sub">Displayed in reports and evidence metadata</div></div><input class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="J. Ellette / CIV-ARCOS" aria-label="Organisation name"></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Default Repository</div><div class="cds-settings-row__label-sub">Primary evidence collection target</div></div><input class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="jellette/CIV-ARCOS" aria-label="Default repository"></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">API Endpoint</div><div class="cds-settings-row__label-sub">CIV-ARCOS backend API base URL</div></div><input class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="http://localhost:8080" aria-label="API endpoint"></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Dark Theme</div><div class="cds-settings-row__label-sub">IBM Carbon G100 (current)</div></div><label class="cds-toggle" aria-label="Dark theme toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Live Evidence Feed</div><div class="cds-settings-row__label-sub">Stream real-time events to dashboard</div></div><label class="cds-toggle" aria-label="Live feed toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Organisation Name</div><div class="cds-settings-row__label-sub">Displayed in reports and evidence metadata</div></div><input id="set-org-name" class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="J. Ellette / CIV-ARCOS" aria-label="Organisation name"></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Default Repository</div><div class="cds-settings-row__label-sub">Primary evidence collection target</div></div><input id="set-default-repo" class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="jellette/CIV-ARCOS" aria-label="Default repository"></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">API Endpoint</div><div class="cds-settings-row__label-sub">CIV-ARCOS backend API base URL</div></div><input id="set-api-endpoint" class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="http://localhost:8080" aria-label="API endpoint"></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Dark Theme</div><div class="cds-settings-row__label-sub">IBM Carbon G100 (current)</div></div><label class="cds-toggle" aria-label="Dark theme toggle"><input id="set-dark-theme" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Live Evidence Feed</div><div class="cds-settings-row__label-sub">Stream real-time events to dashboard</div></div><label class="cds-toggle" aria-label="Live feed toggle"><input id="set-live-feed" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
         </div>
         <!-- Notifications -->
         <div class="cds-tile" style="margin-top:1px;">
           <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent warning"></span>Notifications</div></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Critical Findings Alert</div><div class="cds-settings-row__label-sub">Notify immediately on critical severity</div></div><label class="cds-toggle" aria-label="Critical findings toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Compliance Threshold Alerts</div><div class="cds-settings-row__label-sub">Alert when any framework drops below 80%</div></div><label class="cds-toggle" aria-label="Compliance alerts toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Scan Completion Toasts</div><div class="cds-settings-row__label-sub">Show in-app toast on scan finish</div></div><label class="cds-toggle" aria-label="Scan toasts toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Block Validation Events</div><div class="cds-settings-row__label-sub">Notify on blockchain block confirmation</div></div><label class="cds-toggle" aria-label="Block events toggle"><input type="checkbox"><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Critical Findings Alert</div><div class="cds-settings-row__label-sub">Notify immediately on critical severity</div></div><label class="cds-toggle" aria-label="Critical findings toggle"><input id="set-critical-alerts" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Compliance Threshold Alerts</div><div class="cds-settings-row__label-sub">Alert when any framework drops below 80%</div></div><label class="cds-toggle" aria-label="Compliance alerts toggle"><input id="set-compliance-alerts" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Scan Completion Toasts</div><div class="cds-settings-row__label-sub">Show in-app toast on scan finish</div></div><label class="cds-toggle" aria-label="Scan toasts toggle"><input id="set-scan-toasts" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Block Validation Events</div><div class="cds-settings-row__label-sub">Notify on blockchain block confirmation</div></div><label class="cds-toggle" aria-label="Block events toggle"><input id="set-block-events" type="checkbox"><span class="cds-toggle__track"></span></label></div>
         </div>
       </div>
       <!-- Integrations -->
@@ -4067,10 +4182,10 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
         <!-- Scan settings -->
         <div class="cds-tile" style="margin-top:1px;">
           <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent purple"></span>Scan Configuration</div></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Auto-scan on push</div><div class="cds-settings-row__label-sub">Trigger evidence collection on every push event</div></div><label class="cds-toggle" aria-label="Auto-scan toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">SAST Security Scanning</div><div class="cds-settings-row__label-sub">Run CIV-SCAP on each scan cycle</div></div><label class="cds-toggle" aria-label="SAST toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Auto-scan on push</div><div class="cds-settings-row__label-sub">Trigger evidence collection on every push event</div></div><label class="cds-toggle" aria-label="Auto-scan toggle"><input id="set-auto-scan" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">SAST Security Scanning</div><div class="cds-settings-row__label-sub">Run CIV-SCAP on each scan cycle</div></div><label class="cds-toggle" aria-label="SAST toggle"><input id="set-sast" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
           <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Scheduled Assessments</div><div class="cds-settings-row__label-sub">Full compliance assessment frequency</div></div><select class="cds-select" style="width:160px; flex-shrink:0;" aria-label="Schedule frequency"><option>Daily</option><option>Weekly</option><option>On demand</option></select></div>
-          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Blockchain Anchoring</div><div class="cds-settings-row__label-sub">Auto-commit evidence packages to ledger</div></div><label class="cds-toggle" aria-label="Blockchain toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Blockchain Anchoring</div><div class="cds-settings-row__label-sub">Auto-commit evidence packages to ledger</div></div><label class="cds-toggle" aria-label="Blockchain toggle"><input id="set-blockchain-anchor" type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
         </div>
       </div>
     </div>
@@ -4287,9 +4402,92 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 </div>
 
 
+<!-- ============================================================
+   GLOBAL COMMAND PALETTE  (Ctrl+K / ⌘K)
+   ============================================================ -->
+<div class="cds-cmdpal-overlay" id="cmdpal-overlay" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="cds-cmdpal">
+    <div class="cds-cmdpal__input-wrap">
+      <span class="cds-cmdpal__icon">⌕</span>
+      <input class="cds-cmdpal__input" id="cmdpal-input" type="text" placeholder="Search pages, actions…" autocomplete="off" spellcheck="false">
+      <span class="cds-cmdpal__kbd">Esc</span>
+    </div>
+    <div class="cds-cmdpal__results" id="cmdpal-results" role="listbox"></div>
+    <div class="cds-cmdpal__footer">
+      <span><span class="cds-cmdpal__kbd">↑↓</span> navigate</span>
+      <span><span class="cds-cmdpal__kbd">↵</span> select</span>
+      <span><span class="cds-cmdpal__kbd">Esc</span> close</span>
+    </div>
+  </div>
+</div>
 <div class="cds-toast-stack" id="toast-stack" aria-live="polite" aria-label="Notifications"></div>
 
 <script>
+// === SVG SPARKLINE CHART ===
+function renderSparkline(containerId, data, opts) {
+  const el = document.getElementById(containerId);
+  if (!el || !data || data.length === 0) return;
+  const W = el.clientWidth || 300;
+  const H = opts.height || 60;
+  const pad = { top: 6, right: 8, bottom: 18, left: 8 };
+  const innerW = W - pad.left - pad.right;
+  const innerH = H - pad.top - pad.bottom;
+  const min = opts.min !== undefined ? opts.min : Math.min(...data) * 0.95;
+  const max = opts.max !== undefined ? opts.max : Math.max(...data) * 1.05;
+  const color = opts.color || 'var(--cds-support-success)';
+  const xScale = i => pad.left + (i / (data.length - 1)) * innerW;
+  const yScale = v => pad.top + innerH - ((v - min) / (max - min)) * innerH;
+  const pts = data.map((v, i) => [xScale(i), yScale(v)]);
+  const pathD = pts.map((p, i) => (i === 0 ? `M${p[0].toFixed(1)},${p[1].toFixed(1)}` : `L${p[0].toFixed(1)},${p[1].toFixed(1)}`)).join(' ');
+  const areaD = pathD + ` L${pts[pts.length-1][0].toFixed(1)},${(pad.top+innerH).toFixed(1)} L${pts[0][0].toFixed(1)},${(pad.top+innerH).toFixed(1)} Z`;
+  const labels = opts.labels || [];
+  const labelStep = labels.length > 0 ? Math.ceil(labels.length / 5) : 1;
+  const labelHtml = labels.map((l, i) => {
+    if (i % labelStep !== 0 && i !== labels.length - 1) return '';
+    const x = xScale(i);
+    return `<text class="cds-chart-axis-label" x="${x.toFixed(1)}" y="${(H - 2).toFixed(1)}" text-anchor="middle">${l}</text>`;
+  }).join('');
+  const gridLines = [0.25, 0.5, 0.75].map(f => {
+    const y = pad.top + innerH * (1 - f);
+    return `<line class="cds-chart-grid" x1="${pad.left}" y1="${y.toFixed(1)}" x2="${(W - pad.right).toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+  }).join('');
+  const dots = opts.dots ? pts.map(p => `<circle class="cds-chart-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" fill="${color}"/>`).join('') : '';
+  el.innerHTML = `<svg class="cds-chart-svg" viewBox="0 0 ${W} ${H}" height="${H}" aria-hidden="true">
+    ${gridLines}
+    <path class="cds-chart-area-fill" d="${areaD}" fill="${color}"/>
+    <path class="cds-chart-line" d="${pathD}" stroke="${color}"/>
+    ${dots}
+    ${labelHtml}
+  </svg>`;
+}
+
+function initCharts() {
+  // Dashboard: Quality score 30-day trend
+  renderSparkline('chart-quality-trend', [79,80,81,81,82,82,83,83,84,84,84,85,85,84,85,86,85,86,86,87,86,87,87,87,86,87,87,87,87,87], {
+    height: 64, min: 74, max: 95, color: 'var(--cds-support-success)', labels: Array.from({length:30},(_,i)=>`d-${29-i}`), dots: false
+  });
+  // Dashboard: Evidence velocity 30-day
+  renderSparkline('chart-evidence-velocity', [28,31,29,35,38,33,41,36,39,44,42,40,43,47,45,48,50,46,49,52,51,53,50,54,55,52,56,58,53,47], {
+    height: 64, min: 0, max: 70, color: 'var(--cds-interactive)', dots: false
+  });
+  // Analytics: Quality score 30-day
+  renderSparkline('chart-analytics-quality', [79,80,81,81,82,82,83,83,84,84,84,85,85,84,85,86,85,86,86,87,86,87,87,87,86,87,87,87,87,87], {
+    height: 80, min: 74, max: 95, color: 'var(--cds-support-success)', labels: ['d-29','d-24','d-19','d-14','d-9','d-4','today'], dots: false
+  });
+  // Analytics: Compliance avg 30-day
+  renderSparkline('chart-analytics-compliance', [68,69,70,70,71,71,72,72,73,72,73,74,73,74,74,75,75,74,75,76,75,76,77,76,77,77,77,78,78,78], {
+    height: 80, min: 60, max: 90, color: 'var(--cds-support-warning)', dots: false
+  });
+  // Analytics: Security findings 30-day (lower is better)
+  renderSparkline('chart-analytics-security', [42,40,39,38,36,38,35,34,33,32,30,31,29,28,28,27,26,26,25,24,24,23,22,22,21,20,19,18,16,14], {
+    height: 80, min: 0, max: 50, color: 'var(--cds-support-error)', dots: false
+  });
+  // Blockchain: Chain height 7-day
+  renderSparkline('chart-blockchain-height', [2836,2837,2837,2838,2839,2839,2840,2840,2840,2841,2841,2841,2841,2841], {
+    height: 56, color: 'var(--cds-support-success)', dots: true
+  });
+}
+
 // === PAGE NAV ===
 function setPage(page, el) {
   document.querySelectorAll('.cds-page').forEach(p => p.classList.remove('active'));
@@ -4452,6 +4650,188 @@ setInterval(() => {
     toast(t, s, ty);
   }
 }, 8000);
+
+// Init charts once DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCharts);
+} else {
+  initCharts();
+}
+
+// === COMMAND PALETTE ===
+const CMDPAL_ITEMS = [
+  { icon: '⊞', label: 'Dashboard',         section: 'Overview',    page: 'dashboard' },
+  { icon: '◈', label: 'Evidence Store',    section: 'Overview',    page: 'evidence' },
+  { icon: '◇', label: 'Assurance Cases',   section: 'Assurance',   page: 'gsn' },
+  { icon: '◫', label: 'Code Analysis',     section: 'Assurance',   page: 'analysis' },
+  { icon: '◈', label: 'Quality Badges',    section: 'Assurance',   page: 'badges' },
+  { icon: '▣', label: 'Compliance Frameworks', section: 'Compliance', page: 'compliance' },
+  { icon: '◬', label: 'Risk Map',          section: 'Compliance',  page: 'risk' },
+  { icon: '◪', label: 'CIV-SCAP',          section: 'Compliance',  page: 'scap' },
+  { icon: '⬡', label: 'Federated Network', section: 'Distributed', page: 'network' },
+  { icon: '⬢', label: 'Blockchain Ledger', section: 'Distributed', page: 'blockchain' },
+  { icon: '↺', label: 'Platform Sync',     section: 'Distributed', page: 'sync' },
+  { icon: '◬', label: 'Trends & Insights', section: 'Analytics',   page: 'analytics' },
+  { icon: '◈', label: 'Digital Twin',      section: 'Analytics',   page: 'digitaltwin' },
+  { icon: '▦', label: 'Multi-Tenant',      section: 'System',      page: 'tenants' },
+  { icon: '⚙', label: 'Settings',          section: 'System',      page: 'settings' },
+  { icon: '▶', label: 'Run Scan',          section: 'Actions',     action: () => openModal('scan') },
+  { icon: '⎙', label: 'Export Report',     section: 'Actions',     action: () => openReportModal() },
+];
+
+let _palFocusIdx = -1;
+
+function openCmdPal() {
+  const overlay = document.getElementById('cmdpal-overlay');
+  overlay.classList.add('open');
+  const input = document.getElementById('cmdpal-input');
+  input.value = '';
+  _palFocusIdx = -1;
+  renderPalItems('');
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeCmdPal() {
+  document.getElementById('cmdpal-overlay').classList.remove('open');
+}
+
+function renderPalItems(query) {
+  const q = query.toLowerCase().trim();
+  const filtered = q ? CMDPAL_ITEMS.filter(i => i.label.toLowerCase().includes(q) || i.section.toLowerCase().includes(q)) : CMDPAL_ITEMS;
+  const sections = [...new Set(filtered.map(i => i.section))];
+  const container = document.getElementById('cmdpal-results');
+  container.innerHTML = sections.map(sec => {
+    const items = filtered.filter(i => i.section === sec);
+    return `<div class="cds-cmdpal__section-header">${sec}</div>` +
+      items.map((item, idx) => {
+        const globalIdx = filtered.indexOf(item);
+        return `<div class="cds-cmdpal__item${globalIdx === _palFocusIdx ? ' focused' : ''}" role="option" data-idx="${globalIdx}" onclick="selectPalItem(${globalIdx})">
+          <span class="cds-cmdpal__item-icon">${item.icon}</span>
+          <span class="cds-cmdpal__item-label">${item.label}</span>
+          <span class="cds-cmdpal__item-section">${item.section}</span>
+        </div>`;
+      }).join('');
+  }).join('');
+  _palFilteredItems = filtered;
+}
+
+let _palFilteredItems = CMDPAL_ITEMS;
+
+function selectPalItem(idx) {
+  const item = _palFilteredItems[idx];
+  if (!item) return;
+  closeCmdPal();
+  if (item.page) {
+    const navEl = document.querySelector(`[onclick*="setPage('${item.page}'"]`);
+    setPage(item.page, navEl);
+  } else if (item.action) {
+    item.action();
+  }
+}
+
+document.getElementById('cmdpal-input').addEventListener('input', e => {
+  _palFocusIdx = -1;
+  renderPalItems(e.target.value);
+});
+
+document.getElementById('cmdpal-input').addEventListener('keydown', e => {
+  const items = document.querySelectorAll('#cmdpal-results .cds-cmdpal__item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _palFocusIdx = Math.min(_palFocusIdx + 1, _palFilteredItems.length - 1);
+    renderPalItems(document.getElementById('cmdpal-input').value);
+    const focused = document.querySelector('#cmdpal-results .cds-cmdpal__item.focused');
+    if (focused) focused.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _palFocusIdx = Math.max(_palFocusIdx - 1, 0);
+    renderPalItems(document.getElementById('cmdpal-input').value);
+    const focused = document.querySelector('#cmdpal-results .cds-cmdpal__item.focused');
+    if (focused) focused.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (_palFocusIdx >= 0) selectPalItem(_palFocusIdx);
+    else if (_palFilteredItems.length > 0) selectPalItem(0);
+  } else if (e.key === 'Escape') {
+    closeCmdPal();
+  }
+});
+
+document.getElementById('cmdpal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('cmdpal-overlay')) closeCmdPal();
+});
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    const overlay = document.getElementById('cmdpal-overlay');
+    if (overlay.classList.contains('open')) closeCmdPal();
+    else openCmdPal();
+  }
+});
+
+// === SETTINGS PERSISTENCE ===
+const SETTINGS_FIELDS = [
+  { id: 'set-org-name',    type: 'text',     key: 'orgName',    default: 'J. Ellette / CIV-ARCOS' },
+  { id: 'set-default-repo',type: 'text',     key: 'defaultRepo',default: 'jellette/CIV-ARCOS' },
+  { id: 'set-api-endpoint',type: 'text',     key: 'apiEndpoint',default: 'http://localhost:8080' },
+];
+const SETTINGS_TOGGLES = [
+  { id: 'set-dark-theme',      key: 'darkTheme',      default: true },
+  { id: 'set-live-feed',       key: 'liveFeed',        default: true },
+  { id: 'set-critical-alerts', key: 'criticalAlerts',  default: true },
+  { id: 'set-compliance-alerts',key:'complianceAlerts',default: true },
+  { id: 'set-scan-toasts',     key: 'scanToasts',      default: true },
+  { id: 'set-block-events',    key: 'blockEvents',     default: false },
+  { id: 'set-auto-scan',       key: 'autoScan',        default: true },
+  { id: 'set-sast',            key: 'sast',            default: true },
+  { id: 'set-blockchain-anchor',key:'blockchainAnchor',default: true },
+];
+
+function loadSettings() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('civArcos_settings') || '{}'); } catch (e) { saved = {}; }
+  SETTINGS_FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (el) el.value = saved[f.key] !== undefined ? saved[f.key] : f.default;
+  });
+  SETTINGS_TOGGLES.forEach(t => {
+    const el = document.getElementById(t.id);
+    if (el) el.checked = saved[t.key] !== undefined ? saved[t.key] : t.default;
+  });
+}
+
+function saveSettings() {
+  const data = {};
+  SETTINGS_FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (el) data[f.key] = el.value;
+  });
+  SETTINGS_TOGGLES.forEach(t => {
+    const el = document.getElementById(t.id);
+    if (el) data[t.key] = el.checked;
+  });
+  localStorage.setItem('civArcos_settings', JSON.stringify(data));
+  toast('Settings saved', 'Configuration persisted to browser storage', 'success');
+  applySettings(data);
+}
+
+function discardSettings() {
+  loadSettings();
+  toast('Changes discarded', 'Settings reverted to last saved state', 'info');
+}
+
+function applySettings(data) {
+  // Apply org name to report preview if field exists
+  const orgField = document.getElementById('set-org-name');
+  const orgVal = orgField ? orgField.value : (data.orgName || 'CIV-ARCOS');
+  const repPreview = document.getElementById('report-preview');
+  if (repPreview) {
+    repPreview.querySelectorAll('[data-org]').forEach(el => { el.textContent = orgVal; });
+  }
+}
+
+loadSettings();
 </script>
 </body>
 </html>
