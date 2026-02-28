@@ -61,3 +61,11 @@ A phase can move from **Reported Complete** to **Verified Complete** only when:
   - SVG sparkline/area charts on Dashboard, Analytics, and Blockchain pages (`renderSparkline()` + `initCharts()`)
   - Global command palette (Ctrl+K / ⌘K) with keyboard navigation and page/action shortcuts
   - Settings persistence via localStorage (save/load/discard cycle; 12 settings inputs/toggles wired)
+- 2026-02-28: UI interaction enhancements (round 2):
+  - Notification panel: slide-out right panel with grouped alerts (Security/Risk, Compliance, Blockchain, Platform Events); header bell badge; Mark All Read
+  - Help modal: keyboard shortcuts reference, page-jump hotkeys, feature overview
+  - Sidebar toggle: hamburger collapse/expand with CSS transition; Alt+B shortcut
+  - User profile dropdown: avatar click opens Carbon-styled menu (Settings, Export, Scan, Help, Sign Out)
+  - Interactive Risk Matrix: probability×impact cells show RISK-ID tooltips on hover
+  - Improved setPage(): auto-highlights sidebar nav item when called programmatically
+  - Additional keyboard shortcuts: G+letter page-jump, Alt+N/B/S/E action hotkeys

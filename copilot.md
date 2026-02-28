@@ -1,7 +1,7 @@
 # Copilot Progress Tracker
 
 ## Current Status
-UI operational console (Carbon) fully implemented — all pages complete, plus interactive enhancements (SVG charts, command palette, settings persistence).
+UI operational console (Carbon) fully implemented — all pages complete, plus interactive enhancements (SVG charts, command palette, settings persistence, notification panel, help modal, sidebar toggle, user menu, interactive risk matrix).
 
 ## Design System Decisions
 | Surface | Design System | Notes |
@@ -32,6 +32,13 @@ UI operational console (Carbon) fully implemented — all pages complete, plus i
 - [x] **SVG Sparkline charts** — inline SVG area/line charts on Dashboard (quality trend, evidence velocity), Analytics (quality, compliance, security findings trends), Blockchain (chain height); `renderSparkline()` utility with configurable color, min/max, labels, dots
 - [x] **Global Command Palette (Ctrl+K / ⌘K)** — full-keyboard page navigation, action shortcuts (Run Scan, Export Report), fuzzy label+section filtering, arrow-key + Enter navigation, Escape/overlay-click to dismiss; trigger button in header
 - [x] **Settings persistence (localStorage)** — `saveSettings()` / `loadSettings()` / `discardSettings()` with `localStorage` backend; all 12 settings inputs/toggles wired with `id` attributes; Discard button reverts to last saved state
+- [x] **Notification Panel** — slide-out right panel (340px) with grouped notifications (Security/Risk, Compliance, Blockchain, Platform Events); unread badge count on header bell button; Mark All Read action; auto-increment on live events; close on outside click
+- [x] **Help modal (keyboard shortcuts)** — Carbon modal listing all keyboard shortcuts: Ctrl+K (command palette), Alt+N (notifications), Alt+B (sidebar toggle), Alt+S (scan), Alt+E (export), G+letter page-jump shortcuts; feature overview and API endpoint display
+- [x] **Sidebar toggle** — hamburger button collapses/expands side nav with CSS transition; `Alt+B` keyboard shortcut; content margin adjusts automatically
+- [x] **User profile dropdown menu** — click JE avatar to open Carbon-styled dropdown with nav shortcuts (Settings, Export Report, Run Scan, Help, Sign Out); closes on outside click
+- [x] **Interactive Risk Matrix** — probability×impact grid cells now have `risk-cell` class with hover tooltip listing specific RISK-IDs in each bucket; keyboard-accessible focus ring
+- [x] **Improved `setPage()` navigation** — when called programmatically (e.g., from notifications panel, user menu, keyboard shortcuts), auto-highlights the matching sidebar nav item
+- [x] **Additional keyboard shortcuts** — G+D/E/A/C/R/B/T/S/N page-jump hotkeys; Alt+N/B/S/E action shortcuts; all documented in help modal
 
 ## Build-Related Docs (in `build_docs/`)
 | File | Description |
