@@ -1705,6 +1705,236 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
   color: var(--cds-text-helper);
 }
 .cds-cmdpal__footer span { display: flex; align-items: center; gap: 4px; }
+
+/* ============================================================
+   SIDEBAR COLLAPSE
+   ============================================================ */
+.cds-side-nav { transition: transform 200ms ease; }
+.cds-side-nav.collapsed { transform: translateX(-256px); }
+.cds-content { transition: margin-left 200ms ease; }
+.cds-content.sidebar-collapsed { margin-left: 0; }
+
+/* ============================================================
+   NOTIFICATION PANEL (slide-out right)
+   ============================================================ */
+.cds-notif-panel {
+  position: fixed;
+  top: var(--cds-header-height);
+  right: 0;
+  width: 340px;
+  height: calc(100vh - var(--cds-header-height));
+  background: var(--cds-layer-01);
+  border-left: 1px solid var(--cds-border-subtle-01);
+  z-index: 900;
+  transform: translateX(100%);
+  transition: transform 200ms ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.cds-notif-panel.open { transform: translateX(0); }
+.cds-notif-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+  background: var(--cds-layer-01);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.cds-notif-panel__title { font-size: 14px; font-weight: 600; color: var(--cds-text-primary); }
+.cds-notif-panel__actions { display: flex; gap: 8px; align-items: center; }
+.cds-notif-panel__group-header {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cds-text-helper);
+  background: var(--cds-background);
+}
+.cds-notif-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+  transition: background 0.1s;
+}
+.cds-notif-item:hover { background: var(--cds-layer-hover-01); }
+.cds-notif-item.unread { border-left: 3px solid var(--cds-interactive); padding-left: 13px; }
+.cds-notif-item__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.cds-notif-item__icon--error   { background: var(--cds-support-error-bg);   color: var(--cds-support-error); }
+.cds-notif-item__icon--warning { background: var(--cds-support-warning-bg); color: var(--cds-support-warning); }
+.cds-notif-item__icon--success { background: var(--cds-support-success-bg); color: var(--cds-support-success); }
+.cds-notif-item__icon--info    { background: var(--cds-support-info-bg);    color: var(--cds-support-info); }
+.cds-notif-item__body { flex: 1; min-width: 0; }
+.cds-notif-item__title { font-size: 13px; font-weight: 600; color: var(--cds-text-primary); margin-bottom: 2px; }
+.cds-notif-item__sub   { font-size: 12px; color: var(--cds-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cds-notif-item__time  { font-size: 11px; font-family: var(--cds-font-mono); color: var(--cds-text-helper); white-space: nowrap; align-self: flex-start; margin-top: 2px; }
+.cds-notif-panel__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--cds-text-helper);
+  font-size: 13px;
+}
+.cds-notif-panel__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  background: var(--cds-button-danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 8px;
+  line-height: 1;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   HELP MODAL
+   ============================================================ */
+.cds-modal--help { max-width: 640px; width: 90vw; max-height: 80vh; overflow-y: auto; }
+.cds-kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--cds-font-mono);
+  font-size: 11px;
+  background: var(--cds-layer-02);
+  border: 1px solid var(--cds-border-subtle-01);
+  border-bottom-width: 2px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: var(--cds-text-primary);
+  gap: 2px;
+}
+.cds-help-section { margin-bottom: 24px; }
+.cds-help-section__title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cds-text-helper);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+}
+.cds-shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+}
+.cds-shortcut-row:last-child { border-bottom: none; }
+.cds-shortcut-row__label { color: var(--cds-text-secondary); }
+.cds-shortcut-row__keys  { display: flex; gap: 4px; align-items: center; }
+
+/* ============================================================
+   USER MENU
+   ============================================================ */
+.cds-user-menu-wrap { position: relative; }
+.cds-user-menu {
+  position: absolute;
+  top: calc(100% + 0px);
+  right: 0;
+  min-width: 220px;
+  background: var(--cds-layer-01);
+  border: 1px solid var(--cds-border-subtle-01);
+  z-index: 1100;
+  display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.cds-user-menu.open { display: block; }
+.cds-user-menu__header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+}
+.cds-user-menu__name { font-size: 14px; font-weight: 600; color: var(--cds-text-primary); }
+.cds-user-menu__role { font-size: 11px; color: var(--cds-text-helper); margin-top: 3px; font-family: var(--cds-font-mono); }
+.cds-user-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--cds-text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.1s, color 0.1s;
+}
+.cds-user-menu__item:hover { background: var(--cds-layer-hover-01); color: var(--cds-text-primary); }
+.cds-user-menu__item--danger:hover { background: var(--cds-support-error-bg); color: var(--cds-support-error); }
+.cds-user-menu__divider { height: 1px; background: var(--cds-border-subtle-00); margin: 4px 0; }
+
+/* ============================================================
+   RISK MATRIX INTERACTIVE CELLS
+   ============================================================ */
+.risk-cell { position: relative; cursor: pointer; }
+.risk-cell:hover { outline: 2px solid var(--cds-border-interactive); z-index: 2; position: relative; }
+.risk-cell__tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cds-layer-03);
+  border: 1px solid var(--cds-border-subtle-01);
+  padding: 7px 10px;
+  font-size: 11px;
+  font-family: var(--cds-font-mono);
+  color: var(--cds-text-primary);
+  white-space: nowrap;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  min-width: 80px;
+  text-align: center;
+}
+.risk-cell:hover .risk-cell__tooltip { opacity: 1; }
+
+/* ============================================================
+   HEADER NOTIFICATION BADGE
+   ============================================================ */
+.cds-header__action { position: relative; }
+.cds-header__action .badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 14px;
+  height: 14px;
+  background: var(--cds-button-danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  pointer-events: none;
+  line-height: 1;
+}
 </style>
 </head>
 <body>
@@ -1714,7 +1944,7 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
    ============================================================ -->
 <header class="cds-header" role="banner">
   <!-- Hamburger -->
-  <button class="cds-header__menu-button" aria-label="Navigation menu" type="button">
+  <button class="cds-header__menu-button" aria-label="Toggle navigation" type="button" onclick="toggleSidebar()">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
       <rect x="2" y="4" width="16" height="2"/><rect x="2" y="9" width="16" height="2"/><rect x="2" y="14" width="16" height="2"/>
     </svg>
@@ -1746,19 +1976,43 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 
   <!-- Global actions -->
   <div class="cds-header__global">
-    <button class="cds-header__action" aria-label="Search" type="button" title="Search">
+    <button class="cds-header__action" aria-label="Search" type="button" title="Search (Ctrl+K)" onclick="openCmdPal()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.5"/></svg>
     </button>
-    <button class="cds-header__action" aria-label="Notifications (3)" type="button" title="Notifications">
+    <button class="cds-header__action" aria-label="Notifications" id="notif-btn" type="button" title="Notifications" onclick="toggleNotifPanel()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a5 5 0 00-5 5v3l-1 2h12l-1-2V6a5 5 0 00-5-5z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
+      <span class="badge" id="notif-badge" aria-label="3 unread notifications">3</span>
     </button>
-    <button class="cds-header__action" aria-label="Help" type="button" title="Help">?</button>
+    <button class="cds-header__action" aria-label="Help" type="button" title="Help &amp; keyboard shortcuts" onclick="openModal('help')">?</button>
   </div>
 
   <!-- User -->
-  <div class="cds-header__user" aria-label="User menu">
+  <div class="cds-header__user cds-user-menu-wrap" aria-label="User menu" onclick="toggleUserMenu()">
     <div class="cds-header__user-name">J. Ellette</div>
     <div class="cds-header__user-avatar" aria-hidden="true">JE</div>
+    <div class="cds-user-menu" id="user-menu" role="menu">
+      <div class="cds-user-menu__header">
+        <div class="cds-user-menu__name">J. Ellette</div>
+        <div class="cds-user-menu__role">Administrator · CIV-ARCOS</div>
+      </div>
+      <a class="cds-user-menu__item" onclick="setPage('settings',null); closeUserMenu();" href="#" role="menuitem">
+        <span>⚙</span> Settings
+      </a>
+      <a class="cds-user-menu__item" href="#" onclick="openReportModal(); closeUserMenu();" role="menuitem">
+        <span>⎙</span> Export Report
+      </a>
+      <div class="cds-user-menu__divider"></div>
+      <a class="cds-user-menu__item" href="#" onclick="openModal('scan'); closeUserMenu();" role="menuitem">
+        <span>▶</span> Run Scan
+      </a>
+      <a class="cds-user-menu__item" href="#" onclick="openModal('help'); closeUserMenu();" role="menuitem">
+        <span>?</span> Keyboard Shortcuts
+      </a>
+      <div class="cds-user-menu__divider"></div>
+      <a class="cds-user-menu__item cds-user-menu__item--danger" href="#" role="menuitem" onclick="toast('Session ended','You have been signed out','info'); closeUserMenu();">
+        <span>⏻</span> Sign Out
+      </a>
+    </div>
   </div>
 </header>
 
@@ -3234,24 +3488,24 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
             <tbody>
               <tr>
                 <td style="color:var(--cds-text-secondary); padding:4px; text-align:left;">High</td>
-                <td style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">3</td>
-                <td style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2</td>
-                <td style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">1</td>
-                <td style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2</td>
+                <td class="risk-cell" style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">3<div class="risk-cell__tooltip">RISK-007, RISK-013, RISK-019</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2<div class="risk-cell__tooltip">RISK-004, RISK-017</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">1<div class="risk-cell__tooltip">RISK-002</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2<div class="risk-cell__tooltip">RISK-001, RISK-003</div></td>
               </tr>
               <tr>
                 <td style="color:var(--cds-text-secondary); padding:4px; text-align:left;">Med</td>
-                <td style="background:var(--cds-support-success-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">1</td>
-                <td style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">4</td>
-                <td style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">3</td>
-                <td style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">1</td>
+                <td class="risk-cell" style="background:var(--cds-support-success-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">1<div class="risk-cell__tooltip">RISK-020</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">4<div class="risk-cell__tooltip">RISK-008, RISK-010, RISK-014, RISK-018</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">3<div class="risk-cell__tooltip">RISK-005, RISK-009, RISK-016</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-error-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">1<div class="risk-cell__tooltip">RISK-015</div></td>
               </tr>
               <tr>
                 <td style="color:var(--cds-text-secondary); padding:4px; text-align:left;">Low</td>
-                <td style="background:var(--cds-support-success-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2</td>
-                <td style="background:var(--cds-support-success-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">3</td>
-                <td style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2</td>
-                <td style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">0</td>
+                <td class="risk-cell" style="background:var(--cds-support-success-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2<div class="risk-cell__tooltip">RISK-006, RISK-011</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-success-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">3<div class="risk-cell__tooltip">RISK-012, RISK-021, RISK-022</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">2<div class="risk-cell__tooltip">RISK-023, RISK-024</div></td>
+                <td class="risk-cell" style="background:var(--cds-support-warning-bg); padding:6px; border:1px solid var(--cds-border-subtle-00);">0<div class="risk-cell__tooltip">No risks here</div></td>
               </tr>
             </tbody>
           </table>
@@ -4194,6 +4448,87 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 </main>
 
 <!-- ============================================================
+   NOTIFICATION PANEL (slide-out from right)
+   ============================================================ -->
+<aside class="cds-notif-panel" id="notif-panel" aria-label="Notifications panel" role="complementary">
+  <div class="cds-notif-panel__header">
+    <span class="cds-notif-panel__title">Notifications <span class="cds-notif-panel__badge" id="notif-count">5</span></span>
+    <div class="cds-notif-panel__actions">
+      <button class="cds-btn cds-btn--ghost" style="font-size:11px; padding:4px 10px; height:auto;" type="button" onclick="markAllRead()">Mark all read</button>
+      <button class="cds-btn cds-btn--ghost" style="font-size:14px; padding:4px 8px; height:auto; line-height:1;" type="button" onclick="closeNotifPanel()" aria-label="Close notifications">✕</button>
+    </div>
+  </div>
+
+  <div class="cds-notif-panel__group-header">Security &amp; Risk</div>
+  <div class="cds-notif-item unread" onclick="setPage('risk',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--error">⚠</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">Critical: RISK-001 SQL injection</div>
+      <div class="cds-notif-item__sub">api.py — score 95 · requires immediate action</div>
+    </div>
+    <div class="cds-notif-item__time">2m</div>
+  </div>
+  <div class="cds-notif-item unread" onclick="setPage('risk',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--error">⚠</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">Critical: RISK-002 Token expiry</div>
+      <div class="cds-notif-item__sub">auth module — score 88 · in review</div>
+    </div>
+    <div class="cds-notif-item__time">12m</div>
+  </div>
+
+  <div class="cds-notif-panel__group-header">Compliance</div>
+  <div class="cds-notif-item unread" onclick="setPage('compliance',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--warning">▣</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">ISO 27001 A.12.6.1 below threshold</div>
+      <div class="cds-notif-item__sub">68% — minimum 80% required</div>
+    </div>
+    <div class="cds-notif-item__time">25m</div>
+  </div>
+  <div class="cds-notif-item" onclick="setPage('compliance',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--warning">▣</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">FedRAMP SC-28 needs review</div>
+      <div class="cds-notif-item__sub">Control not fully evidenced · 74%</div>
+    </div>
+    <div class="cds-notif-item__time">1h</div>
+  </div>
+
+  <div class="cds-notif-panel__group-header">Blockchain &amp; Sync</div>
+  <div class="cds-notif-item" onclick="setPage('blockchain',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--success">⬢</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">Block #2,842 validated</div>
+      <div class="cds-notif-item__sub">5 evidence items · 3 nodes confirmed</div>
+    </div>
+    <div class="cds-notif-item__time">8m</div>
+  </div>
+
+  <div class="cds-notif-panel__group-header">Platform Events</div>
+  <div class="cds-notif-item" onclick="setPage('sync',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--info">↺</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">GitHub sync completed</div>
+      <div class="cds-notif-item__sub">47 items ingested · feat/federated-consensus</div>
+    </div>
+    <div class="cds-notif-item__time">3m</div>
+  </div>
+  <div class="cds-notif-item" onclick="setPage('network',null); closeNotifPanel();">
+    <div class="cds-notif-item__icon cds-notif-item__icon--info">⬡</div>
+    <div class="cds-notif-item__body">
+      <div class="cds-notif-item__title">org_delta joined federation</div>
+      <div class="cds-notif-item__sub">Anonymized · privacy level 3 · pending</div>
+    </div>
+    <div class="cds-notif-item__time">45m</div>
+  </div>
+  <div id="notif-empty-state" class="cds-notif-panel__empty" style="display:none;">
+    <span style="font-size:32px; opacity:0.3;">🔔</span>
+    <span>No new notifications</span>
+  </div>
+</aside>
+
+<!-- ============================================================
    SCAN MODAL
    ============================================================ -->
 <div class="cds-modal-overlay" id="modal-scan" role="dialog" aria-modal="true" aria-labelledby="scan-modal-title">
@@ -4403,6 +4738,93 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 
 
 <!-- ============================================================
+   HELP MODAL (keyboard shortcuts + feature guide)
+   ============================================================ -->
+<div class="cds-modal-overlay" id="modal-help" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+  <div class="cds-modal cds-modal--help">
+    <div class="cds-modal__header">
+      <h2 class="cds-modal__title" id="help-modal-title">Help &amp; Keyboard Shortcuts</h2>
+      <button class="cds-modal__close" onclick="closeModal('help')" aria-label="Close dialog">✕</button>
+    </div>
+    <div class="cds-modal__body" style="padding:0 24px 24px;">
+
+      <div class="cds-help-section" style="margin-top:20px;">
+        <div class="cds-help-section__title">Global Shortcuts</div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Open command palette</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">Ctrl</span><span class="cds-kbd">K</span></span>
+        </div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Close panel / modal</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">Esc</span></span>
+        </div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Navigate command palette</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">↑</span><span class="cds-kbd">↓</span></span>
+        </div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Select command palette item</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">↵</span></span>
+        </div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Open notifications panel</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">Alt</span><span class="cds-kbd">N</span></span>
+        </div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Toggle sidebar</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">Alt</span><span class="cds-kbd">B</span></span>
+        </div>
+      </div>
+
+      <div class="cds-help-section">
+        <div class="cds-help-section__title">Page Navigation</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+          <div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Dashboard</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">D</span></span></div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Evidence Store</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">E</span></span></div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Assurance Cases</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">A</span></span></div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Compliance</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">C</span></span></div>
+          </div>
+          <div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Risk Map</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">R</span></span></div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Blockchain</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">B</span></span></div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Analytics</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">T</span></span></div>
+            <div class="cds-shortcut-row"><span class="cds-shortcut-row__label">Settings</span><span class="cds-shortcut-row__keys"><span class="cds-kbd">G</span><span class="cds-kbd">S</span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cds-help-section">
+        <div class="cds-help-section__title">Actions</div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Run Assurance Scan</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">Alt</span><span class="cds-kbd">S</span></span>
+        </div>
+        <div class="cds-shortcut-row">
+          <span class="cds-shortcut-row__label">Export Report</span>
+          <span class="cds-shortcut-row__keys"><span class="cds-kbd">Alt</span><span class="cds-kbd">E</span></span>
+        </div>
+      </div>
+
+      <div class="cds-help-section" style="margin-bottom:0;">
+        <div class="cds-help-section__title">About CIV-ARCOS</div>
+        <div style="font-size:13px; color:var(--cds-text-secondary); line-height:1.6;">
+          <p>Continuous Integration Verification — Automated Requirements and Compliance Operating System.</p>
+          <p style="margin-top:8px;">Built with IBM Carbon Design System (G100 dark) for the operational console.
+          Exported reports use USWDS for accessibility compliance.</p>
+          <p style="margin-top:8px; font-family:var(--cds-font-mono); font-size:11px; color:var(--cds-text-helper);">
+            Version 1.0 · Build 2026.02 · API: <span id="help-api-endpoint">http://localhost:8080</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="cds-modal__footer">
+      <button class="cds-btn cds-btn--primary" onclick="closeModal('help')" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
    GLOBAL COMMAND PALETTE  (Ctrl+K / ⌘K)
    ============================================================ -->
 <div class="cds-cmdpal-overlay" id="cmdpal-overlay" role="dialog" aria-modal="true" aria-label="Command palette">
@@ -4494,7 +4916,13 @@ function setPage(page, el) {
   document.querySelectorAll('.cds-side-nav__item, .cds-header__menu-item').forEach(n => n.classList.remove('active'));
   const pg = document.getElementById('page-' + page);
   if (pg) pg.classList.add('active');
-  if (el) el.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+  } else {
+    // Auto-highlight matching nav item when called programmatically
+    const navItem = document.querySelector(`.cds-side-nav__item[onclick*="'${page}'"]`);
+    if (navItem) navItem.classList.add('active');
+  }
 }
 
 // === MODALS ===
@@ -4832,6 +5260,130 @@ function applySettings(data) {
 }
 
 loadSettings();
+
+// === SIDEBAR TOGGLE ===
+function toggleSidebar() {
+  const nav  = document.querySelector('.cds-side-nav');
+  const content = document.querySelector('.cds-content');
+  nav.classList.toggle('collapsed');
+  content.classList.toggle('sidebar-collapsed');
+}
+
+// === NOTIFICATION PANEL ===
+let _notifOpen = false;
+let _unreadCount = 5;
+
+function toggleNotifPanel() {
+  if (_notifOpen) closeNotifPanel();
+  else openNotifPanel();
+}
+
+function openNotifPanel() {
+  document.getElementById('notif-panel').classList.add('open');
+  _notifOpen = true;
+}
+
+function closeNotifPanel() {
+  document.getElementById('notif-panel').classList.remove('open');
+  _notifOpen = false;
+}
+
+function markAllRead() {
+  document.querySelectorAll('.cds-notif-item.unread').forEach(el => el.classList.remove('unread'));
+  _unreadCount = 0;
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.style.display = 'none';
+  const count = document.getElementById('notif-count');
+  if (count) count.textContent = '0';
+  toast('All notifications marked as read', '', 'success');
+}
+
+// Close notification panel when clicking outside
+document.addEventListener('click', e => {
+  const panel = document.getElementById('notif-panel');
+  const btn   = document.getElementById('notif-btn');
+  if (_notifOpen && panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+    closeNotifPanel();
+  }
+});
+
+// Increment notification badge when auto-toasts fire (simulating real-time)
+const NOTIFICATION_INCREMENT_PROBABILITY = 0.15;
+setInterval(() => {
+  if (Math.random() < NOTIFICATION_INCREMENT_PROBABILITY && !_notifOpen) {
+    _unreadCount++;
+    const badge = document.getElementById('notif-badge');
+    if (badge) { badge.style.display = ''; badge.textContent = _unreadCount; }
+    const count = document.getElementById('notif-count');
+    if (count) count.textContent = _unreadCount;
+  }
+}, 15000);
+
+// === USER MENU ===
+let _userMenuOpen = false;
+
+function toggleUserMenu() {
+  if (_userMenuOpen) closeUserMenu();
+  else {
+    document.getElementById('user-menu').classList.add('open');
+    _userMenuOpen = true;
+  }
+}
+
+function closeUserMenu() {
+  const menu = document.getElementById('user-menu');
+  if (menu) menu.classList.remove('open');
+  _userMenuOpen = false;
+}
+
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.cds-user-menu-wrap');
+  if (_userMenuOpen && wrap && !wrap.contains(e.target)) closeUserMenu();
+});
+
+// === ADDITIONAL KEYBOARD SHORTCUTS ===
+let _gKeyPressed = false;
+let _gTimer = null;
+
+document.addEventListener('keydown', e => {
+  // Alt+N → notifications
+  if (e.altKey && e.key === 'n') { e.preventDefault(); toggleNotifPanel(); return; }
+  // Alt+B → sidebar toggle
+  if (e.altKey && e.key === 'b') { e.preventDefault(); toggleSidebar(); return; }
+  // Alt+S → scan modal
+  if (e.altKey && e.key === 's') { e.preventDefault(); openModal('scan'); return; }
+  // Alt+E → export report
+  if (e.altKey && e.key === 'e') { e.preventDefault(); openReportModal(); return; }
+
+  // G + letter navigation (only when not in input)
+  const tag = document.activeElement ? document.activeElement.tagName : '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+  if (e.key === 'g' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    _gKeyPressed = true;
+    clearTimeout(_gTimer);
+    _gTimer = setTimeout(() => { _gKeyPressed = false; }, 1200);
+    return;
+  }
+  if (_gKeyPressed && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    _gKeyPressed = false;
+    clearTimeout(_gTimer);
+    const pageMap = {
+      d: 'dashboard', e: 'evidence', a: 'gsn',
+      c: 'compliance', r: 'risk', b: 'blockchain',
+      t: 'analytics',  s: 'settings', n: 'network',
+    };
+    const target = pageMap[e.key.toLowerCase()];
+    if (target) { e.preventDefault(); setPage(target, null); }
+  }
+});
+
+// === UPDATE HELP MODAL API ENDPOINT ===
+(function syncHelpEndpoint() {
+  const saved = JSON.parse(localStorage.getItem('civArcos_settings') || '{}');
+  const ep = document.getElementById('help-api-endpoint');
+  if (ep && saved.apiEndpoint) ep.textContent = saved.apiEndpoint;
+})();
 </script>
 </body>
 </html>
