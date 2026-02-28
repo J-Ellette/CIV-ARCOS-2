@@ -53,3 +53,7 @@ A phase can move from **Reported Complete** to **Verified Complete** only when:
 ## Change Log
 
 - 2026-02-28: Initial canonical status file created.
+- 2026-02-28: UI operational console (`civ-arcos-carbon.html`) significantly expanded:
+  - Implemented: Evidence Store, Assurance Cases (GSN), Code Analysis, Quality Badges, Compliance Frameworks, Analytics/Trends, Settings pages
+  - Added: USWDS-styled Export Report modal (no government banner)
+  - Retained stubs: Risk Map, CIV-SCAP, Federated Network, Blockchain Ledger, Platform Sync, Digital Twin, Multi-Tenant

@@ -1411,6 +1411,235 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 .cds-stub-header { padding: 24px 16px 16px; background: var(--cds-layer-01); border-bottom: 1px solid var(--cds-border-subtle-00); }
 .cds-stub-header h1 { font-family: var(--cds-font-condensed); font-size: 24px; font-weight: 300; color: var(--cds-text-primary); }
 .cds-stub-header p { font-size: 12px; color: var(--cds-text-secondary); margin-top: 4px; font-family: var(--cds-font-mono); }
+
+/* ============================================================
+   FILTER / SEARCH TOOLBAR
+   ============================================================ */
+.cds-filter-bar {
+  background: var(--cds-layer-01);
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cds-search-input {
+  height: 32px;
+  background: var(--cds-layer-02);
+  border: none;
+  border-bottom: 1px solid var(--cds-border-strong-01);
+  color: var(--cds-text-primary);
+  font-family: var(--cds-font-sans);
+  font-size: 13px;
+  padding: 0 12px;
+  outline: none;
+  width: 240px;
+  border-radius: 0;
+}
+.cds-search-input:focus {
+  border-bottom-color: var(--cds-interactive);
+  outline: 2px solid var(--cds-interactive);
+  outline-offset: -2px;
+}
+.cds-filter-bar__sep { width: 1px; height: 16px; background: var(--cds-border-subtle-01); flex-shrink: 0; }
+.cds-filter-bar__label { font-size: 11px; color: var(--cds-text-helper); font-family: var(--cds-font-mono); white-space: nowrap; }
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.cds-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+  background: var(--cds-layer-01);
+  padding: 0 16px;
+}
+.cds-tab {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 14px;
+  color: var(--cds-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  border-top: 2px solid transparent;
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+  user-select: none;
+}
+.cds-tab:hover { background: var(--cds-layer-hover-01); color: var(--cds-text-primary); }
+.cds-tab.active { color: var(--cds-text-primary); border-bottom-color: var(--cds-interactive); }
+
+/* ============================================================
+   ACCORDION
+   ============================================================ */
+.cds-accordion { display: flex; flex-direction: column; }
+.cds-accordion-item { border-bottom: 1px solid var(--cds-border-subtle-00); }
+.cds-accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  background: var(--cds-layer-01);
+  transition: background 0.1s;
+  user-select: none;
+}
+.cds-accordion-header:hover { background: var(--cds-layer-hover-01); }
+.cds-accordion-header__chevron {
+  font-size: 10px;
+  color: var(--cds-text-secondary);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+.cds-accordion-item.open .cds-accordion-header__chevron { transform: rotate(90deg); }
+.cds-accordion-header__title { font-size: 14px; font-weight: 500; color: var(--cds-text-primary); flex: 1; }
+.cds-accordion-header__meta { font-family: var(--cds-font-mono); font-size: 11px; color: var(--cds-text-helper); }
+.cds-accordion-body { display: none; background: var(--cds-background); }
+.cds-accordion-item.open .cds-accordion-body { display: block; }
+
+/* ============================================================
+   BADGE CARDS
+   ============================================================ */
+.cds-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--cds-border-subtle-00);
+}
+.cds-badge-card {
+  background: var(--cds-layer-01);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.1s;
+}
+.cds-badge-card:hover { background: var(--cds-layer-hover-01); }
+.cds-badge-visual {
+  display: inline-flex;
+  align-items: stretch;
+  font-family: var(--cds-font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cds-badge-visual__left { padding: 5px 8px; background: #555; color: #fff; }
+.cds-badge-visual__right { padding: 5px 8px; color: #fff; }
+.cds-badge-visual__right--gold   { background: #b8860b; }
+.cds-badge-visual__right--silver { background: #607d8b; }
+.cds-badge-visual__right--bronze { background: #8d6e63; }
+.cds-badge-visual__right--fail   { background: var(--cds-support-error); }
+.cds-badge-visual__right--info   { background: var(--cds-interactive); }
+.cds-badge-card__name { font-size: 14px; font-weight: 500; color: var(--cds-text-primary); }
+.cds-badge-card__desc { font-size: 12px; color: var(--cds-text-secondary); text-align: center; line-height: 1.5; }
+.cds-badge-card__code {
+  font-family: var(--cds-font-mono);
+  font-size: 10px;
+  color: var(--cds-text-helper);
+  background: var(--cds-layer-02);
+  padding: 6px 10px;
+  width: 100%;
+  word-break: break-all;
+  cursor: pointer;
+  border: 1px solid var(--cds-border-subtle-01);
+  text-align: center;
+  transition: background 0.1s;
+}
+.cds-badge-card__code:hover { background: var(--cds-layer-03); color: var(--cds-text-primary); }
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+.cds-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--cds-layer-01);
+  border-top: 1px solid var(--cds-border-subtle-00);
+}
+.cds-pagination__info { font-family: var(--cds-font-mono); font-size: 12px; color: var(--cds-text-helper); }
+.cds-pagination__controls { display: flex; align-items: center; gap: 2px; }
+.cds-pagination__btn {
+  width: 32px; height: 32px;
+  background: none; border: none;
+  color: var(--cds-text-secondary);
+  font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, color 0.1s;
+  font-family: var(--cds-font-mono);
+}
+.cds-pagination__btn:hover { background: var(--cds-layer-hover-01); color: var(--cds-text-primary); }
+.cds-pagination__btn.active { background: var(--cds-layer-02); color: var(--cds-text-primary); font-weight: 600; }
+.cds-pagination__btn:disabled { color: var(--cds-text-helper); cursor: not-allowed; }
+
+/* ============================================================
+   TOGGLE SWITCH
+   ============================================================ */
+.cds-toggle { position: relative; width: 48px; height: 24px; flex-shrink: 0; }
+.cds-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.cds-toggle__track {
+  position: absolute; inset: 0;
+  background: var(--cds-layer-03);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 12px;
+}
+.cds-toggle input:checked + .cds-toggle__track { background: var(--cds-interactive); }
+.cds-toggle__track::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+.cds-toggle input:checked + .cds-toggle__track::after { transform: translateX(24px); }
+
+/* ============================================================
+   SETTINGS ROWS
+   ============================================================ */
+.cds-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+  background: var(--cds-layer-01);
+}
+.cds-settings-row:last-child { border-bottom: none; }
+.cds-settings-row__label { flex: 1; }
+.cds-settings-row__label-title { font-size: 14px; color: var(--cds-text-primary); font-weight: 500; }
+.cds-settings-row__label-sub { font-size: 12px; color: var(--cds-text-helper); font-family: var(--cds-font-mono); margin-top: 3px; }
+
+/* ============================================================
+   ANALYTICS TREND ROWS
+   ============================================================ */
+.cds-trend-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
+}
+.cds-trend-row:last-child { border-bottom: none; }
+.cds-trend-row__label { font-size: 13px; color: var(--cds-text-primary); width: 160px; flex-shrink: 0; }
+.cds-trend-row__bar { flex: 1; height: 8px; background: var(--cds-layer-02); position: relative; }
+.cds-trend-row__fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--cds-interactive); transition: width 0.8s ease; }
+.cds-trend-row__value { font-family: var(--cds-font-mono); font-size: 13px; font-weight: 600; color: var(--cds-text-primary); width: 48px; text-align: right; flex-shrink: 0; }
+.cds-trend-row__delta { font-family: var(--cds-font-mono); font-size: 11px; width: 72px; text-align: right; flex-shrink: 0; }
+
+/* ============================================================
+   USWDS REPORT MODAL (wide)
+   ============================================================ */
+.cds-modal--report { width: min(900px, 95vw); }
 </style>
 </head>
 <body>
@@ -1565,7 +1794,7 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
           <p class="cds-page-header__subtitle">Real-time assurance · compliance · evidence · risk</p>
         </div>
         <div class="cds-page-header__actions">
-          <button class="cds-btn cds-btn--secondary" type="button">Export Report</button>
+          <button class="cds-btn cds-btn--secondary" type="button" onclick="openReportModal()">Export Report</button>
           <button class="cds-btn cds-btn--primary" type="button" onclick="openModal('scan')">Run Scan</button>
         </div>
       </div>
@@ -2099,21 +2328,859 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
 
   </div><!-- end dashboard page -->
 
-  <!-- STUB PAGES -->
-  <div id="page-evidence"    class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Evidence Store</h1><p>Cryptographically-signed assurance evidence · Wire In Backend</p></div><div class="cds-placeholder">Evidence Store — Backend Integration Required</div></div>
-  <div id="page-gsn"         class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Assurance Cases</h1><p>GSN goal / strategy / evidence structures · Wire In Backend</p></div><div class="cds-placeholder">Assurance Case Builder — Backend Integration Required</div></div>
-  <div id="page-analysis"    class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Code Analysis</h1><p>Static analysis engine · Wire In Backend</p></div><div class="cds-placeholder">Code Analysis Engine — Backend Integration Required</div></div>
-  <div id="page-badges"      class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Quality Badges</h1><p>Bronze / Silver / Gold tier badges · Wire In Backend</p></div><div class="cds-placeholder">Badge Generator — Backend Integration Required</div></div>
-  <div id="page-compliance"  class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Compliance Frameworks</h1><p>ISO 27001 · FedRAMP · SOX · NIST · PCI-DSS</p></div><div class="cds-placeholder">Compliance Engine — Backend Integration Required</div></div>
-  <div id="page-risk"        class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Risk Map</h1><p>Component-level risk scoring · Wire In Backend</p></div><div class="cds-placeholder">Risk Map — Backend Integration Required</div></div>
-  <div id="page-scap"        class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>CIV-SCAP</h1><p>Security Content Automation Protocol scanner · Wire In Backend</p></div><div class="cds-placeholder">SCAP Engine — Backend Integration Required</div></div>
-  <div id="page-network"     class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Federated Network</h1><p>Privacy-preserving cross-organization evidence sharing · Wire In Backend</p></div><div class="cds-placeholder">Federated Network View — Backend Integration Required</div></div>
-  <div id="page-blockchain"  class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Blockchain Ledger</h1><p>Immutable evidence provenance chain · Wire In Backend</p></div><div class="cds-placeholder">Ledger Explorer — Backend Integration Required</div></div>
-  <div id="page-sync"        class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Platform Sync</h1><p>GitHub · GitLab · Azure DevOps · Jenkins · Wire In Backend</p></div><div class="cds-placeholder">Sync Engine — Backend Integration Required</div></div>
-  <div id="page-analytics"   class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Trends &amp; Insights</h1><p>Historical quality and compliance analytics · Wire In Backend</p></div><div class="cds-placeholder">Analytics Engine — Backend Integration Required</div></div>
+  <!-- ======================================================
+       EVIDENCE STORE PAGE
+       ====================================================== -->
+  <div id="page-evidence" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> <span>Evidence Store</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Evidence Store</h1>
+          <p class="cds-page-header__subtitle">Cryptographically-signed · SHA-256 provenance · blockchain-anchored</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">Export CSV</button>
+          <button class="cds-btn cds-btn--primary" type="button">Collect Evidence</button>
+        </div>
+      </div>
+    </div>
+    <div class="cds-stat-row" style="grid-template-columns:repeat(4,1fr);" role="region" aria-label="Evidence metrics">
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent info"></div><div class="cds-stat-tile__label">Total Evidence</div><div class="cds-stat-tile__value" id="ev-total">2,847</div><div class="cds-stat-tile__delta delta-up">↑ 47 today</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent success"></div><div class="cds-stat-tile__label">Verified Items</div><div class="cds-stat-tile__value">2,831</div><div class="cds-stat-tile__delta delta-flat">→ 99.4% integrity</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent warning"></div><div class="cds-stat-tile__label">Pending Review</div><div class="cds-stat-tile__value">16</div><div class="cds-stat-tile__delta delta-down">↓ 2 flagged</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent purple"></div><div class="cds-stat-tile__label">Blockchain Anchors</div><div class="cds-stat-tile__value">241</div><div class="cds-stat-tile__delta delta-up">↑ Block #2,841</div></div>
+    </div>
+    <div class="cds-tabs" role="tablist">
+      <div class="cds-tab active" role="tab" onclick="setEvTab('all',this)">All Evidence</div>
+      <div class="cds-tab" role="tab" onclick="setEvTab('test',this)">Tests</div>
+      <div class="cds-tab" role="tab" onclick="setEvTab('scan',this)">Security Scans</div>
+      <div class="cds-tab" role="tab" onclick="setEvTab('commit',this)">Commits</div>
+      <div class="cds-tab" role="tab" onclick="setEvTab('compliance',this)">Compliance</div>
+      <div class="cds-tab" role="tab" onclick="setEvTab('analysis',this)">Analysis</div>
+    </div>
+    <div class="cds-filter-bar">
+      <input class="cds-search-input" type="search" placeholder="Search evidence ID, description…" aria-label="Search evidence" oninput="filterEvidence(this.value)">
+      <div class="cds-filter-bar__sep"></div>
+      <span class="cds-filter-bar__label">Source:</span>
+      <button class="cds-btn cds-btn--ghost cds-btn--sm" type="button">All</button>
+      <button class="cds-btn cds-btn--ghost cds-btn--sm" type="button">pytest</button>
+      <button class="cds-btn cds-btn--ghost cds-btn--sm" type="button">civ-scap</button>
+      <button class="cds-btn cds-btn--ghost cds-btn--sm" type="button">GitHub</button>
+      <div class="cds-filter-bar__sep"></div>
+      <span class="cds-filter-bar__label" id="ev-filter-count">2,847 items</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="cds-data-table" aria-label="Evidence store">
+        <thead><tr>
+          <th scope="col">Type</th><th scope="col">Evidence ID</th><th scope="col">Description</th>
+          <th scope="col">Source</th><th scope="col">Timestamp</th><th scope="col" class="text-right">Score</th><th scope="col">Chain</th>
+        </tr></thead>
+        <tbody id="ev-table-body">
+          <tr data-type="test">
+            <td><span class="cds-tag cds-tag--test">✓ TEST</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_8a3f2c</td>
+            <td><div style="font-size:13px;">Test Suite — security_scanner.py · 511/511 passed</div><div class="mono text-helper" style="font-size:10px;">SHA256: 8a3f2c9d1e4b7af2c9d1e4b7a…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">pytest</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 14:47 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--high">94</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2841</span></td>
+          </tr>
+          <tr data-type="scan">
+            <td><span class="cds-tag cds-tag--scan">⚠ SCAN</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_1d9b7a</td>
+            <td><div style="font-size:13px;">SAST — SQL Injection · api.py:142 · HIGH</div><div class="mono text-helper" style="font-size:10px;">SHA256: 1d9b7ac8f3e5b2a01d9b7ac8…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">civ-scap</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 14:41 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--low">41</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2841</span></td>
+          </tr>
+          <tr data-type="commit">
+            <td><span class="cds-tag cds-tag--commit">⬡ COMMIT</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_c72e1b</td>
+            <td><div style="font-size:13px;">feat: add federated consensus algorithm</div><div class="mono text-helper" style="font-size:10px;">SHA256: c72e1b9a2d5f3e01c72e1b9a…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">GitHub</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 14:35 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--high">88</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2840</span></td>
+          </tr>
+          <tr data-type="compliance">
+            <td><span class="cds-tag cds-tag--compliance">▣ COMPL</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_4f0a9c</td>
+            <td><div style="font-size:13px;">ISO 27001 — A.12.6.1 Patch Management Assessment</div><div class="mono text-helper" style="font-size:10px;">SHA256: 4f0a9c3e8b1d6f2a4f0a9c3e…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">compliance</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 14:18 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--low">68</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2840</span></td>
+          </tr>
+          <tr data-type="analysis">
+            <td><span class="cds-tag cds-tag--analysis">◬ ANLYS</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_3b2d1e</td>
+            <td><div style="font-size:13px;">Static Analysis — 14 code smells · cyclomatic complexity</div><div class="mono text-helper" style="font-size:10px;">SHA256: 3b2d1ec4a7f9e03b2d1ec4a7…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">analyzer</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 14:04 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--med">72</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2840</span></td>
+          </tr>
+          <tr data-type="test">
+            <td><span class="cds-tag cds-tag--test">✓ TEST</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_7e8c3d</td>
+            <td><div style="font-size:13px;">Coverage Report — 92.4% line · 88.1% branch · SILVER</div><div class="mono text-helper" style="font-size:10px;">SHA256: 7e8c3da1f5b2d07e8c3da1f5…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">coverage.py</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 13:49 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--high">92</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2839</span></td>
+          </tr>
+          <tr data-type="scan">
+            <td><span class="cds-tag cds-tag--scan">⚠ SCAN</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_9a1c4f</td>
+            <td><div style="font-size:13px;">Dependency Audit — 3 outdated packages · 1 CVE flagged</div><div class="mono text-helper" style="font-size:10px;">SHA256: 9a1c4fe7b3d58f09a1c4fe7b…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">civ-scap</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 13:21 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--med">76</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2839</span></td>
+          </tr>
+          <tr data-type="commit">
+            <td><span class="cds-tag cds-tag--commit">⬡ COMMIT</span></td>
+            <td class="mono" style="font-size:12px; color:var(--cds-link-primary);">ev_5f2b8e</td>
+            <td><div style="font-size:13px;">fix: resolve memory leak in event loop handler</div><div class="mono text-helper" style="font-size:10px;">SHA256: 5f2b8e1a9c3d74f5f2b8e1a9…</div></td>
+            <td class="mono text-secondary" style="font-size:12px;">GitHub</td>
+            <td class="mono text-helper" style="font-size:12px;">2026-02-28 12:58 UTC</td>
+            <td class="text-right"><span class="cds-score cds-score--high">91</span></td>
+            <td><span class="cds-tag cds-tag--green">✓ #2838</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cds-pagination">
+      <span class="cds-pagination__info">Showing 1–8 of 2,847 items</span>
+      <div class="cds-pagination__controls">
+        <button class="cds-pagination__btn" disabled aria-label="Previous">‹</button>
+        <button class="cds-pagination__btn active">1</button>
+        <button class="cds-pagination__btn">2</button>
+        <button class="cds-pagination__btn">3</button>
+        <span style="color:var(--cds-text-helper); padding:0 6px; font-family:var(--cds-font-mono); font-size:12px;">…</span>
+        <button class="cds-pagination__btn">356</button>
+        <button class="cds-pagination__btn" aria-label="Next">›</button>
+      </div>
+    </div>
+  </div><!-- end evidence page -->
+
+  <!-- ======================================================
+       ASSURANCE CASES PAGE (GSN)
+       ====================================================== -->
+  <div id="page-gsn" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> Assurance <span class="sep">/</span> <span>Assurance Cases</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Assurance Cases</h1>
+          <p class="cds-page-header__subtitle">Goal Structuring Notation (GSN) · Claim / Strategy / Evidence hierarchies</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">New Case</button>
+          <button class="cds-btn cds-btn--primary" type="button">Export YAML</button>
+        </div>
+      </div>
+    </div>
+    <div class="cds-stat-row" style="grid-template-columns:repeat(4,1fr);" role="region" aria-label="Case metrics">
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent info"></div><div class="cds-stat-tile__label">Active Cases</div><div class="cds-stat-tile__value">3</div><div class="cds-stat-tile__delta delta-flat">→ 1 draft</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent success"></div><div class="cds-stat-tile__label">Goals Satisfied</div><div class="cds-stat-tile__value">18<small> /22</small></div><div class="cds-stat-tile__delta delta-up">↑ 81.8%</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent warning"></div><div class="cds-stat-tile__label">Undischarged</div><div class="cds-stat-tile__value">4</div><div class="cds-stat-tile__delta delta-down">↓ need evidence</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent purple"></div><div class="cds-stat-tile__label">Evidence Links</div><div class="cds-stat-tile__value">47</div><div class="cds-stat-tile__delta delta-up">↑ 3 new</div></div>
+    </div>
+    <div class="cds-grid-wrapper">
+      <!-- Case CASE-001 -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent success"></span>CASE-001 — Security &amp; Quality Assurance</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="cds-tag cds-tag--green">ACTIVE</span>
+            <span class="cds-tile-meta">Last updated 2m ago</span>
+          </div>
+        </div>
+        <div class="cds-gsn" style="padding:16px;">
+          <div class="cds-gsn-goal">
+            <div class="cds-gsn-goal__id">G.001 — GOAL</div>
+            <div class="cds-gsn-goal__text">CIV-ARCOS is sufficiently secure and correct for operational deployment</div>
+          </div>
+          <div class="cds-gsn-children">
+            <div class="cds-gsn-strategy">
+              <div class="cds-gsn-strategy__id">S.001 — STRATEGY</div>
+              <div class="cds-gsn-strategy__text">Argument over security, quality, and compliance dimensions using automated evidence</div>
+            </div>
+            <div class="cds-gsn-children">
+              <div class="cds-gsn-goal">
+                <div class="cds-gsn-goal__id">G.002 — GOAL</div>
+                <div class="cds-gsn-goal__text">No exploitable vulnerabilities present (verified by SAST)</div>
+              </div>
+              <div class="cds-gsn-children">
+                <div class="cds-gsn-evidence">
+                  <div class="cds-gsn-evidence__id">E.001 · ev_1d9b7a</div>
+                  <div class="cds-gsn-evidence__text">SAST scan: 0 critical, 2 high findings — remediation in progress</div>
+                </div>
+                <div class="cds-gsn-evidence">
+                  <div class="cds-gsn-evidence__id">E.002 · ev_8a3f2c</div>
+                  <div class="cds-gsn-evidence__text">511 tests, 100% pass rate — security modules covered</div>
+                </div>
+              </div>
+              <div class="cds-gsn-goal">
+                <div class="cds-gsn-goal__id">G.003 — GOAL</div>
+                <div class="cds-gsn-goal__text">Test coverage meets or exceeds Gold tier (&gt;95%)</div>
+              </div>
+              <div class="cds-gsn-children">
+                <div class="cds-gsn-evidence" style="border-left-color:var(--cds-support-warning); background:var(--cds-support-warning-bg);">
+                  <div class="cds-gsn-evidence__id" style="color:var(--cds-support-warning);">E.003 · ev_7e8c3d — PARTIAL</div>
+                  <div class="cds-gsn-evidence__text">92.4% coverage — Silver tier. Gold threshold (95%) not yet reached.</div>
+                </div>
+              </div>
+              <div class="cds-gsn-goal">
+                <div class="cds-gsn-goal__id">G.004 — GOAL</div>
+                <div class="cds-gsn-goal__text">Compliance with ISO 27001 at or above 80% threshold</div>
+              </div>
+              <div class="cds-gsn-children">
+                <div class="cds-gsn-evidence" style="border-left-color:var(--cds-support-error); background:var(--cds-support-error-bg);">
+                  <div class="cds-gsn-evidence__id" style="color:var(--cds-support-error);">E.004 · ev_4f0a9c — FAIL</div>
+                  <div class="cds-gsn-evidence__text">ISO 27001: 78% overall — A.12.6.1 (68%) below 80% minimum threshold</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Case CASE-002 -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent info"></span>CASE-002 — Federated Trust</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="cds-tag cds-tag--blue">DRAFT</span>
+            <span class="cds-tile-meta">Created today</span>
+          </div>
+        </div>
+        <div class="cds-gsn" style="padding:16px;">
+          <div class="cds-gsn-goal">
+            <div class="cds-gsn-goal__id">G.010 — GOAL</div>
+            <div class="cds-gsn-goal__text">Federated network maintains evidence integrity across all participating nodes</div>
+          </div>
+          <div class="cds-gsn-children">
+            <div class="cds-gsn-strategy">
+              <div class="cds-gsn-strategy__id">S.010 — STRATEGY</div>
+              <div class="cds-gsn-strategy__text">Argument by blockchain ledger validation and consensus protocol</div>
+            </div>
+            <div class="cds-gsn-children">
+              <div class="cds-gsn-goal">
+                <div class="cds-gsn-goal__id">G.011 — GOAL</div>
+                <div class="cds-gsn-goal__text">All blocks validated by ≥ 3 independent nodes</div>
+              </div>
+              <div class="cds-gsn-children">
+                <div class="cds-gsn-evidence">
+                  <div class="cds-gsn-evidence__id">E.010 · ev_c72e1b</div>
+                  <div class="cds-gsn-evidence__text">Block #2,841: 4 nodes confirmed · 12 evidence items · hash validated</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end gsn page -->
+
+  <!-- ======================================================
+       CODE ANALYSIS PAGE
+       ====================================================== -->
+  <div id="page-analysis" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> Assurance <span class="sep">/</span> <span>Code Analysis</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Code Analysis</h1>
+          <p class="cds-page-header__subtitle">Static analysis · SAST · dependency audit · complexity metrics</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">View History</button>
+          <button class="cds-btn cds-btn--primary" type="button" onclick="openModal('scan')">Run Analysis</button>
+        </div>
+      </div>
+    </div>
+    <div class="cds-stat-row" style="grid-template-columns:repeat(5,1fr);" role="region" aria-label="Analysis metrics">
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent error"></div><div class="cds-stat-tile__label">Total Findings</div><div class="cds-stat-tile__value">14</div><div class="cds-stat-tile__delta delta-down">↓ 3 critical</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent warning"></div><div class="cds-stat-tile__label">High Severity</div><div class="cds-stat-tile__value">4</div><div class="cds-stat-tile__delta delta-flat">→ unchanged</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent info"></div><div class="cds-stat-tile__label">Code Smells</div><div class="cds-stat-tile__value">14</div><div class="cds-stat-tile__delta delta-down">↓ complexity</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent success"></div><div class="cds-stat-tile__label">Files Analyzed</div><div class="cds-stat-tile__value">142</div><div class="cds-stat-tile__delta delta-up">↑ all scanned</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent success"></div><div class="cds-stat-tile__label">Test Coverage</div><div class="cds-stat-tile__value">92<small>%</small></div><div class="cds-stat-tile__delta delta-flat">→ Silver tier</div></div>
+    </div>
+    <div class="cds-inline-notification cds-inline-notification--error" role="alert">
+      <span class="cds-inline-notification__icon">✕</span>
+      <div>
+        <div class="cds-inline-notification__title">3 critical findings require immediate attention</div>
+        <div class="cds-inline-notification__subtitle">SQL injection (api.py:142), hardcoded credential (config.py:38), unsafe deserialization (parser.py:91)</div>
+      </div>
+    </div>
+    <div class="cds-grid cds-grid--21">
+      <!-- FINDINGS TABLE -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent error"></span>Security Findings</div>
+          <span class="cds-tile-meta">Last scan: 8m ago · ev_1d9b7a</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="cds-data-table" aria-label="Security findings">
+            <thead><tr>
+              <th scope="col">Severity</th><th scope="col">Rule</th><th scope="col">Location</th><th scope="col">Description</th><th scope="col" class="text-right">CWE</th>
+            </tr></thead>
+            <tbody>
+              <tr style="background:var(--cds-support-error-bg);">
+                <td><span class="cds-tag cds-tag--red">CRIT</span></td>
+                <td class="mono" style="font-size:12px;">sqli-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">api.py:142</td>
+                <td style="font-size:13px;">SQL injection via unsanitized query parameter</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-support-error);">CWE-89</td>
+              </tr>
+              <tr style="background:var(--cds-support-error-bg);">
+                <td><span class="cds-tag cds-tag--red">CRIT</span></td>
+                <td class="mono" style="font-size:12px;">hardcred-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">config.py:38</td>
+                <td style="font-size:13px;">Hardcoded API credential in source code</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-support-error);">CWE-798</td>
+              </tr>
+              <tr style="background:var(--cds-support-error-bg);">
+                <td><span class="cds-tag cds-tag--red">CRIT</span></td>
+                <td class="mono" style="font-size:12px;">deser-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">parser.py:91</td>
+                <td style="font-size:13px;">Unsafe deserialization of user-supplied data</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-support-error);">CWE-502</td>
+              </tr>
+              <tr>
+                <td><span class="cds-tag cds-tag--warm">HIGH</span></td>
+                <td class="mono" style="font-size:12px;">xss-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">web/views.py:57</td>
+                <td style="font-size:13px;">Reflected XSS — unescaped user input in template</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-support-warning);">CWE-79</td>
+              </tr>
+              <tr>
+                <td><span class="cds-tag cds-tag--warm">HIGH</span></td>
+                <td class="mono" style="font-size:12px;">authz-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">api.py:208</td>
+                <td style="font-size:13px;">Missing authorization check on admin endpoint</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-support-warning);">CWE-862</td>
+              </tr>
+              <tr>
+                <td><span class="cds-tag cds-tag--blue">MED</span></td>
+                <td class="mono" style="font-size:12px;">exc-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">collector.py:124</td>
+                <td style="font-size:13px;">Exception exposes internal stack trace to caller</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-interactive);">CWE-209</td>
+              </tr>
+              <tr>
+                <td><span class="cds-tag cds-tag--blue">MED</span></td>
+                <td class="mono" style="font-size:12px;">log-001</td>
+                <td class="mono text-secondary" style="font-size:12px;">api.py:71</td>
+                <td style="font-size:13px;">Sensitive data logged in plaintext</td>
+                <td class="text-right mono" style="font-size:12px; color:var(--cds-interactive);">CWE-532</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- METRICS COLUMN -->
+      <div class="cds-grid-wrapper" style="padding:0; gap:1px;">
+        <!-- Complexity -->
+        <div class="cds-tile">
+          <div class="cds-tile-header">
+            <div class="cds-tile-title"><span class="cds-tile-title-accent warning"></span>Complexity Hotspots</div>
+            <span class="cds-tile-meta">Cyclomatic ≥ 10</span>
+          </div>
+          <div class="cds-risk-list">
+            <div class="cds-risk-row"><span class="cds-risk-row__label">api.py</span><div class="cds-risk-row__track"><div class="cds-risk-row__fill" style="width:88%; background:var(--cds-support-error);"></div></div><span class="cds-risk-row__score" style="color:var(--cds-support-error);">88</span><span class="cds-tag cds-tag--red">HIGH</span></div>
+            <div class="cds-risk-row"><span class="cds-risk-row__label">fed_network.py</span><div class="cds-risk-row__track"><div class="cds-risk-row__fill" style="width:62%; background:var(--cds-support-warning);"></div></div><span class="cds-risk-row__score" style="color:var(--cds-support-warning);">62</span><span class="cds-tag cds-tag--warm">MED</span></div>
+            <div class="cds-risk-row"><span class="cds-risk-row__label">parser.py</span><div class="cds-risk-row__track"><div class="cds-risk-row__fill" style="width:44%; background:var(--cds-support-warning);"></div></div><span class="cds-risk-row__score" style="color:var(--cds-support-warning);">44</span><span class="cds-tag cds-tag--warm">MED</span></div>
+            <div class="cds-risk-row"><span class="cds-risk-row__label">storage/graph.py</span><div class="cds-risk-row__track"><div class="cds-risk-row__fill" style="width:22%; background:var(--cds-interactive);"></div></div><span class="cds-risk-row__score" style="color:var(--cds-interactive);">22</span><span class="cds-tag cds-tag--blue">LOW</span></div>
+          </div>
+        </div>
+        <!-- Coverage breakdown -->
+        <div class="cds-tile">
+          <div class="cds-tile-header">
+            <div class="cds-tile-title"><span class="cds-tile-title-accent success"></span>Coverage Breakdown</div>
+            <span class="cds-tile-meta">ev_7e8c3d</span>
+          </div>
+          <div class="cds-compliance-list">
+            <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">Line coverage</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-success);">92.4%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--high" style="width:92.4%"></div></div></div>
+            <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">Branch coverage</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-success);">88.1%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--high" style="width:88.1%"></div></div></div>
+            <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">Function coverage</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-success);">94.7%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--high" style="width:94.7%"></div></div></div>
+            <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">Statement coverage</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-success);">93.2%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--high" style="width:93.2%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end analysis page -->
+
+  <!-- ======================================================
+       QUALITY BADGES PAGE
+       ====================================================== -->
+  <div id="page-badges" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> Assurance <span class="sep">/</span> <span>Quality Badges</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Quality Badges</h1>
+          <p class="cds-page-header__subtitle">Bronze · Silver · Gold tier badges · SVG · embed anywhere</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">Regenerate All</button>
+          <button class="cds-btn cds-btn--primary" type="button" onclick="openModal('scan')">Run Scan to Update</button>
+        </div>
+      </div>
+    </div>
+    <!-- Current badge status -->
+    <div class="cds-stat-row" style="grid-template-columns:repeat(3,1fr);" role="region" aria-label="Badge status">
+      <div class="cds-stat-tile">
+        <div class="cds-stat-tile__accent success"></div>
+        <div class="cds-stat-tile__label">Coverage Badge</div>
+        <div class="cds-stat-tile__value" style="font-size:20px;">🥈 Silver</div>
+        <div class="cds-stat-tile__delta delta-flat">→ 92.4% · target 95% for Gold</div>
+      </div>
+      <div class="cds-stat-tile">
+        <div class="cds-stat-tile__accent success"></div>
+        <div class="cds-stat-tile__label">Quality Badge</div>
+        <div class="cds-stat-tile__value" style="font-size:20px;">🥈 Silver</div>
+        <div class="cds-stat-tile__delta delta-up">↑ 87/100 · near Gold</div>
+      </div>
+      <div class="cds-stat-tile">
+        <div class="cds-stat-tile__accent warning"></div>
+        <div class="cds-stat-tile__label">Security Badge</div>
+        <div class="cds-stat-tile__value" style="font-size:20px;">🥉 Bronze</div>
+        <div class="cds-stat-tile__delta delta-down">↓ 3 critical open</div>
+      </div>
+    </div>
+    <!-- Badge gallery -->
+    <div style="padding:16px 16px 0;">
+      <div class="cds-tile-title" style="padding:0 0 12px; font-size:11px; text-transform:uppercase; letter-spacing:.32px; color:var(--cds-text-secondary);">
+        <span class="cds-tile-title-accent"></span> Current Badges — Click to copy embed code
+      </div>
+    </div>
+    <div style="padding:0 16px 16px;">
+      <div class="cds-badge-grid">
+        <!-- Coverage Silver -->
+        <div class="cds-badge-card">
+          <div class="cds-badge-visual">
+            <span class="cds-badge-visual__left">coverage</span>
+            <span class="cds-badge-visual__right cds-badge-visual__right--silver">92.4% · Silver</span>
+          </div>
+          <div class="cds-badge-card__name">Test Coverage</div>
+          <div class="cds-badge-card__desc">92.4% line coverage · 88.1% branch<br>Silver tier — 95% required for Gold</div>
+          <div class="cds-badge-card__code" role="button" tabindex="0" onclick="copyBadge(this,'![coverage](https://civ-arcos.io/badge/coverage/jellette/CIV-ARCOS)')" title="Click to copy">
+            ![coverage](https://civ-arcos.io/badge/coverage/jellette/CIV-ARCOS)
+          </div>
+        </div>
+        <!-- Quality Silver -->
+        <div class="cds-badge-card">
+          <div class="cds-badge-visual">
+            <span class="cds-badge-visual__left">quality</span>
+            <span class="cds-badge-visual__right cds-badge-visual__right--silver">87/100 · Silver</span>
+          </div>
+          <div class="cds-badge-card__name">Quality Score</div>
+          <div class="cds-badge-card__desc">87/100 overall quality score<br>Silver tier — 95 required for Gold</div>
+          <div class="cds-badge-card__code" role="button" tabindex="0" onclick="copyBadge(this,'![quality](https://civ-arcos.io/badge/quality/jellette/CIV-ARCOS)')" title="Click to copy">
+            ![quality](https://civ-arcos.io/badge/quality/jellette/CIV-ARCOS)
+          </div>
+        </div>
+        <!-- Security Bronze -->
+        <div class="cds-badge-card">
+          <div class="cds-badge-visual">
+            <span class="cds-badge-visual__left">security</span>
+            <span class="cds-badge-visual__right cds-badge-visual__right--bronze">Bronze</span>
+          </div>
+          <div class="cds-badge-card__name">Security Rating</div>
+          <div class="cds-badge-card__desc">3 critical / 4 high open findings<br>Bronze — resolve criticals for Silver</div>
+          <div class="cds-badge-card__code" role="button" tabindex="0" onclick="copyBadge(this,'![security](https://civ-arcos.io/badge/security/jellette/CIV-ARCOS)')" title="Click to copy">
+            ![security](https://civ-arcos.io/badge/security/jellette/CIV-ARCOS)
+          </div>
+        </div>
+        <!-- Compliance Bronze -->
+        <div class="cds-badge-card">
+          <div class="cds-badge-visual">
+            <span class="cds-badge-visual__left">compliance</span>
+            <span class="cds-badge-visual__right cds-badge-visual__right--bronze">78% · Bronze</span>
+          </div>
+          <div class="cds-badge-card__name">Compliance</div>
+          <div class="cds-badge-card__desc">78% average across 5 frameworks<br>Bronze — 85% required for Silver</div>
+          <div class="cds-badge-card__code" role="button" tabindex="0" onclick="copyBadge(this,'![compliance](https://civ-arcos.io/badge/compliance/jellette/CIV-ARCOS)')" title="Click to copy">
+            ![compliance](https://civ-arcos.io/badge/compliance/jellette/CIV-ARCOS)
+          </div>
+        </div>
+        <!-- Blockchain Gold (example of achieved Gold) -->
+        <div class="cds-badge-card">
+          <div class="cds-badge-visual">
+            <span class="cds-badge-visual__left">ledger</span>
+            <span class="cds-badge-visual__right cds-badge-visual__right--gold">verified · Gold</span>
+          </div>
+          <div class="cds-badge-card__name">Blockchain Verified</div>
+          <div class="cds-badge-card__desc">All evidence blockchain-anchored<br>Gold tier — 100% provenance</div>
+          <div class="cds-badge-card__code" role="button" tabindex="0" onclick="copyBadge(this,'![ledger](https://civ-arcos.io/badge/ledger/jellette/CIV-ARCOS)')" title="Click to copy">
+            ![ledger](https://civ-arcos.io/badge/ledger/jellette/CIV-ARCOS)
+          </div>
+        </div>
+        <!-- CIV-ARCOS info badge -->
+        <div class="cds-badge-card">
+          <div class="cds-badge-visual">
+            <span class="cds-badge-visual__left">civ-arcos</span>
+            <span class="cds-badge-visual__right cds-badge-visual__right--info">assurance</span>
+          </div>
+          <div class="cds-badge-card__name">CIV-ARCOS Monitored</div>
+          <div class="cds-badge-card__desc">Repository monitored by CIV-ARCOS<br>Continuous assurance active</div>
+          <div class="cds-badge-card__code" role="button" tabindex="0" onclick="copyBadge(this,'![civ-arcos](https://civ-arcos.io/badge/monitored/jellette/CIV-ARCOS)')" title="Click to copy">
+            ![civ-arcos](https://civ-arcos.io/badge/monitored/jellette/CIV-ARCOS)
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Tier reference table -->
+    <div style="padding:0 16px 16px;">
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent"></span>Tier Thresholds</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="cds-data-table" aria-label="Badge tier thresholds">
+            <thead><tr><th scope="col">Badge Type</th><th scope="col">Bronze</th><th scope="col">Silver</th><th scope="col">Gold</th><th scope="col">Current</th></tr></thead>
+            <tbody>
+              <tr><td>Test Coverage</td><td class="mono" style="color:#8d6e63;">&gt; 60%</td><td class="mono" style="color:#607d8b;">&gt; 80%</td><td class="mono" style="color:#b8860b;">&gt; 95%</td><td><span class="cds-tag cds-tag--gray">92.4% · Silver</span></td></tr>
+              <tr><td>Quality Score</td><td class="mono" style="color:#8d6e63;">&gt; 60</td><td class="mono" style="color:#607d8b;">&gt; 80</td><td class="mono" style="color:#b8860b;">&gt; 95</td><td><span class="cds-tag cds-tag--gray">87 · Silver</span></td></tr>
+              <tr><td>Security</td><td class="mono" style="color:#8d6e63;">0 critical</td><td class="mono" style="color:#607d8b;">0 high</td><td class="mono" style="color:#b8860b;">0 medium</td><td><span class="cds-tag cds-tag--red">3 critical · Bronze</span></td></tr>
+              <tr><td>Compliance</td><td class="mono" style="color:#8d6e63;">&gt; 60%</td><td class="mono" style="color:#607d8b;">&gt; 85%</td><td class="mono" style="color:#b8860b;">&gt; 95%</td><td><span class="cds-tag cds-tag--gray">78% · Bronze</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div><!-- end badges page -->
+
+  <!-- ======================================================
+       COMPLIANCE FRAMEWORKS PAGE
+       ====================================================== -->
+  <div id="page-compliance" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> Compliance <span class="sep">/</span> <span>Frameworks</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Compliance Frameworks</h1>
+          <p class="cds-page-header__subtitle">ISO 27001 · FedRAMP · SOX ITGC · NIST 800-53 · PCI-DSS</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">Schedule Assessment</button>
+          <button class="cds-btn cds-btn--primary" type="button" onclick="openModal('scan')">Run Assessment</button>
+        </div>
+      </div>
+    </div>
+    <div class="cds-stat-row" style="grid-template-columns:repeat(5,1fr);" role="region" aria-label="Compliance metrics">
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent info"></div><div class="cds-stat-tile__label">Frameworks Active</div><div class="cds-stat-tile__value">5</div><div class="cds-stat-tile__delta delta-flat">→ all monitored</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent success"></div><div class="cds-stat-tile__label">Controls Passing</div><div class="cds-stat-tile__value">155<small> /188</small></div><div class="cds-stat-tile__delta delta-up">↑ 82.4%</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent warning"></div><div class="cds-stat-tile__label">Controls Failing</div><div class="cds-stat-tile__value">33</div><div class="cds-stat-tile__delta delta-down">↓ 3 critical gaps</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent purple"></div><div class="cds-stat-tile__label">Avg Compliance</div><div class="cds-stat-tile__value">78<small>%</small></div><div class="cds-stat-tile__delta delta-up">↑ +4% MTD</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent error"></div><div class="cds-stat-tile__label">Critical Gaps</div><div class="cds-stat-tile__value">3</div><div class="cds-stat-tile__delta delta-down">↓ requires action</div></div>
+    </div>
+    <div class="cds-inline-notification" role="alert">
+      <span class="cds-inline-notification__icon">⚠</span>
+      <div>
+        <div class="cds-inline-notification__title">ISO 27001 A.12.6.1 below minimum threshold (68% of 80% required)</div>
+        <div class="cds-inline-notification__subtitle">Patch management controls require remediation. Last assessed: 31 minutes ago.</div>
+      </div>
+    </div>
+    <!-- Accordion frameworks -->
+    <div style="padding:16px;">
+      <div class="cds-accordion">
+        <!-- ISO 27001 -->
+        <div class="cds-accordion-item open">
+          <div class="cds-accordion-header" onclick="toggleAccordion(this)">
+            <span class="cds-accordion-header__chevron">▶</span>
+            <span class="cds-accordion-header__title">ISO/IEC 27001:2022 — Information Security Management</span>
+            <span class="cds-tag cds-tag--warm" style="margin-right:8px;">78%</span>
+            <span class="cds-tag cds-tag--red" style="margin-right:16px;">3 FAIL</span>
+            <span class="cds-accordion-header__meta">Last assessed 31m ago · 14/18 controls</span>
+          </div>
+          <div class="cds-accordion-body">
+            <div style="overflow-x:auto;">
+              <table class="cds-data-table" aria-label="ISO 27001 controls">
+                <thead><tr><th scope="col">Control</th><th scope="col">Domain</th><th scope="col">Description</th><th scope="col">Evidence</th><th scope="col" class="text-right">Status</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono" style="font-size:12px;">A.8.1.1</td><td><span class="cds-tag cds-tag--blue">Asset Mgmt</span></td><td style="font-size:13px;">Inventory of information assets maintained and accurate</td><td class="mono text-helper" style="font-size:11px;">ev_7e8c3d</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">A.9.2.1</td><td><span class="cds-tag cds-tag--purple">Access Ctrl</span></td><td style="font-size:13px;">User access management — registration and de-registration</td><td class="mono text-helper" style="font-size:11px;">ev_4f0a9c</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr style="background:var(--cds-support-error-bg);"><td class="mono" style="font-size:12px;">A.12.6.1</td><td><span class="cds-tag cds-tag--warm">Operations</span></td><td style="font-size:13px;">Technical vulnerability management — patch management process</td><td class="mono text-helper" style="font-size:11px;">ev_1d9b7a</td><td class="text-right"><span class="cds-tag cds-tag--red">FAIL</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">A.12.1.1</td><td><span class="cds-tag cds-tag--warm">Operations</span></td><td style="font-size:13px;">Documented operational procedures in place</td><td class="mono text-helper" style="font-size:11px;">ev_3b2d1e</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">A.14.2.1</td><td><span class="cds-tag cds-tag--teal">Dev</span></td><td style="font-size:13px;">Secure development policy and coding standards</td><td class="mono text-helper" style="font-size:11px;">ev_8a3f2c</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- FedRAMP -->
+        <div class="cds-accordion-item">
+          <div class="cds-accordion-header" onclick="toggleAccordion(this)">
+            <span class="cds-accordion-header__chevron">▶</span>
+            <span class="cds-accordion-header__title">FedRAMP Moderate Baseline — Federal Risk and Authorization Program</span>
+            <span class="cds-tag cds-tag--green" style="margin-right:8px;">91%</span>
+            <span class="cds-tag cds-tag--green" style="margin-right:16px;">82/90</span>
+            <span class="cds-accordion-header__meta">Last assessed 2h ago</span>
+          </div>
+          <div class="cds-accordion-body">
+            <div style="overflow-x:auto;">
+              <table class="cds-data-table" aria-label="FedRAMP controls">
+                <thead><tr><th scope="col">Control</th><th scope="col">Family</th><th scope="col">Description</th><th scope="col">Evidence</th><th scope="col" class="text-right">Status</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono" style="font-size:12px;">AC-2</td><td><span class="cds-tag cds-tag--purple">Access Ctrl</span></td><td style="font-size:13px;">Account management — user account lifecycle controls</td><td class="mono text-helper" style="font-size:11px;">ev_4f0a9c</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">AU-2</td><td><span class="cds-tag cds-tag--teal">Audit</span></td><td style="font-size:13px;">Event logging — audit events and retention policy</td><td class="mono text-helper" style="font-size:11px;">ev_c72e1b</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">CM-6</td><td><span class="cds-tag cds-tag--blue">Config</span></td><td style="font-size:13px;">Configuration settings — security configuration baseline</td><td class="mono text-helper" style="font-size:11px;">ev_3b2d1e</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr style="background:var(--cds-support-warning-bg);"><td class="mono" style="font-size:12px;">SI-2</td><td><span class="cds-tag cds-tag--warm">Integrity</span></td><td style="font-size:13px;">Flaw remediation — patch management cadence</td><td class="mono text-helper" style="font-size:11px;">ev_1d9b7a</td><td class="text-right"><span class="cds-tag cds-tag--warm">PART</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">IA-5</td><td><span class="cds-tag cds-tag--purple">Identification</span></td><td style="font-size:13px;">Authenticator management — credential policies</td><td class="mono text-helper" style="font-size:11px;">ev_9a1c4f</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- SOX ITGC -->
+        <div class="cds-accordion-item">
+          <div class="cds-accordion-header" onclick="toggleAccordion(this)">
+            <span class="cds-accordion-header__chevron">▶</span>
+            <span class="cds-accordion-header__title">SOX ITGC — Sarbanes-Oxley IT General Controls</span>
+            <span class="cds-tag cds-tag--green" style="margin-right:8px;">84%</span>
+            <span class="cds-tag cds-tag--blue" style="margin-right:16px;">17/20</span>
+            <span class="cds-accordion-header__meta">Last assessed 4h ago</span>
+          </div>
+          <div class="cds-accordion-body">
+            <div style="overflow-x:auto;">
+              <table class="cds-data-table" aria-label="SOX ITGC controls">
+                <thead><tr><th scope="col">Control</th><th scope="col">Area</th><th scope="col">Description</th><th scope="col">Evidence</th><th scope="col" class="text-right">Status</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono" style="font-size:12px;">ITGC-1</td><td><span class="cds-tag cds-tag--purple">Access</span></td><td style="font-size:13px;">Logical access provisioning and de-provisioning controls</td><td class="mono text-helper" style="font-size:11px;">ev_4f0a9c</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">ITGC-5</td><td><span class="cds-tag cds-tag--blue">Change</span></td><td style="font-size:13px;">Change management — code review and approval process</td><td class="mono text-helper" style="font-size:11px;">ev_c72e1b</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr style="background:var(--cds-support-error-bg);"><td class="mono" style="font-size:12px;">ITGC-9</td><td><span class="cds-tag cds-tag--warm">Security</span></td><td style="font-size:13px;">Vulnerability management and patch cadence</td><td class="mono text-helper" style="font-size:11px;">ev_1d9b7a</td><td class="text-right"><span class="cds-tag cds-tag--red">FAIL</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- NIST 800-53 -->
+        <div class="cds-accordion-item">
+          <div class="cds-accordion-header" onclick="toggleAccordion(this)">
+            <span class="cds-accordion-header__chevron">▶</span>
+            <span class="cds-accordion-header__title">NIST SP 800-53 Rev 5 — Security and Privacy Controls</span>
+            <span class="cds-tag cds-tag--warm" style="margin-right:8px;">67%</span>
+            <span class="cds-tag cds-tag--red" style="margin-right:16px;">17 FAIL</span>
+            <span class="cds-accordion-header__meta">Last assessed 6h ago · 34/51 controls</span>
+          </div>
+          <div class="cds-accordion-body">
+            <div class="cds-inline-notification cds-inline-notification--info" role="status" style="margin:0;">
+              <span class="cds-inline-notification__icon">ℹ</span>
+              <div><div class="cds-inline-notification__subtitle">34 of 51 selected controls passing. 17 controls require attention. Priority: SI-2, CM-7, AC-17, RA-5.</div></div>
+            </div>
+            <div class="cds-compliance-list">
+              <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">AC — Access Control</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-success);">82%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--high" style="width:82%"></div></div></div>
+              <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">SI — System Integrity</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-error);">48%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--low" style="width:48%"></div></div></div>
+              <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">CM — Config Mgmt</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-warning);">67%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--med" style="width:67%"></div></div></div>
+              <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">AU — Audit &amp; Accountability</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-success);">91%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--high" style="width:91%"></div></div></div>
+              <div><div class="cds-compliance-item__row"><span class="cds-compliance-item__name">RA — Risk Assessment</span><span class="cds-compliance-item__pct" style="color:var(--cds-support-warning);">60%</span></div><div class="cds-progress"><div class="cds-progress__fill cds-progress__fill--med" style="width:60%"></div></div></div>
+            </div>
+          </div>
+        </div>
+        <!-- PCI-DSS -->
+        <div class="cds-accordion-item">
+          <div class="cds-accordion-header" onclick="toggleAccordion(this)">
+            <span class="cds-accordion-header__chevron">▶</span>
+            <span class="cds-accordion-header__title">PCI-DSS v4.0 — Payment Card Industry Data Security Standard</span>
+            <span class="cds-tag cds-tag--green" style="margin-right:8px;">89%</span>
+            <span class="cds-tag cds-tag--blue" style="margin-right:16px;">8/9</span>
+            <span class="cds-accordion-header__meta">Last assessed 8h ago</span>
+          </div>
+          <div class="cds-accordion-body">
+            <div style="overflow-x:auto;">
+              <table class="cds-data-table" aria-label="PCI-DSS requirements">
+                <thead><tr><th scope="col">Req</th><th scope="col">Title</th><th scope="col">Description</th><th scope="col">Evidence</th><th scope="col" class="text-right">Status</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono" style="font-size:12px;">Req 6</td><td style="font-size:12px; font-weight:600;">Secure Systems</td><td style="font-size:13px;">Develop and maintain secure systems and software</td><td class="mono text-helper" style="font-size:11px;">ev_8a3f2c</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">Req 7</td><td style="font-size:12px; font-weight:600;">Access Control</td><td style="font-size:13px;">Restrict access to system components and cardholder data</td><td class="mono text-helper" style="font-size:11px;">ev_4f0a9c</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr><td class="mono" style="font-size:12px;">Req 10</td><td style="font-size:12px; font-weight:600;">Logging</td><td style="font-size:13px;">Log and monitor all access to system components and cardholder data</td><td class="mono text-helper" style="font-size:11px;">ev_c72e1b</td><td class="text-right"><span class="cds-tag cds-tag--green">PASS</span></td></tr>
+                  <tr style="background:var(--cds-support-warning-bg);"><td class="mono" style="font-size:12px;">Req 11</td><td style="font-size:12px; font-weight:600;">Security Testing</td><td style="font-size:13px;">Test security of systems and networks regularly</td><td class="mono text-helper" style="font-size:11px;">ev_1d9b7a</td><td class="text-right"><span class="cds-tag cds-tag--warm">PART</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end compliance page -->
+
+  <!-- RISK, SCAP, NETWORK, BLOCKCHAIN, SYNC stubs (retained for future build-out) -->
+  <div id="page-risk"       class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Risk Map</h1><p>Component-level risk scoring · Wire In Backend</p></div><div class="cds-placeholder">Risk Map — Backend Integration Required</div></div>
+  <div id="page-scap"       class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>CIV-SCAP</h1><p>Security Content Automation Protocol scanner · Wire In Backend</p></div><div class="cds-placeholder">SCAP Engine — Backend Integration Required</div></div>
+  <div id="page-network"    class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Federated Network</h1><p>Privacy-preserving cross-organization evidence sharing · Wire In Backend</p></div><div class="cds-placeholder">Federated Network View — Backend Integration Required</div></div>
+  <div id="page-blockchain" class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Blockchain Ledger</h1><p>Immutable evidence provenance chain · Wire In Backend</p></div><div class="cds-placeholder">Ledger Explorer — Backend Integration Required</div></div>
+  <div id="page-sync"       class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Platform Sync</h1><p>GitHub · GitLab · Azure DevOps · Jenkins · Wire In Backend</p></div><div class="cds-placeholder">Sync Engine — Backend Integration Required</div></div>
+
+  <!-- ======================================================
+       ANALYTICS / TRENDS PAGE
+       ====================================================== -->
+  <div id="page-analytics" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> Analytics <span class="sep">/</span> <span>Trends &amp; Insights</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Trends &amp; Insights</h1>
+          <p class="cds-page-header__subtitle">30-day rolling metrics · quality · compliance · security posture</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">Last 90 days</button>
+          <button class="cds-btn cds-btn--primary" type="button" onclick="openReportModal()">Export Report</button>
+        </div>
+      </div>
+    </div>
+    <div class="cds-stat-row" style="grid-template-columns:repeat(4,1fr);" role="region" aria-label="Trend metrics">
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent success"></div><div class="cds-stat-tile__label">Quality Trend</div><div class="cds-stat-tile__value">+2.3</div><div class="cds-stat-tile__delta delta-up">↑ 84.7 → 87.0 this week</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent warning"></div><div class="cds-stat-tile__label">Compliance Trend</div><div class="cds-stat-tile__value">+4<small>%</small></div><div class="cds-stat-tile__delta delta-up">↑ 74% → 78% MTD</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent error"></div><div class="cds-stat-tile__label">Findings Trend</div><div class="cds-stat-tile__value">−8</div><div class="cds-stat-tile__delta delta-up">↑ 22 → 14 this week</div></div>
+      <div class="cds-stat-tile"><div class="cds-stat-tile__accent info"></div><div class="cds-stat-tile__label">Evidence Velocity</div><div class="cds-stat-tile__value">47<small>/day</small></div><div class="cds-stat-tile__delta delta-up">↑ +12 vs last week</div></div>
+    </div>
+    <div class="cds-grid cds-grid--2col">
+      <!-- Quality trends -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent success"></span>Quality Metrics — 30 Days</div>
+          <span class="cds-tile-meta">Daily rollup</span>
+        </div>
+        <div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">Quality Score</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:87%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">87</span><span class="cds-trend-row__delta delta-up">+2.3</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">Test Coverage</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:92.4%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">92.4%</span><span class="cds-trend-row__delta delta-flat">→ stable</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">Test Pass Rate</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:100%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">100%</span><span class="cds-trend-row__delta delta-up">+0.4%</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">Code Smells</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:14%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">14</span><span class="cds-trend-row__delta delta-down">−3</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">Avg Complexity</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:42%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">8.4</span><span class="cds-trend-row__delta delta-down">−1.2</span></div>
+        </div>
+      </div>
+      <!-- Compliance trends -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent warning"></span>Compliance Trends — 30 Days</div>
+          <span class="cds-tile-meta">Per framework</span>
+        </div>
+        <div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">ISO 27001</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:78%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">78%</span><span class="cds-trend-row__delta delta-up">+2%</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">FedRAMP</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:91%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">91%</span><span class="cds-trend-row__delta delta-up">+1%</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">SOX ITGC</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:84%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">84%</span><span class="cds-trend-row__delta delta-up">+5%</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">NIST 800-53</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:67%; background:var(--cds-support-warning);"></div></div><span class="cds-trend-row__value">67%</span><span class="cds-trend-row__delta delta-up">+8%</span></div>
+          <div class="cds-trend-row"><span class="cds-trend-row__label">PCI-DSS</span><div class="cds-trend-row__bar"><div class="cds-trend-row__fill" style="width:89%; background:var(--cds-support-success);"></div></div><span class="cds-trend-row__value">89%</span><span class="cds-trend-row__delta delta-flat">→ stable</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cds-grid cds-grid--2col">
+      <!-- Security trends -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent error"></span>Security Findings — 30-Day History</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="cds-data-table" aria-label="Security trend history">
+            <thead><tr><th scope="col">Period</th><th scope="col">Critical</th><th scope="col">High</th><th scope="col">Medium</th><th scope="col">Total</th><th scope="col" class="text-right">Score</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="font-size:12px;">This week</td><td><span class="cds-score cds-score--low">3</span></td><td><span class="cds-score cds-score--med">4</span></td><td>7</td><td>14</td><td class="text-right"><span class="cds-score cds-score--low">41</span></td></tr>
+              <tr><td class="mono" style="font-size:12px;">Last week</td><td><span class="cds-score cds-score--low">5</span></td><td><span class="cds-score cds-score--med">6</span></td><td>11</td><td>22</td><td class="text-right"><span class="cds-score cds-score--low">29</span></td></tr>
+              <tr><td class="mono" style="font-size:12px;">-2 weeks</td><td><span class="cds-score cds-score--low">7</span></td><td><span class="cds-score cds-score--med">8</span></td><td>14</td><td>29</td><td class="text-right"><span class="cds-score cds-score--low">21</span></td></tr>
+              <tr><td class="mono" style="font-size:12px;">-3 weeks</td><td><span class="cds-score cds-score--low">8</span></td><td><span class="cds-score cds-score--med">9</span></td><td>17</td><td>34</td><td class="text-right"><span class="cds-score cds-score--low">16</span></td></tr>
+              <tr><td class="mono" style="font-size:12px;">-4 weeks</td><td><span class="cds-score cds-score--low">11</span></td><td><span class="cds-score cds-score--med">12</span></td><td>19</td><td>42</td><td class="text-right"><span class="cds-score cds-score--low">8</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Evidence velocity -->
+      <div class="cds-tile">
+        <div class="cds-tile-header">
+          <div class="cds-tile-title"><span class="cds-tile-title-accent info"></span>Evidence Velocity — Weekly</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="cds-data-table" aria-label="Evidence velocity">
+            <thead><tr><th scope="col">Week</th><th scope="col">Tests</th><th scope="col">Scans</th><th scope="col">Commits</th><th scope="col">Compliance</th><th scope="col" class="text-right">Total</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="font-size:12px;">This week</td><td>142</td><td>89</td><td>73</td><td>25</td><td class="text-right mono" style="color:var(--cds-support-success);">329</td></tr>
+              <tr><td class="mono" style="font-size:12px;">Last week</td><td>128</td><td>71</td><td>61</td><td>17</td><td class="text-right mono">277</td></tr>
+              <tr><td class="mono" style="font-size:12px;">-2 weeks</td><td>119</td><td>65</td><td>55</td><td>21</td><td class="text-right mono">260</td></tr>
+              <tr><td class="mono" style="font-size:12px;">-3 weeks</td><td>104</td><td>58</td><td>48</td><td>14</td><td class="text-right mono">224</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div><!-- end analytics page -->
+
+  <!-- DIGITAL TWIN stub -->
   <div id="page-digitaltwin" class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Digital Twin</h1><p>System simulation and what-if analysis · Wire In Backend</p></div><div class="cds-placeholder">Digital Twin Connector — Backend Integration Required</div></div>
   <div id="page-tenants"     class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Multi-Tenant</h1><p>Organization and namespace management · Wire In Backend</p></div><div class="cds-placeholder">Tenant Manager — Backend Integration Required</div></div>
-  <div id="page-settings"    class="cds-page cds-stub-page"><div class="cds-stub-header"><h1>Settings</h1><p>System configuration and preferences · Wire In Backend</p></div><div class="cds-placeholder">Configuration Panel — Backend Integration Required</div></div>
+
+  <!-- ======================================================
+       SETTINGS PAGE
+       ====================================================== -->
+  <div id="page-settings" class="cds-page">
+    <div class="cds-breadcrumb-bar">CIV-ARCOS <span class="sep">/</span> System <span class="sep">/</span> <span>Settings</span></div>
+    <div class="cds-page-header">
+      <div class="cds-page-header__inner">
+        <div>
+          <h1 class="cds-page-header__title">Settings</h1>
+          <p class="cds-page-header__subtitle">Platform configuration · integrations · notifications · access</p>
+        </div>
+        <div class="cds-page-header__actions">
+          <button class="cds-btn cds-btn--secondary" type="button">Discard</button>
+          <button class="cds-btn cds-btn--primary" type="button" onclick="toast('Settings saved','Configuration updated successfully','success')">Save Changes</button>
+        </div>
+      </div>
+    </div>
+    <div class="cds-grid cds-grid--2col" style="padding:16px; background:var(--cds-background);">
+      <!-- General -->
+      <div>
+        <div class="cds-tile">
+          <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent"></span>General</div></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Organisation Name</div><div class="cds-settings-row__label-sub">Displayed in reports and evidence metadata</div></div><input class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="J. Ellette / CIV-ARCOS" aria-label="Organisation name"></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Default Repository</div><div class="cds-settings-row__label-sub">Primary evidence collection target</div></div><input class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="jellette/CIV-ARCOS" aria-label="Default repository"></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">API Endpoint</div><div class="cds-settings-row__label-sub">CIV-ARCOS backend API base URL</div></div><input class="cds-text-input" style="width:200px; flex-shrink:0;" type="text" value="http://localhost:8080" aria-label="API endpoint"></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Dark Theme</div><div class="cds-settings-row__label-sub">IBM Carbon G100 (current)</div></div><label class="cds-toggle" aria-label="Dark theme toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Live Evidence Feed</div><div class="cds-settings-row__label-sub">Stream real-time events to dashboard</div></div><label class="cds-toggle" aria-label="Live feed toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+        </div>
+        <!-- Notifications -->
+        <div class="cds-tile" style="margin-top:1px;">
+          <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent warning"></span>Notifications</div></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Critical Findings Alert</div><div class="cds-settings-row__label-sub">Notify immediately on critical severity</div></div><label class="cds-toggle" aria-label="Critical findings toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Compliance Threshold Alerts</div><div class="cds-settings-row__label-sub">Alert when any framework drops below 80%</div></div><label class="cds-toggle" aria-label="Compliance alerts toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Scan Completion Toasts</div><div class="cds-settings-row__label-sub">Show in-app toast on scan finish</div></div><label class="cds-toggle" aria-label="Scan toasts toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Block Validation Events</div><div class="cds-settings-row__label-sub">Notify on blockchain block confirmation</div></div><label class="cds-toggle" aria-label="Block events toggle"><input type="checkbox"><span class="cds-toggle__track"></span></label></div>
+        </div>
+      </div>
+      <!-- Integrations -->
+      <div>
+        <div class="cds-tile">
+          <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent info"></span>Platform Integrations</div></div>
+          <div class="cds-settings-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;"><span class="cds-settings-row__label-title">GitHub</span><div style="display:flex; align-items:center; gap:8px;"><span class="cds-tag cds-tag--green">Connected</span><label class="cds-toggle" aria-label="GitHub toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div></div>
+            <input class="cds-text-input" type="password" value="ghp_••••••••••••••••••••" aria-label="GitHub token" placeholder="GitHub personal access token">
+          </div>
+          <div class="cds-settings-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;"><span class="cds-settings-row__label-title">GitLab CI</span><div style="display:flex; align-items:center; gap:8px;"><span class="cds-tag cds-tag--warm">Syncing</span><label class="cds-toggle" aria-label="GitLab toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div></div>
+            <input class="cds-text-input" type="text" value="https://gitlab.com" aria-label="GitLab URL" placeholder="GitLab instance URL">
+          </div>
+          <div class="cds-settings-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;"><span class="cds-settings-row__label-title">Azure DevOps</span><div style="display:flex; align-items:center; gap:8px;"><span class="cds-tag cds-tag--green">Connected</span><label class="cds-toggle" aria-label="Azure toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div></div>
+            <input class="cds-text-input" type="text" value="dev.azure.com/civ-arcos" aria-label="Azure DevOps org" placeholder="Azure DevOps organisation URL">
+          </div>
+          <div class="cds-settings-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;"><span class="cds-settings-row__label-title">CircleCI</span><div style="display:flex; align-items:center; gap:8px;"><span class="cds-tag cds-tag--gray">Not configured</span><label class="cds-toggle" aria-label="CircleCI toggle"><input type="checkbox"><span class="cds-toggle__track"></span></label></div></div>
+            <input class="cds-text-input" type="text" placeholder="CircleCI API token" aria-label="CircleCI token">
+          </div>
+        </div>
+        <!-- Scan settings -->
+        <div class="cds-tile" style="margin-top:1px;">
+          <div class="cds-tile-header"><div class="cds-tile-title"><span class="cds-tile-title-accent purple"></span>Scan Configuration</div></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Auto-scan on push</div><div class="cds-settings-row__label-sub">Trigger evidence collection on every push event</div></div><label class="cds-toggle" aria-label="Auto-scan toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">SAST Security Scanning</div><div class="cds-settings-row__label-sub">Run CIV-SCAP on each scan cycle</div></div><label class="cds-toggle" aria-label="SAST toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Scheduled Assessments</div><div class="cds-settings-row__label-sub">Full compliance assessment frequency</div></div><select class="cds-select" style="width:160px; flex-shrink:0;" aria-label="Schedule frequency"><option>Daily</option><option>Weekly</option><option>On demand</option></select></div>
+          <div class="cds-settings-row"><div class="cds-settings-row__label"><div class="cds-settings-row__label-title">Blockchain Anchoring</div><div class="cds-settings-row__label-sub">Auto-commit evidence packages to ledger</div></div><label class="cds-toggle" aria-label="Blockchain toggle"><input type="checkbox" checked><span class="cds-toggle__track"></span></label></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end settings page -->
 
 </main>
 
@@ -2219,7 +3286,113 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
   </div>
 </div>
 
-<!-- TOAST STACK -->
+<!-- ============================================================
+   USWDS EXPORT REPORT MODAL
+   Uses USWDS design language for exported/public-facing reports.
+   Per project spec: no "An official website of the United States
+   government" banner — this is not a government website.
+   ============================================================ -->
+<div class="cds-modal-overlay" id="modal-report" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+  <div class="cds-modal cds-modal--report">
+    <div class="cds-modal__header">
+      <h2 class="cds-modal__title" id="report-modal-title">Export Assurance Report</h2>
+      <button class="cds-modal__close" onclick="closeModal('report')" aria-label="Close">✕</button>
+    </div>
+    <div class="cds-modal__body">
+      <div class="cds-inline-notification cds-inline-notification--info" role="status">
+        <span class="cds-inline-notification__icon">ℹ</span>
+        <div>
+          <div class="cds-inline-notification__subtitle">Report output uses USWDS (U.S. Web Design System) styling for readability and accessibility. The preview below reflects the final exported document.</div>
+        </div>
+      </div>
+      <div class="cds-form-item" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="cds-form-item">
+          <label class="cds-label" for="rep-title">Report Title</label>
+          <input class="cds-text-input" id="rep-title" type="text" value="CIV-ARCOS Assurance Report">
+        </div>
+        <div class="cds-form-item">
+          <label class="cds-label" for="rep-scope">Scope</label>
+          <select class="cds-select" id="rep-scope">
+            <option>Full Assurance Report (all sections)</option>
+            <option>Executive Summary only</option>
+            <option>Compliance Frameworks only</option>
+            <option>Security Findings only</option>
+          </select>
+        </div>
+      </div>
+      <!-- Preview box styled with USWDS tokens -->
+      <div style="border:1px solid var(--cds-border-subtle-01); background:#fff; color:#1b1b1b; font-family:'Source Sans Pro','Public Sans',sans-serif; font-size:14px; padding:24px; max-height:380px; overflow-y:auto;" id="report-preview">
+        <div style="border-bottom:4px solid #005ea2; padding-bottom:16px; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:40px; height:40px; background:#005ea2; border-radius:2px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; flex-shrink:0;">CA</div>
+            <div>
+              <div style="font-size:20px; font-weight:700; color:#1b1b1b; line-height:1.2;">CIV-ARCOS Assurance Report</div>
+              <div style="font-size:13px; color:#71767a; margin-top:4px; font-family:'Source Code Pro',monospace;">Generated: 2026-02-28 · Repository: jellette/CIV-ARCOS · Operator: J. Ellette</div>
+            </div>
+          </div>
+        </div>
+        <!-- Executive summary -->
+        <div style="margin-bottom:24px;">
+          <h2 style="font-size:16px; font-weight:700; color:#005ea2; border-bottom:1px solid #dfe1e2; padding-bottom:6px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.04em;">Executive Summary</h2>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px;">
+            <div style="border:1px solid #dfe1e2; padding:12px; background:#f0f0f0;">
+              <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#71767a; margin-bottom:4px;">Quality Score</div>
+              <div style="font-size:28px; font-weight:700; color:#1b1b1b; line-height:1;">87<span style="font-size:14px; color:#71767a;">/100</span></div>
+              <div style="font-size:12px; color:#538200; margin-top:4px;">↑ +2.3 this week · Silver tier</div>
+            </div>
+            <div style="border:1px solid #dfe1e2; padding:12px; background:#f0f0f0;">
+              <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#71767a; margin-bottom:4px;">Compliance Avg</div>
+              <div style="font-size:28px; font-weight:700; color:#1b1b1b; line-height:1;">78<span style="font-size:14px; color:#71767a;">%</span></div>
+              <div style="font-size:12px; color:#e52207; margin-top:4px;">⚠ ISO 27001 A.12.6.1 below threshold</div>
+            </div>
+            <div style="border:1px solid #dfe1e2; padding:12px; background:#f0f0f0;">
+              <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#71767a; margin-bottom:4px;">Open Findings</div>
+              <div style="font-size:28px; font-weight:700; color:#1b1b1b; line-height:1;">14</div>
+              <div style="font-size:12px; color:#e52207; margin-top:4px;">3 critical · remediation required</div>
+            </div>
+          </div>
+          <p style="font-size:14px; line-height:1.6; color:#1b1b1b; margin:0;">This report summarises the assurance posture of <strong>jellette/CIV-ARCOS</strong> as of 2026-02-28. The system achieved Silver tier quality (87/100) with 92.4% test coverage. Three critical security findings (SQL injection, hardcoded credential, unsafe deserialization) require immediate remediation before Gold tier eligibility. Compliance averages 78% across five frameworks; ISO 27001 A.12.6.1 patch management is the priority gap at 68% against an 80% minimum threshold.</p>
+        </div>
+        <!-- Evidence summary table -->
+        <div style="margin-bottom:24px;">
+          <h2 style="font-size:16px; font-weight:700; color:#005ea2; border-bottom:1px solid #dfe1e2; padding-bottom:6px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.04em;">Evidence Summary</h2>
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead><tr style="background:#dfe1e2;"><th style="text-align:left; padding:8px; font-weight:700;">Type</th><th style="text-align:left; padding:8px; font-weight:700;">Count</th><th style="text-align:left; padding:8px; font-weight:700;">Latest</th><th style="text-align:right; padding:8px; font-weight:700;">Integrity</th></tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #dfe1e2;"><td style="padding:8px;">Test Results</td><td style="padding:8px; font-family:monospace;">841</td><td style="padding:8px; font-family:monospace; color:#71767a;">ev_8a3f2c · 2m ago</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ 100%</td></tr>
+              <tr style="border-bottom:1px solid #dfe1e2;"><td style="padding:8px;">Security Scans</td><td style="padding:8px; font-family:monospace;">412</td><td style="padding:8px; font-family:monospace; color:#71767a;">ev_1d9b7a · 8m ago</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ 100%</td></tr>
+              <tr style="border-bottom:1px solid #dfe1e2;"><td style="padding:8px;">Commits</td><td style="padding:8px; font-family:monospace;">1,204</td><td style="padding:8px; font-family:monospace; color:#71767a;">ev_c72e1b · 14m ago</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ 100%</td></tr>
+              <tr style="border-bottom:1px solid #dfe1e2;"><td style="padding:8px;">Compliance Assessments</td><td style="padding:8px; font-family:monospace;">247</td><td style="padding:8px; font-family:monospace; color:#71767a;">ev_4f0a9c · 31m ago</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ 100%</td></tr>
+              <tr><td style="padding:8px; font-weight:700;">Total</td><td style="padding:8px; font-family:monospace; font-weight:700;">2,847</td><td style="padding:8px;"></td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ 99.4%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Compliance -->
+        <div>
+          <h2 style="font-size:16px; font-weight:700; color:#005ea2; border-bottom:1px solid #dfe1e2; padding-bottom:6px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.04em;">Compliance Status</h2>
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead><tr style="background:#dfe1e2;"><th style="text-align:left; padding:8px; font-weight:700;">Framework</th><th style="text-align:left; padding:8px; font-weight:700;">Controls</th><th style="text-align:right; padding:8px; font-weight:700;">Score</th><th style="text-align:right; padding:8px; font-weight:700;">Status</th></tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #dfe1e2; background:#fff1d2;"><td style="padding:8px;">ISO 27001</td><td style="padding:8px; font-family:monospace;">14/18</td><td style="padding:8px; text-align:right; font-family:monospace; font-weight:700;">78%</td><td style="padding:8px; text-align:right; color:#e52207; font-weight:700;">⚠ GAP</td></tr>
+              <tr style="border-bottom:1px solid #dfe1e2;"><td style="padding:8px;">FedRAMP</td><td style="padding:8px; font-family:monospace;">82/90</td><td style="padding:8px; text-align:right; font-family:monospace; font-weight:700;">91%</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ PASS</td></tr>
+              <tr style="border-bottom:1px solid #dfe1e2;"><td style="padding:8px;">SOX ITGC</td><td style="padding:8px; font-family:monospace;">17/20</td><td style="padding:8px; text-align:right; font-family:monospace; font-weight:700;">84%</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ PASS</td></tr>
+              <tr style="border-bottom:1px solid #dfe1e2; background:#fff1d2;"><td style="padding:8px;">NIST 800-53</td><td style="padding:8px; font-family:monospace;">34/51</td><td style="padding:8px; text-align:right; font-family:monospace; font-weight:700;">67%</td><td style="padding:8px; text-align:right; color:#e52207; font-weight:700;">⚠ GAP</td></tr>
+              <tr><td style="padding:8px;">PCI-DSS</td><td style="padding:8px; font-family:monospace;">8/9</td><td style="padding:8px; text-align:right; font-family:monospace; font-weight:700;">89%</td><td style="padding:8px; text-align:right; color:#538200; font-weight:700;">✓ PASS</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px; color:#71767a; margin-top:12px; font-family:monospace;">Report generated by CIV-ARCOS · SHA-256 evidence chain verified · Blockchain block #2,841 · This report is for internal assurance purposes.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cds-modal__footer">
+      <button class="cds-btn cds-btn--secondary" onclick="closeModal('report')" type="button">Cancel</button>
+      <button class="cds-btn cds-btn--secondary" onclick="printReport()" type="button">Print / Save PDF</button>
+      <button class="cds-btn cds-btn--primary" onclick="openReportWindow()" type="button">Open in New Tab</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="cds-toast-stack" id="toast-stack" aria-live="polite" aria-label="Notifications"></div>
 
 <script>
@@ -2258,16 +3431,106 @@ function toast(title, sub, type) {
   setTimeout(() => el.remove(), 4500);
 }
 
+// === ACCORDION ===
+function toggleAccordion(header) {
+  const item = header.closest('.cds-accordion-item');
+  item.classList.toggle('open');
+}
+
+// === EVIDENCE PAGE TABS ===
+function setEvTab(type, el) {
+  el.closest('.cds-tabs').querySelectorAll('.cds-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const rows = document.querySelectorAll('#ev-table-body tr');
+  rows.forEach(r => {
+    r.style.display = (type === 'all' || r.dataset.type === type) ? '' : 'none';
+  });
+  const visible = [...rows].filter(r => r.style.display !== 'none').length;
+  const countEl = document.getElementById('ev-filter-count');
+  if (countEl) countEl.textContent = (type === 'all' ? '2,847' : visible) + ' items';
+}
+
+// === EVIDENCE SEARCH ===
+function filterEvidence(query) {
+  const q = query.toLowerCase();
+  const rows = document.querySelectorAll('#ev-table-body tr');
+  rows.forEach(r => {
+    r.style.display = !q || r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+  const visible = [...rows].filter(r => r.style.display !== 'none').length;
+  const countEl = document.getElementById('ev-filter-count');
+  if (countEl) countEl.textContent = (q ? visible : '2,847') + ' items';
+}
+
+// === BADGE COPY ===
+function copyBadge(el, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.textContent.trim();
+    el.textContent = '✓ Copied!';
+    el.style.color = 'var(--cds-support-success)';
+    setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1800);
+  }).catch(() => {
+    toast('Copy failed', 'Use Ctrl+C to copy manually', 'warn');
+  });
+}
+
+// === REPORT MODAL ===
+function openReportModal() { openModal('report'); }
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+function openReportWindow() {
+  const title = escHtml(document.getElementById('rep-title').value || 'CIV-ARCOS Assurance Report');
+  const content = document.getElementById('report-preview').innerHTML;
+  const win = window.open('', '_blank');
+  if (!win) { toast('Popup blocked', 'Allow popups for this page', 'warn'); return; }
+  win.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${title}</title><style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Source Sans Pro', 'Public Sans', Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #1b1b1b; background: #fff; max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+    @media print { body { padding: 0; } }
+    h2 { font-size: 16px; font-weight: 700; color: #005ea2; border-bottom: 1px solid #dfe1e2; padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #dfe1e2; text-align: left; padding: 8px; font-weight: 700; }
+    td { padding: 8px; border-bottom: 1px solid #dfe1e2; }
+  </style></head><body>${content}</body></html>`);
+  win.document.close();
+  closeModal('report');
+  toast('Report opened in new tab', 'Use Ctrl+P to print or save as PDF', 'success');
+}
+
+function printReport() {
+  const title = escHtml(document.getElementById('rep-title').value || 'CIV-ARCOS Assurance Report');
+  const content = document.getElementById('report-preview').innerHTML;
+  const win = window.open('', '_blank');
+  if (!win) { toast('Popup blocked', 'Allow popups for this page', 'warn'); return; }
+  win.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${title}</title><style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Source Sans Pro', 'Public Sans', Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #1b1b1b; background: #fff; padding: 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #dfe1e2; text-align: left; padding: 6px 8px; font-weight: 700; }
+    td { padding: 6px 8px; border-bottom: 1px solid #dfe1e2; }
+  </style></head><body>${content}</body></html>`);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 250);
+  closeModal('report');
+}
+
 // === LIVE COUNTER ===
 let evCount = 2847;
 setInterval(() => {
   if (Math.random() < 0.3) {
     evCount += Math.floor(Math.random() * 3) + 1;
     const formatted = evCount.toLocaleString();
-    const el = document.getElementById('ev-count');
+    ['ev-count', 'ev-total'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = formatted;
+    });
     const el2 = document.getElementById('ev-count-tile');
-    if (el) el.textContent = formatted;
     if (el2) el2.textContent = formatted + ' items';
+    const el3 = document.getElementById('ev-filter-count');
+    if (el3 && el3.textContent.includes(',')) el3.textContent = formatted + ' items';
   }
 }, 3000);
 
