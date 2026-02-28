@@ -233,12 +233,8 @@ class ComprehensiveQualityTemplate(AssuranceTemplate):
             sub_builder = AssuranceCaseBuilder()
             sub_builder = sub_tpl.instantiate(sub_builder, sub_ctx)
             sub_case = sub_builder.build()
-            # Merge nodes into main builder's case
-            for nid, node in sub_case.nodes.items():
-                builder._case.add_node(node)
-            # Link sub-root to composite root
-            if sub_case.root_goal_id:
-                builder._case.link_nodes(root_id, sub_case.root_goal_id)
+            # Merge sub-case nodes into main builder via the public API
+            builder.merge_nodes_from(sub_case, link_root_to=root_id)
 
         return builder
 

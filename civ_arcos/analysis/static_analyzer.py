@@ -141,6 +141,9 @@ class StaticAnalyzer:
         unique_count = len(set(operands)) if operands else 1
         halstead_volume = unique_count * math.log2(unique_count + 1) if unique_count > 0 else 1
         safe_loc = max(1, loc)
+        # Maintainability Index based on the SEI (Software Engineering Institute) formula:
+        # MI = max(0, (171 - 5.2*ln(HV) - 0.23*CC - 16.2*ln(LOC)) * 100/171)
+        # where HV = Halstead Volume (approximated), CC = cyclomatic complexity, LOC = lines of code
         mi_raw = (171
                   - 5.2 * math.log(halstead_volume)
                   - 0.23 * complexity

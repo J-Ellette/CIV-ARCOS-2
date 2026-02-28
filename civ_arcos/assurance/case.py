@@ -185,5 +185,19 @@ class AssuranceCaseBuilder:
             self._case.link_nodes(parent_id, self._last_node_id)
         return self
 
+    def merge_nodes_from(self, other_case: AssuranceCase,
+                         link_root_to: Optional[str] = None) -> "AssuranceCaseBuilder":
+        """Merge all nodes from another AssuranceCase into this builder's case.
+
+        Args:
+            other_case: The source case whose nodes will be merged in.
+            link_root_to: If set, link the other case's root goal as a child of this node ID.
+        """
+        for node in other_case.nodes.values():
+            self._case.add_node(node)
+        if link_root_to and other_case.root_goal_id:
+            self._case.link_nodes(link_root_to, other_case.root_goal_id)
+        return self
+
     def build(self) -> AssuranceCase:
         return self._case

@@ -55,7 +55,12 @@ class Router:
 
     def add_route(self, method: str, pattern: str, handler: Callable) -> None:
         param_names: List[str] = []
-        regex = re.sub(r"\{(\w+)\}", lambda m: (param_names.append(m.group(1)) or "") + r"([^/]+)", pattern)
+
+        def _replace(m: re.Match) -> str:
+            param_names.append(m.group(1))
+            return r"([^/]+)"
+
+        regex = re.sub(r"\{(\w+)\}", _replace, pattern)
         self._routes.append((method.upper(), re.compile(f"^{regex}$"), handler, param_names))
 
     def match(self, method: str, path: str) -> Tuple[Optional[Callable], Dict[str, str]]:
@@ -109,6 +114,15 @@ class Application:
             def do_POST(self): self._handle("POST")
             def do_PUT(self): self._handle("PUT")
             def do_DELETE(self): self._handle("DELETE")
+            def do_OPTIONS(self): self._handle_options()
+
+            def _handle_options(self) -> None:
+                """Handle CORS preflight requests."""
+                self.send_response(204)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+                self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+                self.end_headers()
 
             def _handle(self, method: str) -> None:
                 parsed = urlparse(self.path)

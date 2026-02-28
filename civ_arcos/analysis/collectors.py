@@ -150,8 +150,10 @@ class ComprehensiveAnalysisCollector:
 
     def collect(self) -> List[Evidence]:
         all_evidence: List[Evidence] = []
-        for cls in (StaticAnalysisCollector, SecurityScanCollector,
-                    TestGenerationCollector, CoverageCollector):
-            collector = cls(self._source_path, self._graph)  # type: ignore[call-arg]
+        for cls in (StaticAnalysisCollector, SecurityScanCollector, TestGenerationCollector):
+            collector = cls(self._source_path, self._graph)
             all_evidence.extend(collector.collect())
+        # CoverageCollector takes an optional test_path; use source_path as fallback
+        cov_collector = CoverageCollector(self._source_path, self._graph)
+        all_evidence.extend(cov_collector.collect())
         return all_evidence
