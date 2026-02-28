@@ -1,7 +1,7 @@
 # Copilot Progress Tracker
 
 ## Current Status
-UI operational console (Carbon) fully implemented — all pages complete.
+UI operational console (Carbon) fully implemented — all pages complete, plus interactive enhancements (SVG charts, command palette, settings persistence).
 
 ## Design System Decisions
 | Surface | Design System | Notes |
@@ -29,6 +29,9 @@ UI operational console (Carbon) fully implemented — all pages complete.
 - [x] **Platform Sync page** — integration status table (GitHub/GitLab/Azure/Jenkins/CircleCI), sync events table, ingestion trend bars, stat tiles
 - [x] **Digital Twin page** — what-if scenario table (5 scenarios), model health trend bars, drift alerts feed, stat tiles (models/simulations/coverage/drift)
 - [x] **Multi-Tenant page** — tenant registry table (6 tenants), per-tenant compliance trend bars, resource usage table, stat tiles
+- [x] **SVG Sparkline charts** — inline SVG area/line charts on Dashboard (quality trend, evidence velocity), Analytics (quality, compliance, security findings trends), Blockchain (chain height); `renderSparkline()` utility with configurable color, min/max, labels, dots
+- [x] **Global Command Palette (Ctrl+K / ⌘K)** — full-keyboard page navigation, action shortcuts (Run Scan, Export Report), fuzzy label+section filtering, arrow-key + Enter navigation, Escape/overlay-click to dismiss; trigger button in header
+- [x] **Settings persistence (localStorage)** — `saveSettings()` / `loadSettings()` / `discardSettings()` with `localStorage` backend; all 12 settings inputs/toggles wired with `id` attributes; Discard button reverts to last saved state
 
 ## Build-Related Docs (in `build_docs/`)
 | File | Description |
