@@ -7,12 +7,12 @@ from typing import Any, Dict
 class CoverageAnalyzer:
     """Analyse test coverage data and assign quality tiers."""
 
-    def get_coverage_tier(self, pct: float) -> str:
-        if pct >= 95:
+    def get_coverage_tier(self, coverage_percentage: float) -> str:
+        if coverage_percentage >= 95:
             return "gold"
-        if pct >= 80:
+        if coverage_percentage >= 80:
             return "silver"
-        if pct >= 60:
+        if coverage_percentage >= 60:
             return "bronze"
         return "none"
 
@@ -22,18 +22,18 @@ class CoverageAnalyzer:
         branches_covered = coverage_data.get("branches_covered", 0)
         branches_total = coverage_data.get("branches_total", 1)
 
-        line_pct = (lines_covered / lines_total * 100) if lines_total > 0 else 0.0
-        branch_pct = (branches_covered / branches_total * 100) if branches_total > 0 else 0.0
+        line_coverage_pct = (lines_covered / lines_total * 100) if lines_total > 0 else 0.0
+        branch_coverage_pct = (branches_covered / branches_total * 100) if branches_total > 0 else 0.0
 
-        tier = self.get_coverage_tier(line_pct)
+        tier = self.get_coverage_tier(line_coverage_pct)
         summary = (
-            f"{line_pct:.1f}% line coverage, "
-            f"{branch_pct:.1f}% branch coverage — tier: {tier}"
+            f"{line_coverage_pct:.1f}% line coverage, "
+            f"{branch_coverage_pct:.1f}% branch coverage — tier: {tier}"
         )
 
         return {
-            "line_coverage_pct": round(line_pct, 2),
-            "branch_coverage_pct": round(branch_pct, 2),
+            "line_coverage_pct": round(line_coverage_pct, 2),
+            "branch_coverage_pct": round(branch_coverage_pct, 2),
             "tier": tier,
             "summary": summary,
         }
@@ -57,12 +57,12 @@ class CoverageAnalyzer:
             # Parse "TOTAL   N   N   N%" line
             match = re.search(r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)%', output)
             if match:
-                stmts = int(match.group(1))
-                missed = int(match.group(2))
-                covered = stmts - missed
+                total_statements = int(match.group(1))
+                missed_statements = int(match.group(2))
+                covered_statements = total_statements - missed_statements
                 return {
-                    "lines_covered": covered,
-                    "lines_total": stmts,
+                    "lines_covered": covered_statements,
+                    "lines_total": total_statements,
                     "branches_covered": 0,
                     "branches_total": 0,
                     "raw_output": output,

@@ -93,23 +93,21 @@ class TestGenerator:
 
     def generate_test_template(self, func_name: str, params: List[str],
                                class_name: Optional[str] = None) -> str:
-        indent = "    "
+        indentation = "    "
         if class_name:
-            param_str = ", ".join(p for p in params if p != "self")
             args = ", ".join("None" for p in params if p != "self")
             lines = [
                 f"def test_{func_name}():",
-                f"{indent}instance = {class_name}()",
-                f"{indent}result = instance.{func_name}({args})",
-                f"{indent}assert result is not None  # TODO: add assertions",
+                f"{indentation}instance = {class_name}()",
+                f"{indentation}result = instance.{func_name}({args})",
+                f"{indentation}assert result is not None  # TODO: add assertions",
             ]
         else:
-            param_str = ", ".join(params)
             args = ", ".join("None" for _ in params)
             lines = [
                 f"def test_{func_name}():",
-                f"{indent}result = {func_name}({args})",
-                f"{indent}assert result is not None  # TODO: add assertions",
+                f"{indentation}result = {func_name}({args})",
+                f"{indentation}assert result is not None  # TODO: add assertions",
             ]
         return "\n".join(lines)
 

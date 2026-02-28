@@ -90,9 +90,9 @@ def collect_evidence(req: Request) -> Response:
     evidence_list = collector.collect(repo_url=repo_url)
     node_ids = []
     for ev in evidence_list:
-        nid = _store.store_evidence(ev)
+        graph_node_id = _store.store_evidence(ev)
         _ledger.add_block({"evidence_id": ev.id, "checksum": ev.checksum})
-        node_ids.append(nid)
+        node_ids.append(graph_node_id)
     return Response({"collected": len(evidence_list), "node_ids": node_ids}, status_code=201)
 
 
@@ -176,15 +176,15 @@ def blockchain_chain(req: Request) -> Response:
     length = _ledger.get_chain_length()
     start = max(0, length - limit)
     blocks = []
-    for i in range(start, length):
-        b = _ledger.get_block(i)
-        if b:
+    for block_index in range(start, length):
+        block = _ledger.get_block(block_index)
+        if block:
             blocks.append({
-                "index": b.index,
-                "hash": b.hash,
-                "previous_hash": b.previous_hash,
-                "timestamp": b.timestamp,
-                "data": b.data,
+                "index": block.index,
+                "hash": block.hash,
+                "previous_hash": block.previous_hash,
+                "timestamp": block.timestamp,
+                "data": block.data,
             })
     return Response({"blocks": list(reversed(blocks)), "total": length, "valid": _ledger.validate_chain()})
 

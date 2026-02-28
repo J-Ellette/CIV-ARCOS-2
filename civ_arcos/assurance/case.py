@@ -63,11 +63,11 @@ class AssuranceCase:
         visited: List[GSNNode] = []
         seen: set = set()
 
-        def _dfs(nid: str) -> None:
-            if nid in seen or nid not in self.nodes:
+        def _dfs(current_node_id: str) -> None:
+            if current_node_id in seen or current_node_id not in self.nodes:
                 return
-            seen.add(nid)
-            node = self.nodes[nid]
+            seen.add(current_node_id)
+            node = self.nodes[current_node_id]
             visited.append(node)
             for child_id in node.children:
                 _dfs(child_id)

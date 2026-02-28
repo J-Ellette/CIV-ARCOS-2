@@ -43,12 +43,12 @@ class BlockchainLedger:
         self._chain.append(genesis)
 
     def add_block(self, data: Dict[str, Any]) -> Block:
-        prev = self._chain[-1]
+        previous_block = self._chain[-1]
         block = Block(
             index=len(self._chain),
             timestamp=datetime.now(timezone.utc).isoformat(),
             data=data,
-            previous_hash=prev.hash,
+            previous_hash=previous_block.hash,
         )
         block.hash = block.compute_hash()
         self._chain.append(block)
@@ -58,12 +58,12 @@ class BlockchainLedger:
         return block
 
     def validate_chain(self) -> bool:
-        for i in range(1, len(self._chain)):
-            curr = self._chain[i]
-            prev = self._chain[i - 1]
-            if curr.hash != curr.compute_hash():
+        for block_index in range(1, len(self._chain)):
+            current_block = self._chain[block_index]
+            previous_block = self._chain[block_index - 1]
+            if current_block.hash != current_block.compute_hash():
                 return False
-            if curr.previous_hash != prev.hash:
+            if current_block.previous_hash != previous_block.hash:
                 return False
         return True
 
