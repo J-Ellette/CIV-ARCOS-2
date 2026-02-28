@@ -2,11 +2,10 @@
 import json
 import urllib.request
 import urllib.error
-import uuid
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from civ_arcos.evidence.collector import Evidence, EvidenceCollector
+from civ_arcos.utils import make_evidence
 
 
 class GitHubCollector(EvidenceCollector):
@@ -89,14 +88,7 @@ class GitHubCollector(EvidenceCollector):
 
     def _make_evidence(self, etype: str, source: str, data: Dict[str, Any],
                        provenance: Dict[str, Any]) -> Evidence:
-        return Evidence(
-            id=str(uuid.uuid4()),
-            type=etype,
-            source=source,
-            timestamp=datetime.now(timezone.utc).isoformat(),
-            data=data,
-            provenance=provenance,
-        )
+        return make_evidence(etype, source, data, provenance)
 
     def _mock_evidence(self, repo_url: str) -> List[Evidence]:
         return [self._make_evidence(

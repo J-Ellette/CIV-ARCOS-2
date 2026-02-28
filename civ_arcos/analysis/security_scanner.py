@@ -1,7 +1,8 @@
 """Security vulnerability scanner using regex pattern matching."""
-import os
 import re
 from typing import Any, Dict, List
+
+from civ_arcos.utils import iter_python_files
 
 # Patterns and their metadata
 _PATTERNS = [
@@ -92,12 +93,7 @@ class SecurityScanner:
         }
 
     def scan_directory(self, path: str) -> List[Dict[str, Any]]:
-        results: List[Dict[str, Any]] = []
-        for root, _dirs, files in os.walk(path):
-            for fname in files:
-                if fname.endswith(".py"):
-                    results.append(self.scan_file(os.path.join(root, fname)))
-        return results
+        return [self.scan_file(fpath) for fpath in iter_python_files(path)]
 
     def calculate_security_score(self, scan_results: List[Dict[str, Any]]) -> Dict[str, Any]:
         breakdown: Dict[str, int] = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}

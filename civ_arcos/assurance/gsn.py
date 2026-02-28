@@ -55,61 +55,46 @@ class GSNNode:
         return cls(**d)
 
 
-class GSNGoal(GSNNode):
+class _GSNTypedNode(GSNNode):
+    """Private intermediate class that injects a fixed node type.
+
+    Each concrete subclass declares a class-level ``_NODE_TYPE`` attribute;
+    this single ``__init__`` uses it so the duplicated body does not need to
+    be repeated in every subclass.
+    """
+
+    #: Subclasses must set this to the :class:`GSNNodeType` value that
+    #: identifies the concrete node kind (e.g. ``GSNNodeType.GOAL``).
+    _NODE_TYPE: GSNNodeType
+
     def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
         super().__init__(
             id=node_id or str(uuid.uuid4()),
-            node_type=GSNNodeType.GOAL,
+            node_type=self.__class__._NODE_TYPE,
             statement=statement,
             **kwargs,
         )
 
 
-class GSNStrategy(GSNNode):
-    def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
-        super().__init__(
-            id=node_id or str(uuid.uuid4()),
-            node_type=GSNNodeType.STRATEGY,
-            statement=statement,
-            **kwargs,
-        )
+class GSNGoal(_GSNTypedNode):
+    _NODE_TYPE = GSNNodeType.GOAL
 
 
-class GSNSolution(GSNNode):
-    def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
-        super().__init__(
-            id=node_id or str(uuid.uuid4()),
-            node_type=GSNNodeType.SOLUTION,
-            statement=statement,
-            **kwargs,
-        )
+class GSNStrategy(_GSNTypedNode):
+    _NODE_TYPE = GSNNodeType.STRATEGY
 
 
-class GSNContext(GSNNode):
-    def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
-        super().__init__(
-            id=node_id or str(uuid.uuid4()),
-            node_type=GSNNodeType.CONTEXT,
-            statement=statement,
-            **kwargs,
-        )
+class GSNSolution(_GSNTypedNode):
+    _NODE_TYPE = GSNNodeType.SOLUTION
 
 
-class GSNAssumption(GSNNode):
-    def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
-        super().__init__(
-            id=node_id or str(uuid.uuid4()),
-            node_type=GSNNodeType.ASSUMPTION,
-            statement=statement,
-            **kwargs,
-        )
+class GSNContext(_GSNTypedNode):
+    _NODE_TYPE = GSNNodeType.CONTEXT
 
 
-class GSNJustification(GSNNode):
-    def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
-        super().__init__(
-            id=node_id or str(uuid.uuid4()),
-            node_type=GSNNodeType.JUSTIFICATION,
-            statement=statement,
-            **kwargs,
-        )
+class GSNAssumption(_GSNTypedNode):
+    _NODE_TYPE = GSNNodeType.ASSUMPTION
+
+
+class GSNJustification(_GSNTypedNode):
+    _NODE_TYPE = GSNNodeType.JUSTIFICATION
