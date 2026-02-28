@@ -1,8 +1,9 @@
 """Static code analysis using Python's AST module."""
 import ast
 import math
-import os
 from typing import Any, Dict, List
+
+from civ_arcos.utils import iter_python_files
 
 
 def _cyclomatic_complexity(tree: ast.AST) -> int:
@@ -158,9 +159,4 @@ class StaticAnalyzer:
         }
 
     def analyze_directory(self, path: str) -> List[Dict[str, Any]]:
-        results: List[Dict[str, Any]] = []
-        for root, _dirs, files in os.walk(path):
-            for fname in files:
-                if fname.endswith(".py"):
-                    results.append(self.analyze_file(os.path.join(root, fname)))
-        return results
+        return [self.analyze_file(fpath) for fpath in iter_python_files(path)]

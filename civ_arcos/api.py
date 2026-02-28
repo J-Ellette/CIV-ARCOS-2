@@ -21,6 +21,7 @@ from civ_arcos.assurance.case import AssuranceCaseBuilder
 from civ_arcos.assurance.patterns import PatternInstantiator, ProjectType
 from civ_arcos.assurance.templates import TemplateLibrary
 from civ_arcos.assurance.visualizer import GSNVisualizer
+from civ_arcos.utils import iter_python_files
 
 _start_time = time.time()
 app: Application = create_app()
@@ -241,16 +242,8 @@ def analysis_security(req: Request) -> Response:
 def analysis_tests(req: Request) -> Response:
     body = req.json() or {}
     source_path = body.get("source_path", ".")
-    import os
     gen = TestGenerator()
-    suggestions_list = []
-    if os.path.isfile(source_path):
-        suggestions_list.append(gen.get_suggestions(source_path))
-    else:
-        for root, _dirs, files in os.walk(source_path):
-            for fname in files:
-                if fname.endswith(".py"):
-                    suggestions_list.append(gen.get_suggestions(os.path.join(root, fname)))
+    suggestions_list = [gen.get_suggestions(fpath) for fpath in iter_python_files(source_path)]
     return Response({"results": suggestions_list, "file_count": len(suggestions_list)})
 
 
