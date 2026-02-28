@@ -41,8 +41,8 @@ class BadgeGenerator:
         label_width = len(label) * 7 + 10
         value_width = len(value) * 7 + 10
         total_width = label_width + value_width
-        label_x = label_width // 2
-        value_x = label_width + value_width // 2
+        label_center_x = label_width // 2
+        value_center_x = label_width + value_width // 2
         return (
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="20">'
             f'<linearGradient id="s" x2="0" y2="100%">'
@@ -53,10 +53,10 @@ class BadgeGenerator:
             f'<rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>'
             f'<rect width="{total_width}" height="20" fill="url(#s)"/>'
             f'<g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">'
-            f'<text x="{label_x}" y="15" fill="#010101" fill-opacity=".3">{label}</text>'
-            f'<text x="{label_x}" y="14">{label}</text>'
-            f'<text x="{value_x}" y="15" fill="#010101" fill-opacity=".3">{value}</text>'
-            f'<text x="{value_x}" y="14">{value}</text>'
+            f'<text x="{label_center_x}" y="15" fill="#010101" fill-opacity=".3">{label}</text>'
+            f'<text x="{label_center_x}" y="14">{label}</text>'
+            f'<text x="{value_center_x}" y="15" fill="#010101" fill-opacity=".3">{value}</text>'
+            f'<text x="{value_center_x}" y="14">{value}</text>'
             f'</g>'
             f'</svg>'
         )

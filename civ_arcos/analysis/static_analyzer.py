@@ -8,32 +8,32 @@ from civ_arcos.utils import iter_python_files
 
 def _cyclomatic_complexity(tree: ast.AST) -> int:
     """Count cyclomatic complexity: 1 + decision points."""
-    count = 1
+    complexity_count = 1
     for node in ast.walk(tree):
         if isinstance(node, (ast.If, ast.For, ast.While, ast.ExceptHandler,
                               ast.With, ast.Assert)):
-            count += 1
+            complexity_count += 1
         elif isinstance(node, ast.BoolOp):
             # each 'and'/'or' adds (len(values)-1) branches
-            count += len(node.values) - 1
+            complexity_count += len(node.values) - 1
         elif isinstance(node, (ast.comprehension,)):
-            count += 1
-    return count
+            complexity_count += 1
+    return complexity_count
 
 
 def _function_complexity(func_node: ast.AST) -> int:
-    count = 1
+    complexity_count = 1
     for node in ast.walk(func_node):
         if node is func_node:
             continue
         if isinstance(node, (ast.If, ast.For, ast.While, ast.ExceptHandler,
                               ast.With, ast.Assert)):
-            count += 1
+            complexity_count += 1
         elif isinstance(node, ast.BoolOp):
-            count += len(node.values) - 1
+            complexity_count += len(node.values) - 1
         elif isinstance(node, ast.comprehension):
-            count += 1
-    return count
+            complexity_count += 1
+    return complexity_count
 
 
 def _nesting_depth(node: ast.AST) -> int:
@@ -41,14 +41,14 @@ def _nesting_depth(node: ast.AST) -> int:
     nesting_types = (ast.If, ast.For, ast.While, ast.With, ast.Try,
                      ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
 
-    def _depth(n: ast.AST, current: int) -> int:
-        max_d = current
-        for child in ast.iter_child_nodes(n):
+    def _depth(ast_node: ast.AST, current_depth: int) -> int:
+        max_depth = current_depth
+        for child in ast.iter_child_nodes(ast_node):
             if isinstance(child, nesting_types):
-                max_d = max(max_d, _depth(child, current + 1))
+                max_depth = max(max_depth, _depth(child, current_depth + 1))
             else:
-                max_d = max(max_d, _depth(child, current))
-        return max_d
+                max_depth = max(max_depth, _depth(child, current_depth))
+        return max_depth
 
     return _depth(node, 0)
 
@@ -79,7 +79,7 @@ class StaticAnalyzer:
             return {"file": path, "error": f"SyntaxError: {exc}"}
 
         lines = source.splitlines()
-        loc = len(lines)
+        lines_of_code = len(lines)
 
         # --- per-function and per-class info (single AST walk) ---------------
         functions: List[Dict[str, Any]] = []
@@ -138,21 +138,21 @@ class StaticAnalyzer:
         operands = _collect_names(tree)
         unique_count = len(set(operands)) if operands else 1
         halstead_volume = unique_count * math.log2(unique_count + 1) if unique_count > 0 else 1
-        safe_loc = max(1, loc)
+        safe_lines_of_code = max(1, lines_of_code)
         # Maintainability Index based on the SEI (Software Engineering Institute) formula:
         # MI = max(0, (171 - 5.2*ln(HV) - 0.23*CC - 16.2*ln(LOC)) * 100/171)
         # where HV = Halstead Volume (approximated), CC = cyclomatic complexity, LOC = lines of code
-        mi_raw = (171
+        raw_maintainability_index = (171
                   - 5.2 * math.log(halstead_volume)
                   - 0.23 * complexity
-                  - 16.2 * math.log(safe_loc))
-        maintainability_index = max(0.0, mi_raw * 100 / 171)
+                  - 16.2 * math.log(safe_lines_of_code))
+        maintainability_index = max(0.0, raw_maintainability_index * 100 / 171)
 
         return {
             "file": path,
             "complexity": complexity,
             "maintainability_index": round(maintainability_index, 2),
-            "loc": loc,
+            "loc": lines_of_code,
             "functions": functions,
             "classes": classes,
             "code_smells": code_smells,
