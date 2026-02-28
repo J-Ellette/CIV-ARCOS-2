@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 from civ_arcos.assurance.case import AssuranceCaseBuilder
 from civ_arcos.assurance.patterns import PatternInstantiator, ProjectType
@@ -11,6 +11,56 @@ from civ_arcos.assurance.visualizer import GSNVisualizer
 from civ_arcos.evidence.collector import EvidenceStore
 from civ_arcos.storage.graph import EvidenceGraph
 from civ_arcos.web.framework import Application, Request, Response
+
+
+def _pdf_escape(text: str) -> str:
+    """Escape text for use in a PDF literal string."""
+    return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+
+def _render_simple_pdf(lines: List[str]) -> bytes:
+    """Render a compact single-page PDF with plain text lines."""
+    text_lines = [f"({_pdf_escape(line)}) Tj" for line in lines]
+    stream = "BT\n/F1 12 Tf\n50 780 Td\n" + "\nT*\n".join(text_lines) + "\nET"
+    stream_bytes = stream.encode("utf-8")
+
+    objects = [
+        b"1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+        b"2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+        (
+            b"3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+            b"/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n"
+        ),
+        b"4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+        (
+            b"5 0 obj\n<< /Length "
+            + str(len(stream_bytes)).encode("ascii")
+            + b" >>\nstream\n"
+            + stream_bytes
+            + b"\nendstream\nendobj\n"
+        ),
+    ]
+
+    out = bytearray()
+    out.extend(b"%PDF-1.4\n")
+    offsets = [0]
+    for obj in objects:
+        offsets.append(len(out))
+        out.extend(obj)
+
+    xref_pos = len(out)
+    out.extend(f"xref\n0 {len(offsets)}\n".encode("ascii"))
+    out.extend(b"0000000000 65535 f \n")
+    for off in offsets[1:]:
+        out.extend(f"{off:010d} 00000 n \n".encode("ascii"))
+
+    out.extend(
+        (
+            f"trailer\n<< /Size {len(offsets)} /Root 1 0 R >>\n"
+            f"startxref\n{xref_pos}\n%%EOF\n"
+        ).encode("ascii")
+    )
+    return bytes(out)
 
 
 def register_assurance_legacy_routes(
@@ -120,6 +170,39 @@ def register_assurance_legacy_routes(
             dot = visualizer.to_dot(case)
             return Response(dot, content_type="text/plain")
         return Response(visualizer.generate_summary(case))
+
+    @app.route("/api/assurance/{case_id}/export", methods=["GET"])
+    def assurance_export(req: Request, case_id: str = "") -> Response:
+        case = assurance_cases.get(case_id)
+        if case is None:
+            return Response({"error": "Assurance case not found"}, status_code=404)
+
+        export_format = req.query("format", "pdf").lower()
+        if export_format != "pdf":
+            return Response(
+                {"error": "Unsupported export format. Use format=pdf"},
+                status_code=400,
+            )
+
+        summary = visualizer.generate_summary(case)
+        pdf_bytes = _render_simple_pdf(
+            [
+                "CIV-ARCOS Assurance Summary",
+                f"Case ID: {case.case_id}",
+                f"Title: {case.title}",
+                f"Project Type: {case.project_type}",
+                f"Node Count: {summary['node_count']}",
+                f"Evidence Count: {summary['evidence_count']}",
+                f"Max Depth: {summary['max_depth']}",
+            ]
+        )
+        return Response(
+            pdf_bytes,
+            content_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="assurance-{case.case_id}.pdf"'
+            },
+        )
 
     @app.route("/api/assurance/auto-generate", methods=["POST"])
     def assurance_auto_generate(req: Request) -> Response:

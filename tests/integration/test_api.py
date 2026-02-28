@@ -330,6 +330,53 @@ def test_v1_assurance_create_and_get_contract():
     assert fetched_data["data"]["case"]["case_id"] == case_id
 
 
+def test_assurance_export_pdf_returns_pdf_bytes():
+    """Legacy assurance export should return a PDF artifact for an existing case."""
+    from civ_arcos import api
+
+    payload = {
+        "project_name": "Export Project",
+        "project_type": "api",
+        "template": "comprehensive_quality",
+    }
+    body = json.dumps(payload).encode()
+    headers = {
+        "Content-Type": "application/json",
+        "Content-Length": str(len(body)),
+    }
+
+    created = api.app.handle("POST", "/api/assurance/create", {}, body, headers)
+    assert created.status_code == 201
+    case_id = json.loads(created.body)["case_id"]
+
+    exported = api.app.handle(
+        "GET",
+        f"/api/assurance/{case_id}/export",
+        {"format": ["pdf"]},
+        b"",
+        {},
+    )
+    assert exported.status_code == 200
+    assert exported.content_type == "application/pdf"
+    assert exported.body.startswith(b"%PDF-")
+    disposition = exported.headers.get("Content-Disposition", "")
+    assert case_id in disposition
+
+
+def test_assurance_export_pdf_missing_case_returns_404():
+    """Assurance export should return 404 for unknown assurance cases."""
+    from civ_arcos import api
+
+    resp = api.app.handle(
+        "GET",
+        "/api/assurance/nonexistent-case/export",
+        {"format": ["pdf"]},
+        b"",
+        {},
+    )
+    assert resp.status_code == 404
+
+
 def test_legacy_risk_route_still_available():
     """Legacy risk route should remain available during modularization."""
     from civ_arcos import api

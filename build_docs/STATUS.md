@@ -53,6 +53,31 @@ A phase can move from **Reported Complete** to **Verified Complete** only when:
 ## Change Log
 
 - 2026-02-28: Initial canonical status file created.
+- 2026-02-28: STEP_04.0 execution slice implemented (assurance PDF export):
+  - Added `GET /api/assurance/{case_id}/export?format=pdf` in `civ_arcos/api_routes/assurance.py` with deterministic single-page PDF generation from assurance summary data.
+  - Added integration tests in `tests/integration/test_api.py` for successful export and 404 missing-case behavior.
+  - Verification: `python -m pytest tests/integration/test_api.py -k "assurance and export" -q` (2 passed).
+  - Added verification matrix row `V-025` for export behavior.
+- 2026-02-28: Optional step-doc execution kickoff started:
+  - Decomposed `STEP_04.0` through `STEP_10` optional/future items into concrete first implementation slices.
+  - Added tranche planning checklist with per-step exit criteria in `build_docs/build-guide-updated.md` (section E.1).
+- 2026-02-28: V-011 remediation completed (distributed scope reconciliation):
+  - Reconciled claim to implemented distributed blockchain ledger coverage (`civ_arcos/distributed/blockchain_ledger.py`) because federated/sync modules are not present in the current workspace.
+  - Verification: `python -m pytest tests/integration/test_api.py -k blockchain -q` (3 passed).
+  - Updated `build_docs/VERIFICATION_MATRIX.md` V-011 from `PARTIAL` to `PASS`.
+- 2026-02-28: V-008 and V-012 scope reconciliation decision recorded:
+  - Repository audit confirmed referenced cache/task and I18N/digital twin modules/tests are absent in current workspace.
+  - Updated `build_docs/VERIFICATION_MATRIX.md` rows V-008 and V-012 from `FAIL` to `DEFERRED` with explicit owner/milestone.
+  - Owner: Project maintainers. Milestone: 2026-Q2 scope reconciliation.
+- 2026-02-28: Q-005 remediation completed (automated docs consistency gate):
+  - Added `scripts/docs_consistency_check.py` to validate Q-row docs consistency across matrix/build guide/status.
+  - Verification: `python scripts/docs_consistency_check.py` (pass).
+  - Updated `build_docs/VERIFICATION_MATRIX.md` Q-005 from `PARTIAL` to `PASS`.
+- 2026-02-28: Q-001 remediation completed (linting baseline):
+  - Added staged flake8 policy in `setup.cfg` (Black-aligned line length and scoped ignores).
+  - Removed remaining unused imports/variables and minor lint blockers in touched modules/tests.
+  - Verification: `python -m flake8 civ_arcos tests` (pass).
+  - Regression: `python -m pytest tests/integration/test_api.py tests/integration/test_health_webhook.py tests/unit/test_evidence.py -q` (51 passed).
 - 2026-02-28: Q-002 remediation completed (formatting baseline):
   - Applied code formatting: `python -m black civ_arcos tests` (47 files reformatted).
   - Verification: `python -m black --check civ_arcos tests` (pass; 64 files unchanged).

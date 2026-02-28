@@ -48,31 +48,34 @@ Source: `build_docs/VERIFICATION_MATRIX.md`.
 Status update (2026-02-28): `NOT_RUN` rows have now been closed in the matrix and replaced with `PASS`, `FAIL`, or `PARTIAL` outcomes.
 
 ### Remediation checklist (from current FAIL/PARTIAL outcomes)
+  
+#### FAIL rows (3)
 
-#### FAIL rows (5)
-
-- [ ] **V-008 (FAIL): cache/task load stability checks are stale**
+- [x] **V-008 (DEFERRED): cache/task load stability checks are stale**
   - Gap: matrix command references missing modules/tests (`civ_arcos/core/cache.py`, `civ_arcos/core/tasks.py`, related test files).
   - Action:
     - Decide whether cache/tasks are still in scope.
     - If in scope: implement/restore modules + tests and run concurrency/load checks.
     - If out of scope: mark deferred with owner/milestone and update matrix source modules/claim.
   - Exit criterion: row is `PASS` with executable command, or explicitly `DEFERRED` (tracked owner + milestone).
+  - Result (2026-02-28): ✅ Deferred after scope audit confirmed referenced cache/tasks modules and tests are absent in current workspace. Owner: Project maintainers. Milestone: 2026-Q2 scope reconciliation.
 
-- [ ] **V-012 (FAIL): I18N + digital twin verification paths are stale**
+- [x] **V-012 (DEFERRED): I18N + digital twin verification paths are stale**
   - Gap: referenced modules/tests are absent from current workspace.
   - Action:
     - Reconcile docs vs repository state for I18N/digital twin.
     - Either restore implementation/tests or update matrix + status docs to deferred/archived scope.
   - Exit criterion: row is `PASS` with runnable command, or explicitly deferred with ownership.
+  - Result (2026-02-28): ✅ Deferred after scope audit confirmed referenced I18N/digital twin modules and tests are absent in current workspace. Owner: Project maintainers. Milestone: 2026-Q2 scope reconciliation.
 
-- [ ] **Q-001 (FAIL): flake8 baseline fails**
+- [x] **Q-001 (FAIL): flake8 baseline fails**
   - Gap: existing codebase has many lint violations.
   - Action:
     - Define lint policy (scope, ignores, max-line-length, staged adoption).
     - Triage violations into mechanical vs semantic fixes.
     - Apply fixes in targeted batches and re-run flake8.
   - Exit criterion: agreed baseline command returns exit code 0.
+  - Result (2026-02-28): ✅ `python -m flake8 civ_arcos tests` passes after adding staged flake8 policy in `setup.cfg` and fixing remaining unused import/variable violations.
 
 - [x] **Q-002 (FAIL): black --check fails**
   - Gap: formatter reports 47 files would be reformatted.
@@ -90,7 +93,7 @@ Status update (2026-02-28): `NOT_RUN` rows have now been closed in the matrix an
   - Exit criterion: `mypy civ_arcos` exits 0.
   - Result (2026-02-28): ✅ `mypy civ_arcos` passes (`Success: no issues found in 41 source files`).
 
-#### PARTIAL rows (3)
+#### PARTIAL rows (0)
 
 - [x] **V-007 (PARTIAL): dashboard route smoke exists, dedicated test missing**
   - Current evidence: `/dashboard` returns HTTP 200.
@@ -100,25 +103,27 @@ Status update (2026-02-28): `NOT_RUN` rows have now been closed in the matrix an
   - Exit criterion: dedicated test command passes and row moves to `PASS`.
   - Result (2026-02-28): ✅ `python -m pytest tests/integration/test_dashboard.py -q` passes (`2 passed`) and matrix row is now `PASS`.
 
-- [ ] **V-011 (PARTIAL): blockchain checks pass, federated/sync coverage missing**
+- [x] **V-011 (PARTIAL): blockchain checks pass, federated/sync coverage missing**
   - Current evidence: blockchain integration checks pass.
   - Action:
     - Add or restore federated/sync tests (or update claim scope to blockchain-only if intentionally removed).
     - Align matrix source modules + command with actual codebase.
   - Exit criterion: full distributed claim covered by runnable tests and row moves to `PASS` (or scoped/deferred clearly).
+  - Result (2026-02-28): ✅ Scope reconciled to implemented blockchain ledger path; `python -m pytest tests/integration/test_api.py -k blockchain -q` passes (`3 passed`) and matrix row is now `PASS`.
 
-- [ ] **Q-005 (PARTIAL): docs consistency gate is undefined**
+- [x] **Q-005 (PARTIAL): docs consistency gate is undefined**
   - Current evidence: manual review indicates drift + markdown lint issues.
   - Action:
     - Define explicit docs-consistency command(s) and pass criteria.
     - Add command to matrix row and run it in CI/local.
   - Exit criterion: row has defined automated check and passes.
+  - Result (2026-02-28): ✅ `python scripts/docs_consistency_check.py` passes and matrix row is now `PASS`.
 
 ### Release checklist items still open
 
-- [ ] All in-scope `V-*` rows are `PASS` or explicitly deferred.
-- [ ] All `Q-*` rows are `PASS`.
-- [ ] Deferred items are logged with owner and target milestone.
+- [x] All in-scope `V-*` rows are `PASS` or explicitly deferred.
+- [x] All `Q-*` rows are `PASS`.
+- [x] Deferred items are logged with owner and target milestone.
 
 ## C) Step-level items explicitly partial/pending
 
@@ -171,6 +176,56 @@ These are listed as optional/future in step docs and are not currently in baseli
 - `build_docs/STEP_08.md`
 - `build_docs/STEP_09.md`
 - `build_docs/STEP_10.md`
+
+### E.1) Active execution tranche (kickoff)
+
+Status (2026-02-28): Started decomposition of optional step docs into concrete implementation slices.
+
+- [x] **STEP_04.0 slice** (`build_docs/STEP_04.0.md`)
+  - Scope: badge/dashboard enhancements.
+  - First implementation slice: add PDF export for assurance summaries using current report artifacts.
+  - Exit criterion: new export endpoint + tests + matrix row for export behavior.
+  - Result (2026-02-28): ✅ Added `GET /api/assurance/{case_id}/export?format=pdf`, integration coverage in `tests/integration/test_api.py`, and verification row `V-025`.
+
+- [ ] **STEP_05-06 slice** (`build_docs/STEP_05-06.md`)
+  - Scope: executive reporting and plugin ecosystem extensions.
+  - First implementation slice: scheduled report generation (local scheduler + persisted report metadata).
+  - Exit criterion: scheduler job path tested and documented runbook command.
+
+- [ ] **STEP_05.5 slice** (`build_docs/STEP_05.5.md`)
+  - Scope: quality reporter/websocket/reporting improvements.
+  - First implementation slice: quality metrics history persistence + trend endpoint.
+  - Exit criterion: deterministic trend API response with unit/integration coverage.
+
+- [ ] **STEP_05_ENTERPRISE slice** (`build_docs/STEP_05_ENTERPRISE.md`)
+  - Scope: enterprise multi-tenant/compliance scaling.
+  - First implementation slice: compliance report generation artifact (JSON first, PDF deferred).
+  - Exit criterion: tenant-scoped report generation endpoint and cross-tenant isolation tests.
+
+- [ ] **STEP_06 slice** (`build_docs/STEP_06.md`)
+  - Scope: AI-optional backends and fallback evolution.
+  - First implementation slice: Azure OpenAI backend adapter behind explicit opt-in configuration.
+  - Exit criterion: backend selection tests pass with unchanged default software-fallback mode.
+
+- [ ] **STEP_07 slice** (`build_docs/STEP_07.md`)
+  - Scope: distributed/federated sync extensions.
+  - First implementation slice: websocket sync event stream for blockchain updates.
+  - Exit criterion: stream endpoint contract + integration tests for publish/receive behavior.
+
+- [ ] **STEP_08 slice** (`build_docs/STEP_08.md`)
+  - Scope: visualization ecosystem expansion.
+  - First implementation slice: dashboard live updates path (subscribe + refresh risk/ledger widgets).
+  - Exit criterion: UI integration test for live update payload handling.
+
+- [ ] **STEP_09 slice** (`build_docs/STEP_09.md`)
+  - Scope: remaining marketplace/community/API ecosystem features.
+  - First implementation slice: plugin versioning metadata + update compatibility checks.
+  - Exit criterion: plugin registry supports version constraints and compatibility test matrix passes.
+
+- [ ] **STEP_10 slice** (`build_docs/STEP_10.md`)
+  - Scope: future-proofing innovations (quantum/edge/autonomous).
+  - First implementation slice: predictive quality forecasting baseline (non-ML statistical forecast first).
+  - Exit criterion: forecast endpoint with deterministic fixtures and regression tests.
 
 ## F) Status/document drift items to reconcile
 
