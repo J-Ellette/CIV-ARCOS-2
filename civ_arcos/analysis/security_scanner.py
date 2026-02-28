@@ -1,4 +1,5 @@
 """Security vulnerability scanner using regex pattern matching."""
+
 import re
 from typing import Any, Dict, List
 
@@ -9,8 +10,7 @@ _PATTERNS = [
     (
         "SQL_INJECTION",
         re.compile(
-            r'(execute|cursor)\s*\(\s*["\'].*%'
-            r'|(execute|cursor)\s*\(\s*f["\']',
+            r'(execute|cursor)\s*\(\s*["\'].*%' r'|(execute|cursor)\s*\(\s*f["\']',
             re.IGNORECASE,
         ),
         "CRITICAL",
@@ -19,10 +19,10 @@ _PATTERNS = [
     (
         "COMMAND_INJECTION",
         re.compile(
-            r'subprocess.*shell\s*=\s*True'
-            r'|os\.system\s*\('
-            r'|eval\s*\('
-            r'|exec\s*\(',
+            r"subprocess.*shell\s*=\s*True"
+            r"|os\.system\s*\("
+            r"|eval\s*\("
+            r"|exec\s*\(",
             re.IGNORECASE,
         ),
         "CRITICAL",
@@ -39,19 +39,19 @@ _PATTERNS = [
     ),
     (
         "INSECURE_FUNCTION",
-        re.compile(r'\bpickle\.loads?\b|\byaml\.load\s*\('),
+        re.compile(r"\bpickle\.loads?\b|\byaml\.load\s*\("),
         "MEDIUM",
         "Use of insecure deserialization function",
     ),
     (
         "BARE_EXCEPT",
-        re.compile(r'except\s*:'),
+        re.compile(r"except\s*:"),
         "LOW",
         "Bare except clause hides errors",
     ),
 ]
 
-_SKIP_COMMENT = re.compile(r'#\s*(example|placeholder)', re.IGNORECASE)
+_SKIP_COMMENT = re.compile(r"#\s*(example|placeholder)", re.IGNORECASE)
 
 _SEVERITY_DEDUCTION = {
     "CRITICAL": 20,
@@ -69,7 +69,12 @@ class SecurityScanner:
             with open(path, "r", encoding="utf-8", errors="replace") as fh:
                 lines = fh.readlines()
         except OSError as exc:
-            return {"file": path, "vulnerabilities": [], "vulnerability_count": 0, "error": str(exc)}
+            return {
+                "file": path,
+                "vulnerabilities": [],
+                "vulnerability_count": 0,
+                "error": str(exc),
+            }
 
         vulnerabilities: List[Dict[str, Any]] = []
         for lineno, line in enumerate(lines, start=1):
@@ -78,13 +83,15 @@ class SecurityScanner:
                 continue
             for vuln_type, pattern, severity, description in _PATTERNS:
                 if pattern.search(stripped):
-                    vulnerabilities.append({
-                        "type": vuln_type,
-                        "severity": severity,
-                        "description": description,
-                        "line": lineno,
-                        "code": stripped,
-                    })
+                    vulnerabilities.append(
+                        {
+                            "type": vuln_type,
+                            "severity": severity,
+                            "description": description,
+                            "line": lineno,
+                            "code": stripped,
+                        }
+                    )
 
         return {
             "file": path,
@@ -95,7 +102,9 @@ class SecurityScanner:
     def scan_directory(self, path: str) -> List[Dict[str, Any]]:
         return [self.scan_file(fpath) for fpath in iter_python_files(path)]
 
-    def calculate_security_score(self, scan_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def calculate_security_score(
+        self, scan_results: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         breakdown: Dict[str, int] = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
         for result in scan_results:
             for vuln in result.get("vulnerabilities", []):

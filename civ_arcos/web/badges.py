@@ -48,7 +48,7 @@ class BadgeGenerator:
             f'<linearGradient id="s" x2="0" y2="100%">'
             f'<stop offset="0" stop-color="#bbb" stop-opacity=".1"/>'
             f'<stop offset="1" stop-opacity=".1"/>'
-            f'</linearGradient>'
+            f"</linearGradient>"
             f'<rect width="{label_width}" height="20" fill="#555"/>'
             f'<rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>'
             f'<rect width="{total_width}" height="20" fill="url(#s)"/>'
@@ -57,6 +57,6 @@ class BadgeGenerator:
             f'<text x="{label_center_x}" y="14">{label}</text>'
             f'<text x="{value_center_x}" y="15" fill="#010101" fill-opacity=".3">{value}</text>'
             f'<text x="{value_center_x}" y="14">{value}</text>'
-            f'</g>'
-            f'</svg>'
+            f"</g>"
+            f"</svg>"
         )

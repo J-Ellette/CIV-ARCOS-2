@@ -1,4 +1,7 @@
 """Tests for evidence collection and storage."""
+
+from concurrent.futures import ThreadPoolExecutor
+
 import pytest
 from civ_arcos.evidence.collector import Evidence, EvidenceStore
 from civ_arcos.storage.graph import EvidenceGraph
@@ -7,6 +10,7 @@ from civ_arcos.storage.graph import EvidenceGraph
 def make_evidence(etype="test", source="test_source") -> Evidence:
     import uuid
     from datetime import datetime, timezone
+
     return Evidence(
         id=str(uuid.uuid4()),
         type=etype,
@@ -58,8 +62,54 @@ def test_evidence_not_found():
 
 
 def test_evidence_checksum_detects_tamper():
-    import hashlib, json
+    import hashlib
+    import json
+
     ev = make_evidence()
-    assert ev.checksum == hashlib.sha256(
-        json.dumps(ev.data, sort_keys=True).encode()
-    ).hexdigest()
+    assert (
+        ev.checksum
+        == hashlib.sha256(json.dumps(ev.data, sort_keys=True).encode()).hexdigest()
+    )
+
+
+def test_evidence_store_cold_start_recovery(tmp_path):
+    graph = EvidenceGraph()
+    store = EvidenceStore(graph)
+    evidence = make_evidence("recovery")
+    store.store_evidence(evidence)
+
+    path = str(tmp_path / "evidence_graph.json")
+    graph.save(path)
+
+    loaded_graph = EvidenceGraph()
+    loaded_graph.load(path)
+    rehydrated_store = EvidenceStore(loaded_graph)
+    restored = rehydrated_store.get_evidence(evidence.id)
+
+    assert restored is not None
+    assert restored.id == evidence.id
+    assert restored.type == "recovery"
+
+
+def test_evidence_store_concurrent_writes_preserved_after_reload(tmp_path):
+    graph = EvidenceGraph()
+    store = EvidenceStore(graph)
+
+    def _write(_: int) -> str:
+        evidence = make_evidence("parallel")
+        return store.store_evidence(evidence)
+
+    write_count = 100
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = list(executor.map(_write, range(write_count)))
+
+    assert len(results) == write_count
+
+    path = str(tmp_path / "parallel_graph.json")
+    graph.save(path)
+
+    loaded_graph = EvidenceGraph()
+    loaded_graph.load(path)
+    loaded_store = EvidenceStore(loaded_graph)
+    loaded = loaded_store.list_evidence()
+    assert len(loaded) == write_count

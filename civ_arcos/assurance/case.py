@@ -1,12 +1,18 @@
 """Assurance case builder and case model."""
+
 import uuid
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from civ_arcos.assurance.gsn import (
-    GSNNode, GSNNodeType, GSNGoal, GSNStrategy, GSNSolution, GSNContext,
-    GSNAssumption, GSNJustification,
+    GSNNode,
+    GSNNodeType,
+    GSNGoal,
+    GSNStrategy,
+    GSNSolution,
+    GSNContext,
+    GSNAssumption,
+    GSNJustification,
 )
 
 _TYPE_MAP = {
@@ -22,8 +28,13 @@ _TYPE_MAP = {
 class AssuranceCase:
     """An assurance case backed by a GSN graph."""
 
-    def __init__(self, case_id: Optional[str] = None, title: str = "",
-                 description: str = "", project_type: str = "general") -> None:
+    def __init__(
+        self,
+        case_id: Optional[str] = None,
+        title: str = "",
+        description: str = "",
+        project_type: str = "general",
+    ) -> None:
         self.case_id: str = case_id or str(uuid.uuid4())
         self.title: str = title
         self.description: str = description
@@ -101,7 +112,9 @@ class AssuranceCase:
             if not node.evidence_ids:
                 warnings.append(f"Node '{nid}' has no evidence linked")
             if node.node_type == GSNNodeType.GOAL and not node.children:
-                warnings.append(f"Goal '{nid}' has no supporting strategies or solutions")
+                warnings.append(
+                    f"Goal '{nid}' has no supporting strategies or solutions"
+                )
 
         return {"valid": len(errors) == 0, "errors": errors, "warnings": warnings}
 
@@ -142,34 +155,46 @@ class AssuranceCase:
 class AssuranceCaseBuilder:
     """Fluent builder API for constructing an AssuranceCase."""
 
-    def __init__(self, title: str = "", description: str = "",
-                 project_type: str = "general") -> None:
-        self._case = AssuranceCase(title=title, description=description,
-                                   project_type=project_type)
+    def __init__(
+        self, title: str = "", description: str = "", project_type: str = "general"
+    ) -> None:
+        self._case = AssuranceCase(
+            title=title, description=description, project_type=project_type
+        )
         self._last_node_id: Optional[str] = None
 
-    def add_goal(self, statement: str, node_id: Optional[str] = None) -> "AssuranceCaseBuilder":
+    def add_goal(
+        self, statement: str, node_id: Optional[str] = None
+    ) -> "AssuranceCaseBuilder":
         node = GSNGoal(statement, node_id=node_id)
         self._case.add_node(node)
         self._last_node_id = node.id
         return self
 
-    def add_strategy(self, statement: str, node_id: Optional[str] = None) -> "AssuranceCaseBuilder":
+    def add_strategy(
+        self, statement: str, node_id: Optional[str] = None
+    ) -> "AssuranceCaseBuilder":
         node = GSNStrategy(statement, node_id=node_id)
         self._case.add_node(node)
         self._last_node_id = node.id
         return self
 
-    def add_solution(self, statement: str, evidence_ids: Optional[List[str]] = None,
-                     node_id: Optional[str] = None) -> "AssuranceCaseBuilder":
+    def add_solution(
+        self,
+        statement: str,
+        evidence_ids: Optional[List[str]] = None,
+        node_id: Optional[str] = None,
+    ) -> "AssuranceCaseBuilder":
         node = GSNSolution(statement, node_id=node_id)
-        for eid in (evidence_ids or []):
+        for eid in evidence_ids or []:
             node.add_evidence(eid)
         self._case.add_node(node)
         self._last_node_id = node.id
         return self
 
-    def add_context(self, statement: str, node_id: Optional[str] = None) -> "AssuranceCaseBuilder":
+    def add_context(
+        self, statement: str, node_id: Optional[str] = None
+    ) -> "AssuranceCaseBuilder":
         node = GSNContext(statement, node_id=node_id)
         self._case.add_node(node)
         self._last_node_id = node.id
@@ -185,8 +210,9 @@ class AssuranceCaseBuilder:
             self._case.link_nodes(parent_id, self._last_node_id)
         return self
 
-    def merge_nodes_from(self, other_case: AssuranceCase,
-                         link_root_to: Optional[str] = None) -> "AssuranceCaseBuilder":
+    def merge_nodes_from(
+        self, other_case: AssuranceCase, link_root_to: Optional[str] = None
+    ) -> "AssuranceCaseBuilder":
         """Merge all nodes from another AssuranceCase into this builder's case.
 
         Args:

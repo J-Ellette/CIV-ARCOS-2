@@ -1,4 +1,5 @@
 """Unit tests for StaticAnalyzer."""
+
 import ast
 import os
 import tempfile

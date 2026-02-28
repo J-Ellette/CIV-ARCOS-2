@@ -1,4 +1,5 @@
 """Test template generation and untested function detection."""
+
 import ast
 import os
 from typing import Any, Dict, List, Optional
@@ -20,14 +21,19 @@ def _parse_functions_and_classes(path: str):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             # skip private/dunder at module level unless inside class
             params = [a.arg for a in node.args.args]
-            functions.append({"name": node.name, "params": params, "lineno": node.lineno})
+            functions.append(
+                {"name": node.name, "params": params, "lineno": node.lineno}
+            )
         elif isinstance(node, ast.ClassDef):
             methods = [
                 {"name": n.name, "params": [a.arg for a in n.args.args]}
                 for n in ast.walk(node)
-                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n is not node
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and n is not node
             ]
-            classes.append({"name": node.name, "methods": methods, "lineno": node.lineno})
+            classes.append(
+                {"name": node.name, "methods": methods, "lineno": node.lineno}
+            )
 
     return functions, classes
 
@@ -80,8 +86,11 @@ class TestGenerator:
         functions, classes = _parse_functions_and_classes(path)
         tested = _gather_tested_names(path)
 
-        untested_functions = [f for f in functions if f["name"] not in tested
-                              and not f["name"].startswith("_")]
+        untested_functions = [
+            f
+            for f in functions
+            if f["name"] not in tested and not f["name"].startswith("_")
+        ]
         untested_classes = [c for c in classes if c["name"] not in tested]
 
         return {
@@ -91,8 +100,9 @@ class TestGenerator:
             "untested_classes": untested_classes,
         }
 
-    def generate_test_template(self, func_name: str, params: List[str],
-                               class_name: Optional[str] = None) -> str:
+    def generate_test_template(
+        self, func_name: str, params: List[str], class_name: Optional[str] = None
+    ) -> str:
         indentation = "    "
         if class_name:
             args = ", ".join("None" for p in params if p != "self")
@@ -126,14 +136,18 @@ class TestGenerator:
         templates: List[str] = []
         for func in functions:
             if not func["name"].startswith("_"):
-                templates.append(self.generate_test_template(func["name"], func["params"]))
+                templates.append(
+                    self.generate_test_template(func["name"], func["params"])
+                )
                 templates.append("")
 
         for cls in classes:
             for method in cls.get("methods", []):
                 if not method["name"].startswith("_"):
                     templates.append(
-                        self.generate_test_template(method["name"], method["params"], cls["name"])
+                        self.generate_test_template(
+                            method["name"], method["params"], cls["name"]
+                        )
                     )
                     templates.append("")
 
@@ -144,22 +158,28 @@ class TestGenerator:
         suggestions: List[Dict[str, Any]] = []
 
         for func in analysis["untested_functions"]:
-            suggestions.append({
-                "name": func["name"],
-                "type": "function",
-                "template": self.generate_test_template(func["name"], func["params"]),
-            })
+            suggestions.append(
+                {
+                    "name": func["name"],
+                    "type": "function",
+                    "template": self.generate_test_template(
+                        func["name"], func["params"]
+                    ),
+                }
+            )
 
         for cls in analysis["untested_classes"]:
             for method in cls.get("methods", []):
                 if not method["name"].startswith("_"):
-                    suggestions.append({
-                        "name": f"{cls['name']}.{method['name']}",
-                        "type": "method",
-                        "template": self.generate_test_template(
-                            method["name"], method["params"], cls["name"]
-                        ),
-                    })
+                    suggestions.append(
+                        {
+                            "name": f"{cls['name']}.{method['name']}",
+                            "type": "method",
+                            "template": self.generate_test_template(
+                                method["name"], method["params"], cls["name"]
+                            ),
+                        }
+                    )
 
         return {
             "functions_found": len(analysis["functions"]),

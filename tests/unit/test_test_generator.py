@@ -1,4 +1,5 @@
 """Unit tests for TestGenerator."""
+
 import os
 import tempfile
 import pytest
@@ -32,7 +33,9 @@ def test_generate_test_template_function():
 
 
 def test_generate_test_template_method():
-    tpl = TestGenerator().generate_test_template("my_method", ["self", "x"], class_name="MyClass")
+    tpl = TestGenerator().generate_test_template(
+        "my_method", ["self", "x"], class_name="MyClass"
+    )
     assert "def test_my_method" in tpl
     assert "MyClass()" in tpl
     assert "instance.my_method" in tpl

@@ -1,4 +1,5 @@
 """Utility functions for CIV-ARCOS."""
+
 import os
 import uuid
 from datetime import datetime, timezone
@@ -33,7 +34,11 @@ def make_evidence(
         source=source,
         timestamp=datetime.now(timezone.utc).isoformat(),
         data=data,
-        provenance=provenance if provenance is not None else {"collector": ev_type, "source_path": source},
+        provenance=(
+            provenance
+            if provenance is not None
+            else {"collector": ev_type, "source_path": source}
+        ),
     )
 
 

@@ -1,8 +1,15 @@
 """Unit tests for GSN node types and classes."""
+
 import pytest
 from civ_arcos.assurance.gsn import (
-    GSNNodeType, GSNNode, GSNGoal, GSNStrategy, GSNSolution,
-    GSNContext, GSNAssumption, GSNJustification,
+    GSNNodeType,
+    GSNNode,
+    GSNGoal,
+    GSNStrategy,
+    GSNSolution,
+    GSNContext,
+    GSNAssumption,
+    GSNJustification,
 )
 
 

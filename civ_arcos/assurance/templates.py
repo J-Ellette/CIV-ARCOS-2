@@ -1,15 +1,15 @@
 """Assurance case templates for common quality scenarios."""
+
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
-from civ_arcos.assurance.case import AssuranceCaseBuilder, AssuranceCase
+from civ_arcos.assurance.case import AssuranceCaseBuilder
 
 
 class AssuranceTemplate(ABC):
     @property
     @abstractmethod
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
 
     @property
     def display_name(self) -> str:
@@ -24,9 +24,9 @@ class AssuranceTemplate(ABC):
         return "general"
 
     @abstractmethod
-    def instantiate(self, builder: AssuranceCaseBuilder,
-                    context: Optional[Dict[str, Any]] = None) -> AssuranceCaseBuilder:
-        ...
+    def instantiate(
+        self, builder: AssuranceCaseBuilder, context: Optional[Dict[str, Any]] = None
+    ) -> AssuranceCaseBuilder: ...
 
 
 class CodeQualityTemplate(AssuranceTemplate):
@@ -46,16 +46,18 @@ class CodeQualityTemplate(AssuranceTemplate):
     def category(self) -> str:
         return "quality"
 
-    def instantiate(self, builder: AssuranceCaseBuilder,
-                    context: Optional[Dict[str, Any]] = None) -> AssuranceCaseBuilder:
+    def instantiate(
+        self, builder: AssuranceCaseBuilder, context: Optional[Dict[str, Any]] = None
+    ) -> AssuranceCaseBuilder:
         ctx = context or {}
         project = ctx.get("project_name", "the system")
 
         goal_id = "cq_root"
         strat_id = "cq_strat"
         (
-            builder
-            .add_goal(f"The code of {project} meets quality standards", node_id=goal_id)
+            builder.add_goal(
+                f"The code of {project} meets quality standards", node_id=goal_id
+            )
             .set_as_root()
             .add_strategy(
                 "Argue by demonstrating low complexity, high maintainability, and absence of code smells",
@@ -89,16 +91,16 @@ class TestCoverageTemplate(AssuranceTemplate):
     def category(self) -> str:
         return "testing"
 
-    def instantiate(self, builder: AssuranceCaseBuilder,
-                    context: Optional[Dict[str, Any]] = None) -> AssuranceCaseBuilder:
+    def instantiate(
+        self, builder: AssuranceCaseBuilder, context: Optional[Dict[str, Any]] = None
+    ) -> AssuranceCaseBuilder:
         ctx = context or {}
         project = ctx.get("project_name", "the system")
 
         goal_id = "tc_root"
         strat_id = "tc_strat"
         (
-            builder
-            .add_goal(f"{project} is adequately tested", node_id=goal_id)
+            builder.add_goal(f"{project} is adequately tested", node_id=goal_id)
             .set_as_root()
             .add_strategy(
                 "Argue by demonstrating sufficient line/branch coverage and critical function tests",
@@ -132,23 +134,28 @@ class SecurityAssuranceTemplate(AssuranceTemplate):
     def category(self) -> str:
         return "security"
 
-    def instantiate(self, builder: AssuranceCaseBuilder,
-                    context: Optional[Dict[str, Any]] = None) -> AssuranceCaseBuilder:
+    def instantiate(
+        self, builder: AssuranceCaseBuilder, context: Optional[Dict[str, Any]] = None
+    ) -> AssuranceCaseBuilder:
         ctx = context or {}
         project = ctx.get("project_name", "the system")
 
         goal_id = "sec_root"
         strat_id = "sec_strat"
         (
-            builder
-            .add_goal(f"{project} is free from known security vulnerabilities", node_id=goal_id)
+            builder.add_goal(
+                f"{project} is free from known security vulnerabilities",
+                node_id=goal_id,
+            )
             .set_as_root()
             .add_strategy(
                 "Argue by demonstrating absence of OWASP Top-10 vulnerabilities via automated scanning",
                 node_id=strat_id,
             )
             .link_to_parent(goal_id)
-            .add_solution("No critical vulnerabilities (SQL injection, command injection)")
+            .add_solution(
+                "No critical vulnerabilities (SQL injection, command injection)"
+            )
             .link_to_parent(strat_id)
             .add_solution("No hardcoded secrets or credentials")
             .link_to_parent(strat_id)
@@ -175,16 +182,18 @@ class MaintainabilityTemplate(AssuranceTemplate):
     def category(self) -> str:
         return "quality"
 
-    def instantiate(self, builder: AssuranceCaseBuilder,
-                    context: Optional[Dict[str, Any]] = None) -> AssuranceCaseBuilder:
+    def instantiate(
+        self, builder: AssuranceCaseBuilder, context: Optional[Dict[str, Any]] = None
+    ) -> AssuranceCaseBuilder:
         ctx = context or {}
         project = ctx.get("project_name", "the system")
 
         goal_id = "maint_root"
         strat_id = "maint_strat"
         (
-            builder
-            .add_goal(f"{project} is maintainable and understandable", node_id=goal_id)
+            builder.add_goal(
+                f"{project} is maintainable and understandable", node_id=goal_id
+            )
             .set_as_root()
             .add_strategy(
                 "Argue by demonstrating low complexity, consistent style, and documentation",
@@ -218,17 +227,23 @@ class ComprehensiveQualityTemplate(AssuranceTemplate):
     def category(self) -> str:
         return "comprehensive"
 
-    def instantiate(self, builder: AssuranceCaseBuilder,
-                    context: Optional[Dict[str, Any]] = None) -> AssuranceCaseBuilder:
+    def instantiate(
+        self, builder: AssuranceCaseBuilder, context: Optional[Dict[str, Any]] = None
+    ) -> AssuranceCaseBuilder:
         ctx = context or {}
         project = ctx.get("project_name", "the system")
 
         root_id = "comp_root"
-        builder.add_goal(f"{project} meets comprehensive software quality standards",
-                         node_id=root_id).set_as_root()
+        builder.add_goal(
+            f"{project} meets comprehensive software quality standards", node_id=root_id
+        ).set_as_root()
 
-        for sub_tpl in (CodeQualityTemplate(), TestCoverageTemplate(),
-                        SecurityAssuranceTemplate(), MaintainabilityTemplate()):
+        for sub_tpl in (
+            CodeQualityTemplate(),
+            TestCoverageTemplate(),
+            SecurityAssuranceTemplate(),
+            MaintainabilityTemplate(),
+        ):
             sub_ctx = dict(ctx)
             sub_builder = AssuranceCaseBuilder()
             sub_builder = sub_tpl.instantiate(sub_builder, sub_ctx)

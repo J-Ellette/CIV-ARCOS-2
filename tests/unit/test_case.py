@@ -1,4 +1,5 @@
 """Unit tests for AssuranceCase and AssuranceCaseBuilder."""
+
 import pytest
 from civ_arcos.assurance.case import AssuranceCase, AssuranceCaseBuilder
 from civ_arcos.assurance.gsn import GSNGoal, GSNStrategy, GSNSolution, GSNNodeType

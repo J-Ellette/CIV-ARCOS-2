@@ -1,10 +1,9 @@
 """Evidence collection with provenance tracking."""
+
 import hashlib
 import json
-import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from civ_arcos.storage.graph import EvidenceGraph
@@ -13,6 +12,7 @@ from civ_arcos.storage.graph import EvidenceGraph
 @dataclass
 class Evidence:
     """Immutable evidence record with cryptographic checksum."""
+
     id: str
     type: str
     source: str
@@ -44,7 +44,9 @@ class EvidenceCollector(ABC):
         """Collect evidence from CI system."""
 
     @abstractmethod
-    def collect_from_security_tools(self, scan_results: Dict[str, Any]) -> List[Evidence]:
+    def collect_from_security_tools(
+        self, scan_results: Dict[str, Any]
+    ) -> List[Evidence]:
         """Collect evidence from security tools."""
 
 
@@ -70,21 +72,33 @@ class EvidenceStore:
         self._last_hash = evidence.checksum
         return node_id
 
-    def get_evidence(self, evidence_id: str) -> Optional[Evidence]:
+    def get_evidence(
+        self, evidence_id: str, tenant_id: Optional[str] = None
+    ) -> Optional[Evidence]:
         nodes = self._graph.find_nodes_by_property("evidence_id", evidence_id)
         if not nodes:
             return None
-        return self._node_to_evidence(nodes[0].properties)
+        evidence = self._node_to_evidence(nodes[0].properties)
+        if tenant_id and evidence.provenance.get("tenant_id") != tenant_id:
+            return None
+        return evidence
 
-    def list_evidence(self) -> List[Evidence]:
+    def list_evidence(self, tenant_id: Optional[str] = None) -> List[Evidence]:
         nodes = self._graph.find_nodes_by_label("Evidence")
-        return [self._node_to_evidence(n.properties) for n in nodes]
+        evidence_list = [self._node_to_evidence(n.properties) for n in nodes]
+        if tenant_id:
+            return [
+                ev
+                for ev in evidence_list
+                if ev.provenance.get("tenant_id") == tenant_id
+            ]
+        return evidence_list
 
     def verify_chain(self) -> bool:
         """Verify evidence chain integrity by checking checksums."""
         nodes = sorted(
             self._graph.find_nodes_by_label("Evidence"),
-            key=lambda n: n.properties.get("timestamp", "")
+            key=lambda n: n.properties.get("timestamp", ""),
         )
         for node in nodes:
             props = node.properties

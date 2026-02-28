@@ -1,4 +1,5 @@
 """Tests for the webhook security utilities."""
+
 import hashlib
 import hmac as _hmac
 import time
@@ -21,6 +22,7 @@ def _make_sig(body: bytes, secret: str) -> str:
 # ---------------------------------------------------------------------------
 # validate_github_signature
 # ---------------------------------------------------------------------------
+
 
 class TestValidateGithubSignature:
     """Unit tests for HMAC-SHA256 signature validation."""
@@ -64,6 +66,7 @@ class TestValidateGithubSignature:
 # validate_timestamp
 # ---------------------------------------------------------------------------
 
+
 class TestValidateTimestamp:
     """Unit tests for timestamp tolerance checking."""
 
@@ -103,6 +106,7 @@ class TestValidateTimestamp:
 # ---------------------------------------------------------------------------
 # _NonceCache
 # ---------------------------------------------------------------------------
+
 
 class TestNonceCache:
     """Unit tests for the in-memory nonce / delivery-ID replay cache."""

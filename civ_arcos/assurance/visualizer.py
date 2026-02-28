@@ -1,26 +1,30 @@
 """GSN visualizer — produces SVG, DOT, and summary output."""
-from typing import Any, Dict, Optional
+
+from typing import Any, Dict
 
 from civ_arcos.assurance.case import AssuranceCase
-from civ_arcos.assurance.gsn import GSNNodeType, GSNNode
-
+from civ_arcos.assurance.gsn import GSNNodeType
 
 # Color / shape mapping per node type
 _STYLE: Dict[GSNNodeType, Dict[str, str]] = {
-    GSNNodeType.GOAL:          {"fill": "#4caf50", "shape": "rect",          "label": "G"},
-    GSNNodeType.STRATEGY:      {"fill": "#2196f3", "shape": "parallelogram", "label": "S"},
-    GSNNodeType.SOLUTION:      {"fill": "#ffc107", "shape": "circle",        "label": "Sn"},
-    GSNNodeType.CONTEXT:       {"fill": "#9e9e9e", "shape": "rounded_rect",  "label": "C"},
-    GSNNodeType.ASSUMPTION:    {"fill": "#e91e63", "shape": "rounded_rect",  "label": "A"},
-    GSNNodeType.JUSTIFICATION: {"fill": "#9c27b0", "shape": "rounded_rect",  "label": "J"},
+    GSNNodeType.GOAL: {"fill": "#4caf50", "shape": "rect", "label": "G"},
+    GSNNodeType.STRATEGY: {"fill": "#2196f3", "shape": "parallelogram", "label": "S"},
+    GSNNodeType.SOLUTION: {"fill": "#ffc107", "shape": "circle", "label": "Sn"},
+    GSNNodeType.CONTEXT: {"fill": "#9e9e9e", "shape": "rounded_rect", "label": "C"},
+    GSNNodeType.ASSUMPTION: {"fill": "#e91e63", "shape": "rounded_rect", "label": "A"},
+    GSNNodeType.JUSTIFICATION: {
+        "fill": "#9c27b0",
+        "shape": "rounded_rect",
+        "label": "J",
+    },
 }
 
 _DOT_SHAPE: Dict[GSNNodeType, str] = {
-    GSNNodeType.GOAL:          "box",
-    GSNNodeType.STRATEGY:      "parallelogram",
-    GSNNodeType.SOLUTION:      "ellipse",
-    GSNNodeType.CONTEXT:       "box",
-    GSNNodeType.ASSUMPTION:    "box",
+    GSNNodeType.GOAL: "box",
+    GSNNodeType.STRATEGY: "parallelogram",
+    GSNNodeType.SOLUTION: "ellipse",
+    GSNNodeType.CONTEXT: "box",
+    GSNNodeType.ASSUMPTION: "box",
     GSNNodeType.JUSTIFICATION: "box",
 }
 
@@ -34,8 +38,10 @@ class GSNVisualizer:
     def to_svg(self, case: AssuranceCase) -> str:
         nodes = case.traverse()
         if not nodes:
-            return "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'>" \
-                   "<text x='10' y='30'>Empty case</text></svg>"
+            return (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'>"
+                "<text x='10' y='30'>Empty case</text></svg>"
+            )
 
         # Simple vertical tree layout
         x_spacing = 220
@@ -62,7 +68,14 @@ class GSNVisualizer:
         # Any unreached nodes
         for node in nodes:
             if node.id not in positions:
-                positions[node.id] = (30, (max(v[1] for v in positions.values()) + y_spacing) if positions else 30)
+                positions[node.id] = (
+                    30,
+                    (
+                        (max(v[1] for v in positions.values()) + y_spacing)
+                        if positions
+                        else 30
+                    ),
+                )
 
         max_x = max(p[0] for p in positions.values()) + node_w + 30
         max_y = max(p[1] for p in positions.values()) + node_h + 30
@@ -97,15 +110,21 @@ class GSNVisualizer:
             style = _STYLE.get(node.node_type, _STYLE[GSNNodeType.GOAL])
             fill = style["fill"]
             label = style["label"]
-            text = (node.statement[:28] + "…") if len(node.statement) > 30 else node.statement
-            escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            text = (
+                (node.statement[:28] + "…")
+                if len(node.statement) > 30
+                else node.statement
+            )
+            escaped = (
+                text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            )
             lines.append(
                 f'<rect x="{x}" y="{y}" width="{node_w}" height="{node_h}" '
                 f'rx="6" fill="{fill}" stroke="#333" stroke-width="1"/>'
             )
             lines.append(
                 f'<text x="{x + 6}" y="{y + 20}" font-size="10" fill="white" font-weight="bold">'
-                f'[{label}]</text>'
+                f"[{label}]</text>"
             )
             lines.append(
                 f'<text x="{x + 6}" y="{y + 38}" font-size="9" fill="white">{escaped}</text>'
@@ -118,7 +137,11 @@ class GSNVisualizer:
     # DOT
     # ------------------------------------------------------------------
     def to_dot(self, case: AssuranceCase) -> str:
-        lines = [f'digraph "{case.title or case.case_id}" {{', '  rankdir=TB;', '  node [fontsize=10];']
+        lines = [
+            f'digraph "{case.title or case.case_id}" {{',
+            "  rankdir=TB;",
+            "  node [fontsize=10];",
+        ]
         for node in case.nodes.values():
             shape = _DOT_SHAPE.get(node.node_type, "box")
             label = node.statement.replace('"', '\\"')[:50]

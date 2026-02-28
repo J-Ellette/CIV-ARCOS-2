@@ -1,4 +1,5 @@
 """Unit tests for SecurityScanner."""
+
 import os
 import tempfile
 import pytest
@@ -76,10 +77,12 @@ def test_calculate_security_score_clean():
 
 def test_calculate_security_score_deductions():
     scan_results = [
-        {"vulnerabilities": [
-            {"type": "SQL_INJECTION", "severity": "CRITICAL"},
-            {"type": "HARDCODED_SECRET", "severity": "HIGH"},
-        ]}
+        {
+            "vulnerabilities": [
+                {"type": "SQL_INJECTION", "severity": "CRITICAL"},
+                {"type": "HARDCODED_SECRET", "severity": "HIGH"},
+            ]
+        }
     ]
     score_data = SecurityScanner().calculate_security_score(scan_results)
     # 100 - 20 (critical) - 10 (high) = 70

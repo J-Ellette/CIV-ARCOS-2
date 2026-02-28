@@ -1,4 +1,5 @@
 """Tests for SVG badge generator."""
+
 import pytest
 from civ_arcos.web.badges import BadgeGenerator
 

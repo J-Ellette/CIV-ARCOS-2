@@ -4,17 +4,18 @@ Provides HMAC-SHA256 signature verification (GitHub-style ``X-Hub-Signature-256`
 header), timestamp tolerance checks, and an in-memory nonce cache to prevent
 replayed deliveries.
 """
+
 import hashlib
 import hmac
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Optional, Set
-
 
 # ---------------------------------------------------------------------------
 # Signature validation
 # ---------------------------------------------------------------------------
+
 
 def validate_github_signature(
     body: bytes,
@@ -41,7 +42,7 @@ def validate_github_signature(
         return False
     if not signature_header.startswith("sha256="):
         return False
-    expected_sig = signature_header[len("sha256="):]
+    expected_sig = signature_header[len("sha256=") :]
     mac = hmac.new(secret.encode(), body, hashlib.sha256)
     computed_sig = mac.hexdigest()
     # Use constant-time comparison to prevent timing attacks.
@@ -51,6 +52,7 @@ def validate_github_signature(
 # ---------------------------------------------------------------------------
 # Timestamp tolerance
 # ---------------------------------------------------------------------------
+
 
 def validate_timestamp(
     timestamp_str: str,
@@ -86,6 +88,7 @@ def validate_timestamp(
 # ---------------------------------------------------------------------------
 # Nonce / delivery-ID replay cache
 # ---------------------------------------------------------------------------
+
 
 class _NonceCache:
     """Thread-safe in-memory cache for seen delivery IDs.

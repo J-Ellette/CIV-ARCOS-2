@@ -1,4 +1,5 @@
 """Integration tests for analysis API routes."""
+
 import json
 import os
 import tempfile
@@ -48,7 +49,9 @@ def test_analysis_comprehensive_route_exists():
     with tempfile.TemporaryDirectory() as tmpdir:
         with open(os.path.join(tmpdir, "mod.py"), "w") as fh:
             fh.write("def baz():\n    pass\n")
-        resp = handle("POST", "/api/analysis/comprehensive", body={"source_path": tmpdir})
+        resp = handle(
+            "POST", "/api/analysis/comprehensive", body={"source_path": tmpdir}
+        )
         assert resp.status_code == 200
         data = json.loads(resp.body)
         assert "evidence_collected" in data

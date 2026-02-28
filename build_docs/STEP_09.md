@@ -1,5 +1,22 @@
 # Step 9 Implementation Complete: Market & Ecosystem
 
+## Incremental Alignment Update (2026-02-28)
+
+The historical Step 9 document describes a broad marketplace/ecosystem feature set.
+In the current repository state, the following Step 9-aligned baseline is now implemented:
+
+- `civ_arcos/core/plugin_marketplace.py`
+  - `PluginValidator`: AST-based validation with forbidden import checks and checksum generation.
+  - `PluginSandbox`: isolated subprocess execution (`python -I`), timeout enforcement, and bounded output capture.
+- `civ_arcos/api.py`
+  - `POST /api/plugins/validate`
+  - `POST /api/plugins/execute`
+- Tests
+  - `tests/unit/test_plugin_marketplace.py`
+  - `tests/integration/test_plugin_api.py`
+
+Remaining Step 9 ecosystem capabilities in this file (full marketplace lifecycle, community platform, GraphQL ecosystem, and additional webhooks) should be treated as planned/partial until implemented in code and verified in `VERIFICATION_MATRIX.md`.
+
 ## Overview
 
 Successfully implemented Step 9 of the CIV-ARCOS enhancement: comprehensive Market & Ecosystem features including Plugin Marketplace, API Ecosystem with multi-version support and webhooks, and Community Platform for sharing quality patterns, best practices, and threat intelligence.

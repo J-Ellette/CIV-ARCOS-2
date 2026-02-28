@@ -1,4 +1,5 @@
 """Tests for configuration system."""
+
 import os
 import pytest
 from civ_arcos.core import config as config_module

@@ -8,6 +8,18 @@
 
 We are laying the foundation to build a "civilian" version of military-grade software assurance, while following proven ARCOS methodologies - perfect for open source projects, enterprise development teams, or as a SaaS offering. We will be creating the various parts of the system by emulating and perfecting existing technologies.
 
+## Roadmap Update Protocol
+
+Use this protocol whenever implementation work changes scope, priority, or completion status.
+
+1. Update root `README.md` section **Roadmap next up** with the new status and next action.
+2. Update `copilot.md` with the completed implementation details.
+3. Update `build_docs/STATUS.md` change log with date-stamped summary.
+4. Update `build_docs/VERIFICATION_MATRIX.md` with verification command(s) and pass/fail state.
+5. If step-level docs are impacted, update the relevant `STEP_*.md` file in the same work session.
+
+This keeps the roadmap, execution log, and verification evidence synchronized.
+
 ## Technologies We Will NOT Use
 
 We won't be using the following technologies, but will take inspiration from and emulate them:
@@ -204,12 +216,6 @@ const qualityBadges = {
 5. Implement badge generation
 6. Create the web dashboard
 7. Iterate and expand functionality
-
-### Step 4.1 UI design
-
-(re)build the frontend UI/GUI
-Use the United States Web Design System: <https://github.com/uswds/uswds> as the UI.
-Use <https://designsystem.digital.gov/> as the specif design to copy/emulate.
 
 ### Step 4.2 Emulation and incorporate
 

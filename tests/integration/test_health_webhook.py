@@ -1,4 +1,5 @@
 """Integration tests for health endpoints and webhook endpoint."""
+
 import hashlib
 import hmac
 import json
@@ -9,8 +10,10 @@ import pytest
 def _handle(method: str, path: str, body: bytes = b"", headers=None, query_params=None):
     """Invoke the API application handle() directly."""
     from civ_arcos import api
+
     return api.app.handle(
-        method, path,
+        method,
+        path,
         query_params or {},
         body,
         headers or {},
@@ -26,6 +29,7 @@ def _make_sig(body: bytes, secret: str) -> str:
 # ---------------------------------------------------------------------------
 # Health — liveness
 # ---------------------------------------------------------------------------
+
 
 class TestHealthLive:
     """Tests for GET /api/health/live."""
@@ -50,6 +54,7 @@ class TestHealthLive:
 # ---------------------------------------------------------------------------
 # Health — readiness
 # ---------------------------------------------------------------------------
+
 
 class TestHealthReady:
     """Tests for GET /api/health/ready."""
@@ -83,6 +88,7 @@ class TestHealthReady:
 # Health — dependencies
 # ---------------------------------------------------------------------------
 
+
 class TestHealthDependencies:
     """Tests for GET /api/health/dependencies."""
 
@@ -109,6 +115,7 @@ class TestHealthDependencies:
 # Webhook — POST /api/webhooks/github
 # ---------------------------------------------------------------------------
 
+
 class TestWebhookGitHub:
     """Tests for POST /api/webhooks/github."""
 
@@ -132,11 +139,14 @@ class TestWebhookGitHub:
         monkeypatch.setenv("CIV_WEBHOOK_SECRET", secret)
         body = json.dumps({"action": "push"}).encode()
         sig = _make_sig(body, secret)
-        resp = self._post(body, {
-            "X-Hub-Signature-256": sig,
-            "X-GitHub-Event": "push",
-            "X-GitHub-Delivery": "delivery-test-001",
-        })
+        resp = self._post(
+            body,
+            {
+                "X-Hub-Signature-256": sig,
+                "X-GitHub-Event": "push",
+                "X-GitHub-Delivery": "delivery-test-001",
+            },
+        )
         assert resp.status_code == 202
         data = json.loads(resp.body)
         assert data["received"] is True
@@ -147,16 +157,20 @@ class TestWebhookGitHub:
         monkeypatch.setenv("CIV_WEBHOOK_SECRET", "real-secret")
         body = json.dumps({"action": "push"}).encode()
         wrong_sig = _make_sig(body, "wrong-secret")
-        resp = self._post(body, {
-            "X-Hub-Signature-256": wrong_sig,
-            "X-GitHub-Event": "push",
-        })
+        resp = self._post(
+            body,
+            {
+                "X-Hub-Signature-256": wrong_sig,
+                "X-GitHub-Event": "push",
+            },
+        )
         assert resp.status_code == 401
 
     def test_replay_rejected(self, monkeypatch):
         """A delivery with a previously seen delivery ID must be rejected (409)."""
         monkeypatch.delenv("CIV_WEBHOOK_SECRET", raising=False)
         from civ_arcos.web.webhook import nonce_cache
+
         delivery_id = "unique-delivery-xyz-replay-test"
         # Ensure clean state.
         with nonce_cache._lock:

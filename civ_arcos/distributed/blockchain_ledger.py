@@ -1,4 +1,5 @@
 """SHA-256 blockchain for evidence integrity."""
+
 import hashlib
 import json
 from dataclasses import dataclass
@@ -15,12 +16,15 @@ class Block:
     hash: str = ""
 
     def compute_hash(self) -> str:
-        content = json.dumps({
-            "index": self.index,
-            "timestamp": self.timestamp,
-            "data": self.data,
-            "previous_hash": self.previous_hash,
-        }, sort_keys=True)
+        content = json.dumps(
+            {
+                "index": self.index,
+                "timestamp": self.timestamp,
+                "data": self.data,
+                "previous_hash": self.previous_hash,
+            },
+            sort_keys=True,
+        )
         return hashlib.sha256(content.encode()).hexdigest()
 
 

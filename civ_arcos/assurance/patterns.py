@@ -1,4 +1,5 @@
 """Pattern instantiator: create AssuranceCases from project types."""
+
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -22,26 +23,43 @@ class ProjectType(Enum):
 # Which templates to apply per project type
 _PROJECT_TEMPLATES: Dict[str, List[str]] = {
     ProjectType.WEB_APP.value: ["code_quality", "security_assurance", "test_coverage"],
-    ProjectType.API.value: ["code_quality", "security_assurance", "test_coverage", "maintainability"],
+    ProjectType.API.value: [
+        "code_quality",
+        "security_assurance",
+        "test_coverage",
+        "maintainability",
+    ],
     ProjectType.LIBRARY.value: ["code_quality", "test_coverage", "maintainability"],
-    ProjectType.MOBILE_APP.value: ["code_quality", "security_assurance", "test_coverage"],
+    ProjectType.MOBILE_APP.value: [
+        "code_quality",
+        "security_assurance",
+        "test_coverage",
+    ],
     ProjectType.CLI_TOOL.value: ["code_quality", "test_coverage"],
-    ProjectType.MICROSERVICE.value: ["code_quality", "security_assurance", "test_coverage"],
+    ProjectType.MICROSERVICE.value: [
+        "code_quality",
+        "security_assurance",
+        "test_coverage",
+    ],
     ProjectType.DESKTOP_APP.value: ["code_quality", "test_coverage", "maintainability"],
     ProjectType.GENERAL.value: ["comprehensive_quality"],
 }
 
 
 class PatternInstantiator:
-    def __init__(self, template_library: Optional[TemplateLibrary] = None,
-                 graph: Optional[EvidenceGraph] = None,
-                 evidence_store: Optional[EvidenceStore] = None) -> None:
+    def __init__(
+        self,
+        template_library: Optional[TemplateLibrary] = None,
+        graph: Optional[EvidenceGraph] = None,
+        evidence_store: Optional[EvidenceStore] = None,
+    ) -> None:
         self._library = template_library or TemplateLibrary()
         self._graph = graph
         self._store = evidence_store
 
-    def instantiate_for_project(self, project_name: str,
-                                 project_type: "ProjectType | str") -> AssuranceCase:
+    def instantiate_for_project(
+        self, project_name: str, project_type: "ProjectType | str"
+    ) -> AssuranceCase:
         if isinstance(project_type, ProjectType):
             pt_value = project_type.value
         else:
@@ -50,9 +68,11 @@ class PatternInstantiator:
         template_names = _PROJECT_TEMPLATES.get(pt_value, ["comprehensive_quality"])
         ctx = {"project_name": project_name}
 
-        builder = AssuranceCaseBuilder(title=f"{project_name} Assurance Case",
-                                       description=f"Quality assurance for {project_name}",
-                                       project_type=pt_value)
+        builder = AssuranceCaseBuilder(
+            title=f"{project_name} Assurance Case",
+            description=f"Quality assurance for {project_name}",
+            project_type=pt_value,
+        )
         # Use first template as primary (sets root), rest add supplementary nodes
         for i, tname in enumerate(template_names):
             tpl = self._library.get_template(tname)
@@ -73,9 +93,12 @@ class PatternInstantiator:
 
         return builder.build()
 
-    def instantiate_and_link_evidence(self, project_name: str,
-                                       project_type: "ProjectType | str",
-                                       evidence_filters: Optional[Dict[str, Any]] = None) -> AssuranceCase:
+    def instantiate_and_link_evidence(
+        self,
+        project_name: str,
+        project_type: "ProjectType | str",
+        evidence_filters: Optional[Dict[str, Any]] = None,
+    ) -> AssuranceCase:
         case = self.instantiate_for_project(project_name, project_type)
         if self._store:
             evidence_list = self._store.list_evidence()
@@ -89,8 +112,9 @@ class PatternInstantiator:
                     case.link_evidence(root.id, ev.id)
         return case
 
-    def generate_from_evidence(self, project_name: str,
-                                evidence_ids: Optional[List[str]] = None) -> AssuranceCase:
+    def generate_from_evidence(
+        self, project_name: str, evidence_ids: Optional[List[str]] = None
+    ) -> AssuranceCase:
         evidence_ids = evidence_ids or []
         # Infer project type from evidence
         project_type = ProjectType.GENERAL

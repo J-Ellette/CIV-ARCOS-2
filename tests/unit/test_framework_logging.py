@@ -1,4 +1,5 @@
 """Tests for the structured logging / correlation ID middleware."""
+
 import json
 import logging
 import pytest
@@ -12,10 +13,10 @@ from civ_arcos.web.framework import (
     create_app,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _app_with_hello() -> Application:
     """Return a minimal app with a single GET /hello route."""
@@ -32,6 +33,7 @@ def _app_with_hello() -> Application:
 # ---------------------------------------------------------------------------
 # _make_correlation_id
 # ---------------------------------------------------------------------------
+
 
 class TestMakeCorrelationId:
     """Unit tests for _make_correlation_id."""
@@ -58,6 +60,7 @@ class TestMakeCorrelationId:
 # Response headers — X-Correlation-ID
 # ---------------------------------------------------------------------------
 
+
 class TestCorrelationIdHeader:
     """Verify that X-Correlation-ID is added to every response."""
 
@@ -80,8 +83,7 @@ class TestCorrelationIdHeader:
         """If the caller sends X-Correlation-ID, the same value is echoed back."""
         app = _app_with_hello()
         incoming_id = "abcd1234ef567890"
-        resp = app.handle("GET", "/hello", {}, b"",
-                           {"X-Correlation-ID": incoming_id})
+        resp = app.handle("GET", "/hello", {}, b"", {"X-Correlation-ID": incoming_id})
         assert resp.headers["X-Correlation-ID"] == incoming_id
 
     def test_header_present_on_error(self):
@@ -101,6 +103,7 @@ class TestCorrelationIdHeader:
 # ---------------------------------------------------------------------------
 # Structured request logging
 # ---------------------------------------------------------------------------
+
 
 class TestRequestLogging:
     """Verify that _log_request emits valid JSON to the logger."""

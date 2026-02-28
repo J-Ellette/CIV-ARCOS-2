@@ -1,8 +1,12 @@
 """Unit tests for assurance templates and TemplateLibrary."""
+
 import pytest
 from civ_arcos.assurance.templates import (
-    TemplateLibrary, CodeQualityTemplate, TestCoverageTemplate,
-    SecurityAssuranceTemplate, ComprehensiveQualityTemplate,
+    TemplateLibrary,
+    CodeQualityTemplate,
+    TestCoverageTemplate,
+    SecurityAssuranceTemplate,
+    ComprehensiveQualityTemplate,
 )
 from civ_arcos.assurance.case import AssuranceCaseBuilder
 

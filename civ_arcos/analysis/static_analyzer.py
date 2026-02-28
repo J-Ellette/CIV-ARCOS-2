@@ -1,4 +1,5 @@
 """Static code analysis using Python's AST module."""
+
 import ast
 import math
 from typing import Any, Dict, List
@@ -10,8 +11,9 @@ def _cyclomatic_complexity(tree: ast.AST) -> int:
     """Count cyclomatic complexity: 1 + decision points."""
     complexity_count = 1
     for node in ast.walk(tree):
-        if isinstance(node, (ast.If, ast.For, ast.While, ast.ExceptHandler,
-                              ast.With, ast.Assert)):
+        if isinstance(
+            node, (ast.If, ast.For, ast.While, ast.ExceptHandler, ast.With, ast.Assert)
+        ):
             complexity_count += 1
         elif isinstance(node, ast.BoolOp):
             # each 'and'/'or' adds (len(values)-1) branches
@@ -26,8 +28,9 @@ def _function_complexity(func_node: ast.AST) -> int:
     for node in ast.walk(func_node):
         if node is func_node:
             continue
-        if isinstance(node, (ast.If, ast.For, ast.While, ast.ExceptHandler,
-                              ast.With, ast.Assert)):
+        if isinstance(
+            node, (ast.If, ast.For, ast.While, ast.ExceptHandler, ast.With, ast.Assert)
+        ):
             complexity_count += 1
         elif isinstance(node, ast.BoolOp):
             complexity_count += len(node.values) - 1
@@ -38,8 +41,16 @@ def _function_complexity(func_node: ast.AST) -> int:
 
 def _nesting_depth(node: ast.AST) -> int:
     """Compute maximum nesting depth within a node."""
-    nesting_types = (ast.If, ast.For, ast.While, ast.With, ast.Try,
-                     ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+    nesting_types = (
+        ast.If,
+        ast.For,
+        ast.While,
+        ast.With,
+        ast.Try,
+        ast.FunctionDef,
+        ast.AsyncFunctionDef,
+        ast.ClassDef,
+    )
 
     def _depth(ast_node: ast.AST, current_depth: int) -> int:
         max_depth = current_depth
@@ -93,43 +104,55 @@ class StaticAnalyzer:
                 func_lines = end - start + 1
                 params = [a.arg for a in node.args.args]
                 complexity = _function_complexity(node)
-                functions.append({
-                    "name": node.name,
-                    "complexity": complexity,
-                    "lines": func_lines,
-                    "params": params,
-                    "lineno": start,
-                })
+                functions.append(
+                    {
+                        "name": node.name,
+                        "complexity": complexity,
+                        "lines": func_lines,
+                        "params": params,
+                        "lineno": start,
+                    }
+                )
                 if func_lines > 50:
-                    code_smells.append({
-                        "type": "long_function",
-                        "description": f"Function '{node.name}' is {func_lines} lines (>50)",
-                        "line": start,
-                    })
+                    code_smells.append(
+                        {
+                            "type": "long_function",
+                            "description": f"Function '{node.name}' is {func_lines} lines (>50)",
+                            "line": start,
+                        }
+                    )
                 if len(params) > 5:
-                    code_smells.append({
-                        "type": "too_many_params",
-                        "description": f"Function '{node.name}' has {len(params)} parameters (>5)",
-                        "line": start,
-                    })
+                    code_smells.append(
+                        {
+                            "type": "too_many_params",
+                            "description": f"Function '{node.name}' has {len(params)} parameters (>5)",
+                            "line": start,
+                        }
+                    )
                 depth = _nesting_depth(node)
                 if depth > 4:
-                    code_smells.append({
-                        "type": "deep_nesting",
-                        "description": f"Function '{node.name}' has nesting depth {depth} (>4)",
-                        "line": start,
-                    })
+                    code_smells.append(
+                        {
+                            "type": "deep_nesting",
+                            "description": f"Function '{node.name}' has nesting depth {depth} (>4)",
+                            "line": start,
+                        }
+                    )
             elif isinstance(node, ast.ClassDef):
                 start = node.lineno
                 end = getattr(node, "end_lineno", start)
                 class_lines = end - start + 1
-                classes.append({"name": node.name, "lines": class_lines, "lineno": start})
+                classes.append(
+                    {"name": node.name, "lines": class_lines, "lineno": start}
+                )
                 if class_lines > 500:
-                    code_smells.append({
-                        "type": "large_class",
-                        "description": f"Class '{node.name}' is {class_lines} lines (>500)",
-                        "line": start,
-                    })
+                    code_smells.append(
+                        {
+                            "type": "large_class",
+                            "description": f"Class '{node.name}' is {class_lines} lines (>500)",
+                            "line": start,
+                        }
+                    )
 
         # --- file-level complexity -------------------------------------------
         complexity = _cyclomatic_complexity(tree)
@@ -137,15 +160,19 @@ class StaticAnalyzer:
         # --- maintainability index -------------------------------------------
         operands = _collect_names(tree)
         unique_count = len(set(operands)) if operands else 1
-        halstead_volume = unique_count * math.log2(unique_count + 1) if unique_count > 0 else 1
+        halstead_volume = (
+            unique_count * math.log2(unique_count + 1) if unique_count > 0 else 1
+        )
         safe_lines_of_code = max(1, lines_of_code)
         # Maintainability Index based on the SEI (Software Engineering Institute) formula:
         # MI = max(0, (171 - 5.2*ln(HV) - 0.23*CC - 16.2*ln(LOC)) * 100/171)
         # where HV = Halstead Volume (approximated), CC = cyclomatic complexity, LOC = lines of code
-        raw_maintainability_index = (171
-                  - 5.2 * math.log(halstead_volume)
-                  - 0.23 * complexity
-                  - 16.2 * math.log(safe_lines_of_code))
+        raw_maintainability_index = (
+            171
+            - 5.2 * math.log(halstead_volume)
+            - 0.23 * complexity
+            - 16.2 * math.log(safe_lines_of_code)
+        )
         maintainability_index = max(0.0, raw_maintainability_index * 100 / 171)
 
         return {

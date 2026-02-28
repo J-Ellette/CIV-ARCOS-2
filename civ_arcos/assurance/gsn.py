@@ -1,4 +1,5 @@
 """Goal Structuring Notation (GSN) node types and classes."""
+
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -23,8 +24,12 @@ class GSNNode:
     properties: Dict[str, Any] = field(default_factory=dict)
     children: List[str] = field(default_factory=list)
     evidence_ids: List[str] = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    updated_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def add_child(self, node_id: str) -> None:
         if node_id not in self.children:
@@ -67,7 +72,9 @@ class _GSNTypedNode(GSNNode):
     #: identifies the concrete node kind (e.g. ``GSNNodeType.GOAL``).
     _NODE_TYPE: GSNNodeType
 
-    def __init__(self, statement: str, node_id: Optional[str] = None, **kwargs: Any) -> None:
+    def __init__(
+        self, statement: str, node_id: Optional[str] = None, **kwargs: Any
+    ) -> None:
         super().__init__(
             id=node_id or str(uuid.uuid4()),
             node_type=self.__class__._NODE_TYPE,

@@ -1,4 +1,5 @@
 """Configuration for CIV-ARCOS."""
+
 import os
 from dataclasses import dataclass
 

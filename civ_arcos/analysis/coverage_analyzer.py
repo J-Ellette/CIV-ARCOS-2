@@ -1,4 +1,5 @@
 """Coverage analysis and tier classification."""
+
 import subprocess
 import re
 from typing import Any, Dict
@@ -22,8 +23,12 @@ class CoverageAnalyzer:
         branches_covered = coverage_data.get("branches_covered", 0)
         branches_total = coverage_data.get("branches_total", 1)
 
-        line_coverage_pct = (lines_covered / lines_total * 100) if lines_total > 0 else 0.0
-        branch_coverage_pct = (branches_covered / branches_total * 100) if branches_total > 0 else 0.0
+        line_coverage_pct = (
+            (lines_covered / lines_total * 100) if lines_total > 0 else 0.0
+        )
+        branch_coverage_pct = (
+            (branches_covered / branches_total * 100) if branches_total > 0 else 0.0
+        )
 
         tier = self.get_coverage_tier(line_coverage_pct)
         summary = (
@@ -43,7 +48,9 @@ class CoverageAnalyzer:
         try:
             result = subprocess.run(
                 [
-                    "python", "-m", "pytest",
+                    "python",
+                    "-m",
+                    "pytest",
                     test_path,
                     f"--cov={source_path}",
                     "--cov-report=term-missing",
@@ -55,7 +62,7 @@ class CoverageAnalyzer:
             )
             output = result.stdout + result.stderr
             # Parse "TOTAL   N   N   N%" line
-            match = re.search(r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)%', output)
+            match = re.search(r"TOTAL\s+(\d+)\s+(\d+)\s+(\d+)%", output)
             if match:
                 total_statements = int(match.group(1))
                 missed_statements = int(match.group(2))

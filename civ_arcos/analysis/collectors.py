@@ -1,4 +1,5 @@
 """Evidence collectors integrating analysis tools with the evidence system."""
+
 from typing import Any, Dict, List, Optional
 
 from civ_arcos.evidence.collector import Evidence, EvidenceCollector, EvidenceStore
@@ -31,7 +32,9 @@ class _AnalysisCollector(EvidenceCollector):
     def collect_from_ci(self, build_id: str) -> List[Evidence]:
         return []
 
-    def collect_from_security_tools(self, scan_results: Dict[str, Any]) -> List[Evidence]:
+    def collect_from_security_tools(
+        self, scan_results: Dict[str, Any]
+    ) -> List[Evidence]:
         return []
 
     def _store_and_return(self, ev: Evidence) -> List[Evidence]:
@@ -60,7 +63,9 @@ class SecurityScanCollector(_AnalysisCollector):
         )
         return self._store_and_return(ev)
 
-    def collect_from_security_tools(self, scan_results: Dict[str, Any]) -> List[Evidence]:
+    def collect_from_security_tools(
+        self, scan_results: Dict[str, Any]
+    ) -> List[Evidence]:
         ev = make_evidence("security_scan", self._source_path, scan_results)
         return self._store_and_return(ev)
 
@@ -69,8 +74,7 @@ class TestGenerationCollector(_AnalysisCollector):
     def collect(self, *args: Any, **kwargs: Any) -> List[Evidence]:
         gen = TestGenerator()
         suggestions_list = [
-            gen.get_suggestions(fpath)
-            for fpath in iter_python_files(self._source_path)
+            gen.get_suggestions(fpath) for fpath in iter_python_files(self._source_path)
         ]
         ev = make_evidence(
             "test_generation",
@@ -81,8 +85,12 @@ class TestGenerationCollector(_AnalysisCollector):
 
 
 class CoverageCollector(_AnalysisCollector):
-    def __init__(self, source_path: str, graph: Optional[EvidenceGraph] = None,
-                 test_path: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        source_path: str,
+        graph: Optional[EvidenceGraph] = None,
+        test_path: Optional[str] = None,
+    ) -> None:
         super().__init__(source_path, graph)
         self._test_path = test_path or source_path
 
@@ -92,8 +100,12 @@ class CoverageCollector(_AnalysisCollector):
         if raw:
             analysis = analyzer.analyze_coverage_data(raw)
         else:
-            analysis = {"line_coverage_pct": 0.0, "branch_coverage_pct": 0.0,
-                        "tier": "none", "summary": "Coverage data unavailable"}
+            analysis = {
+                "line_coverage_pct": 0.0,
+                "branch_coverage_pct": 0.0,
+                "tier": "none",
+                "summary": "Coverage data unavailable",
+            }
         ev = make_evidence("coverage", self._source_path, analysis)
         return self._store_and_return(ev)
 
@@ -107,7 +119,11 @@ class ComprehensiveAnalysisCollector:
 
     def collect(self) -> List[Evidence]:
         all_evidence: List[Evidence] = []
-        for cls in (StaticAnalysisCollector, SecurityScanCollector, TestGenerationCollector):
+        for cls in (
+            StaticAnalysisCollector,
+            SecurityScanCollector,
+            TestGenerationCollector,
+        ):
             collector = cls(self._source_path, self._graph)
             all_evidence.extend(collector.collect())
         # CoverageCollector takes an optional test_path; use source_path as fallback

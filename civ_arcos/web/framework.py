@@ -1,4 +1,5 @@
 """Custom web framework built on http.server."""
+
 import json
 import logging
 import re
@@ -54,8 +55,15 @@ def _log_request(
 
 class Request:
     """HTTP request wrapper."""
-    def __init__(self, method: str, path: str, query_params: Dict[str, List[str]],
-                 body: bytes, headers: Dict[str, str]) -> None:
+
+    def __init__(
+        self,
+        method: str,
+        path: str,
+        query_params: Dict[str, List[str]],
+        body: bytes,
+        headers: Dict[str, str],
+    ) -> None:
         self.method = method
         self.path = path
         self.query_params = query_params
@@ -78,9 +86,14 @@ class Request:
 
 class Response:
     """HTTP response wrapper."""
-    def __init__(self, body: Any = None, status_code: int = 200,
-                 content_type: str = "application/json",
-                 headers: Optional[Dict[str, str]] = None) -> None:
+
+    def __init__(
+        self,
+        body: Any = None,
+        status_code: int = 200,
+        content_type: str = "application/json",
+        headers: Optional[Dict[str, str]] = None,
+    ) -> None:
         self.status_code = status_code
         self.content_type = content_type
         self.headers = headers or {}
@@ -109,9 +122,13 @@ class Router:
             return r"([^/]+)"
 
         regex = re.sub(r"\{(\w+)\}", _replace, pattern)
-        self._routes.append((method.upper(), re.compile(f"^{regex}$"), handler, param_names))
+        self._routes.append(
+            (method.upper(), re.compile(f"^{regex}$"), handler, param_names)
+        )
 
-    def match(self, method: str, path: str) -> Tuple[Optional[Callable], Dict[str, str]]:
+    def match(
+        self, method: str, path: str
+    ) -> Tuple[Optional[Callable], Dict[str, str]]:
         for route_method, pattern, handler, param_names in self._routes:
             if route_method != method.upper():
                 continue
@@ -132,15 +149,23 @@ class Application:
         """Decorator for route registration."""
         if methods is None:
             methods = ["GET"]
+
         def decorator(func: Callable) -> Callable:
             for method in methods:
                 self._router.add_route(method, path, func)
             return func
+
         return decorator
 
-    def handle(self, method: str, path: str, query_params: Dict[str, List[str]],
-               body: bytes, headers: Dict[str, str],
-               correlation_id: Optional[str] = None) -> Response:
+    def handle(
+        self,
+        method: str,
+        path: str,
+        query_params: Dict[str, List[str]],
+        body: bytes,
+        headers: Dict[str, str],
+        correlation_id: Optional[str] = None,
+    ) -> Response:
         """Dispatch a request through the router.
 
         Parameters
@@ -181,18 +206,31 @@ class Application:
         app = self
 
         class Handler(BaseHTTPRequestHandler):
-            def do_GET(self): self._handle("GET")
-            def do_POST(self): self._handle("POST")
-            def do_PUT(self): self._handle("PUT")
-            def do_DELETE(self): self._handle("DELETE")
-            def do_OPTIONS(self): self._handle_options()
+            def do_GET(self):
+                self._handle("GET")
+
+            def do_POST(self):
+                self._handle("POST")
+
+            def do_PUT(self):
+                self._handle("PUT")
+
+            def do_DELETE(self):
+                self._handle("DELETE")
+
+            def do_OPTIONS(self):
+                self._handle_options()
 
             def _handle_options(self) -> None:
                 """Handle CORS preflight requests."""
                 self.send_response(204)
                 self.send_header("Access-Control-Allow-Origin", "*")
-                self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-                self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+                self.send_header(
+                    "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"
+                )
+                self.send_header(
+                    "Access-Control-Allow-Headers", "Content-Type, Authorization"
+                )
                 self.end_headers()
 
             def _handle(self, method: str) -> None:
@@ -202,9 +240,15 @@ class Application:
                 body = self.rfile.read(length) if length else b""
                 headers = {k: v for k, v in self.headers.items()}
                 # Honour a correlation ID from the caller; otherwise generate one.
-                incoming_corr = headers.get("X-Correlation-ID") or headers.get("x-correlation-id")
+                incoming_corr = headers.get("X-Correlation-ID") or headers.get(
+                    "x-correlation-id"
+                )
                 response = app.handle(
-                    method, parsed.path, query_params, body, headers,
+                    method,
+                    parsed.path,
+                    query_params,
+                    body,
+                    headers,
                     correlation_id=incoming_corr or None,
                 )
                 self.send_response(response.status_code)
