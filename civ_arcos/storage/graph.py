@@ -3,7 +3,7 @@ import json
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 
 @dataclass
@@ -31,6 +31,10 @@ class EvidenceGraph:
     def __init__(self) -> None:
         self._nodes: Dict[str, GraphNode] = {}
         self._relationships: Dict[str, GraphRelationship] = {}
+        # Indexes for O(1) lookups
+        self._label_index: Dict[str, Set[str]] = {}          # label -> set of node IDs
+        self._src_rel_index: Dict[str, Set[str]] = {}         # source node ID -> set of rel IDs
+        self._tgt_rel_index: Dict[str, Set[str]] = {}         # target node ID -> set of rel IDs
 
     def add_node(self, labels: List[str], properties: Dict[str, Any]) -> str:
         now = datetime.now(timezone.utc).isoformat()
@@ -39,6 +43,8 @@ class EvidenceGraph:
             id=node_id, labels=labels, properties=properties,
             created_at=now, updated_at=now
         )
+        for label in labels:
+            self._label_index.setdefault(label, set()).add(node_id)
         return node_id
 
     def get_node(self, node_id: str) -> Optional[GraphNode]:
@@ -51,24 +57,32 @@ class EvidenceGraph:
             id=rel_id, type=rel_type, source_id=source_id, target_id=target_id,
             properties=properties, created_at=now
         )
+        self._src_rel_index.setdefault(source_id, set()).add(rel_id)
+        self._tgt_rel_index.setdefault(target_id, set()).add(rel_id)
         return rel_id
 
     def get_relationships(self, node_id: str) -> List[GraphRelationship]:
-        return [r for r in self._relationships.values()
-                if r.source_id == node_id or r.target_id == node_id]
+        rel_ids = (
+            self._src_rel_index.get(node_id, set())
+            | self._tgt_rel_index.get(node_id, set())
+        )
+        return [self._relationships[rid] for rid in rel_ids]
 
     def find_nodes_by_label(self, label: str) -> List[GraphNode]:
-        return [n for n in self._nodes.values() if label in n.labels]
+        return [self._nodes[nid] for nid in self._label_index.get(label, set())]
 
     def find_nodes_by_property(self, key: str, value: Any) -> List[GraphNode]:
         return [n for n in self._nodes.values() if n.properties.get(key) == value]
 
     def get_neighbors(self, node_id: str) -> List[GraphNode]:
         neighbors = []
-        for r in self._relationships.values():
-            if r.source_id == node_id and r.target_id in self._nodes:
+        for rid in self._src_rel_index.get(node_id, set()):
+            r = self._relationships[rid]
+            if r.target_id in self._nodes:
                 neighbors.append(self._nodes[r.target_id])
-            elif r.target_id == node_id and r.source_id in self._nodes:
+        for rid in self._tgt_rel_index.get(node_id, set()):
+            r = self._relationships[rid]
+            if r.source_id in self._nodes:
                 neighbors.append(self._nodes[r.source_id])
         return neighbors
 
@@ -88,5 +102,18 @@ class EvidenceGraph:
     def load(self, path: str) -> None:
         with open(path, "r") as f:
             data = json.load(f)
-        self._nodes = {k: GraphNode(**v) for k, v in data.get("nodes", {}).items()}
-        self._relationships = {k: GraphRelationship(**v) for k, v in data.get("relationships", {}).items()}
+        self._nodes = {}
+        self._relationships = {}
+        self._label_index = {}
+        self._src_rel_index = {}
+        self._tgt_rel_index = {}
+        for k, v in data.get("nodes", {}).items():
+            node = GraphNode(**v)
+            self._nodes[k] = node
+            for label in node.labels:
+                self._label_index.setdefault(label, set()).add(k)
+        for k, v in data.get("relationships", {}).items():
+            rel = GraphRelationship(**v)
+            self._relationships[k] = rel
+            self._src_rel_index.setdefault(rel.source_id, set()).add(k)
+            self._tgt_rel_index.setdefault(rel.target_id, set()).add(k)

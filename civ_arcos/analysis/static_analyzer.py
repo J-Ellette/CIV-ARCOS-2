@@ -80,8 +80,9 @@ class StaticAnalyzer:
         lines = source.splitlines()
         loc = len(lines)
 
-        # --- per-function info ------------------------------------------------
+        # --- per-function and per-class info (single AST walk) ---------------
         functions: List[Dict[str, Any]] = []
+        classes: List[Dict[str, Any]] = []
         code_smells: List[Dict[str, Any]] = []
 
         for node in ast.walk(tree):
@@ -117,11 +118,7 @@ class StaticAnalyzer:
                         "description": f"Function '{node.name}' has nesting depth {depth} (>4)",
                         "line": start,
                     })
-
-        # --- per-class info ---------------------------------------------------
-        classes: List[Dict[str, Any]] = []
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef):
+            elif isinstance(node, ast.ClassDef):
                 start = node.lineno
                 end = getattr(node, "end_lineno", start)
                 class_lines = end - start + 1

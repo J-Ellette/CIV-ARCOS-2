@@ -29,6 +29,7 @@ class BlockchainLedger:
 
     def __init__(self) -> None:
         self._chain: List[Block] = []
+        self._evidence_index: Dict[str, Block] = {}
         self._create_genesis()
 
     def _create_genesis(self) -> None:
@@ -51,6 +52,9 @@ class BlockchainLedger:
         )
         block.hash = block.compute_hash()
         self._chain.append(block)
+        evidence_id = data.get("evidence_id")
+        if evidence_id is not None:
+            self._evidence_index[evidence_id] = block
         return block
 
     def validate_chain(self) -> bool:
@@ -69,10 +73,7 @@ class BlockchainLedger:
         return None
 
     def find_evidence(self, evidence_id: str) -> Optional[Block]:
-        for block in self._chain:
-            if block.data.get("evidence_id") == evidence_id:
-                return block
-        return None
+        return self._evidence_index.get(evidence_id)
 
     def get_chain_length(self) -> int:
         return len(self._chain)
