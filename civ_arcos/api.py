@@ -42,8 +42,8 @@ _settings: Dict[str, Any] = {}
 def _get_dashboard_html() -> bytes:
     """Read and return the dashboard HTML file."""
     candidates = [
-        Path(__file__).parent.parent / "civ-arcos-dashboard.html",
-        Path("civ-arcos-dashboard.html"),
+        Path(__file__).parent.parent / "civ-arcos-carbon.html",
+        Path("civ-arcos-carbon.html"),
     ]
     for p in candidates:
         if p.exists():
