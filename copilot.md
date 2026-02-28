@@ -1,7 +1,7 @@
 # Copilot Progress Tracker
 
 ## Current Status
-UI operational console (Carbon) implementation in progress. Core pages implemented.
+UI operational console (Carbon) fully implemented — all pages complete.
 
 ## Design System Decisions
 | Surface | Design System | Notes |
@@ -22,7 +22,13 @@ UI operational console (Carbon) implementation in progress. Core pages implement
 - [x] **Compliance Frameworks page** — accordion per framework (ISO 27001, FedRAMP, SOX ITGC, NIST 800-53, PCI-DSS) with control tables, stat row
 - [x] **Analytics / Trends page** — 30-day quality metrics, compliance trends per framework, security history table, evidence velocity table
 - [x] **Settings page** — general config, notifications, platform integrations (GitHub/GitLab/Azure/CircleCI toggles), scan configuration
-- [x] **USWDS Export Report modal** — generates USWDS-styled report (executive summary, evidence summary, compliance table); "Open in New Tab" and "Print/PDF" options; no "official government website" banner
+- [x] **Risk Map page** — risk register table, probability×impact matrix, risk trend bars, stat tiles (critical/high/medium/mitigated/score)
+- [x] **CIV-SCAP page** — benchmark results (NIST/CIS/STIG/OVAL), scan history table, failed rules table, stat tiles
+- [x] **Federated Network page** — node topology table (7 nodes/4 orgs), network health trend bars, recent activity feed, stat tiles
+- [x] **Blockchain Ledger page** — block explorer table (recent 6 blocks), chain health/evidence-type trend bars, stat tiles (height/txns/integrity/nodes/block-time)
+- [x] **Platform Sync page** — integration status table (GitHub/GitLab/Azure/Jenkins/CircleCI), sync events table, ingestion trend bars, stat tiles
+- [x] **Digital Twin page** — what-if scenario table (5 scenarios), model health trend bars, drift alerts feed, stat tiles (models/simulations/coverage/drift)
+- [x] **Multi-Tenant page** — tenant registry table (6 tenants), per-tenant compliance trend bars, resource usage table, stat tiles
 
 ## Build-Related Docs (in `build_docs/`)
 | File | Description |
@@ -37,16 +43,8 @@ UI operational console (Carbon) implementation in progress. Core pages implement
 | `improvements.md` | Planned improvements |
 | `I18N_DIGITALTWIN.md` | Internationalisation / digital twin notes |
 
-## Remaining Stubs (future build-out)
-| Page | ID | Notes |
-|------|----|-------|
-| Risk Map | `page-risk` | Component-level risk scoring · backend required |
-| CIV-SCAP | `page-scap` | SCAP scanner integration · backend required |
-| Federated Network | `page-network` | Cross-org evidence sharing · backend required |
-| Blockchain Ledger | `page-blockchain` | Ledger explorer · backend required |
-| Platform Sync | `page-sync` | CI/CD sync engine · backend required |
-| Digital Twin | `page-digitaltwin` | System simulation · backend required |
-| Multi-Tenant | `page-tenants` | Org/namespace management · backend required |
+## Remaining Stubs
+None — all pages fully implemented.
 
 ## Notes
 - Run tests: `python -m pytest tests/ -q`
