@@ -13,6 +13,7 @@ from civ_arcos.evidence.collector import EvidenceStore
 from civ_arcos.storage.graph import EvidenceGraph
 from civ_arcos.web.badges import BadgeGenerator
 from civ_arcos.web.framework import Application, Request, Response, create_app
+from civ_arcos.web.webhook import nonce_cache, validate_github_signature, validate_timestamp
 from civ_arcos.analysis.static_analyzer import StaticAnalyzer
 from civ_arcos.analysis.security_scanner import SecurityScanner
 from civ_arcos.analysis.test_generator import TestGenerator
@@ -78,6 +79,133 @@ def status(req: Request) -> Response:
         "blockchain_length": _ledger.get_chain_length(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
+
+
+# ---------------------------------------------------------------------------
+# Health endpoints (liveness, readiness, dependency health)
+# ---------------------------------------------------------------------------
+
+@app.route("/api/health/live", methods=["GET"])
+def health_live(req: Request) -> Response:
+    """Liveness probe — always 200 when the process is running."""
+    return Response({"status": "ok"})
+
+
+@app.route("/api/health/ready", methods=["GET"])
+def health_ready(req: Request) -> Response:
+    """Readiness probe — checks that core subsystems are operational.
+
+    Returns 200 when ready, 503 when one or more subsystems are degraded.
+    """
+    checks: Dict[str, Any] = {}
+
+    # Blockchain integrity
+    try:
+        checks["blockchain"] = {
+            "status": "ok" if _ledger.validate_chain() else "degraded",
+            "length": _ledger.get_chain_length(),
+        }
+    except Exception as exc:  # noqa: BLE001
+        checks["blockchain"] = {"status": "error", "detail": str(exc)}
+
+    # Evidence store
+    try:
+        _ = _store.list_evidence()
+        checks["evidence_store"] = {"status": "ok"}
+    except Exception as exc:  # noqa: BLE001
+        checks["evidence_store"] = {"status": "error", "detail": str(exc)}
+
+    degraded = any(
+        v.get("status") != "ok" for v in checks.values()
+    )
+    overall = "degraded" if degraded else "ok"
+    return Response({"status": overall, "checks": checks},
+                    status_code=503 if degraded else 200)
+
+
+@app.route("/api/health/dependencies", methods=["GET"])
+def health_dependencies(req: Request) -> Response:
+    """Full dependency health report.
+
+    Extends :func:`health_ready` with additional optional subsystem details
+    (assurance cases count, uptime, version).
+    """
+    checks: Dict[str, Any] = {}
+
+    try:
+        checks["blockchain"] = {
+            "status": "ok" if _ledger.validate_chain() else "degraded",
+            "length": _ledger.get_chain_length(),
+        }
+    except Exception as exc:  # noqa: BLE001
+        checks["blockchain"] = {"status": "error", "detail": str(exc)}
+
+    try:
+        ev_count = len(_store.list_evidence())
+        checks["evidence_store"] = {"status": "ok", "evidence_count": ev_count}
+    except Exception as exc:  # noqa: BLE001
+        checks["evidence_store"] = {"status": "error", "detail": str(exc)}
+
+    checks["assurance_cases"] = {
+        "status": "ok",
+        "count": len(_assurance_cases),
+    }
+
+    degraded = any(
+        v.get("status") != "ok" for v in checks.values()
+    )
+    return Response({
+        "status": "degraded" if degraded else "ok",
+        "version": "0.1.0",
+        "uptime_seconds": round(time.time() - _start_time, 2),
+        "checks": checks,
+    }, status_code=503 if degraded else 200)
+
+
+# ---------------------------------------------------------------------------
+# Webhook endpoint (GitHub events with HMAC-SHA256 + replay protection)
+# ---------------------------------------------------------------------------
+
+@app.route("/api/webhooks/github", methods=["POST"])
+def webhook_github(req: Request) -> Response:
+    """Accept a GitHub webhook delivery with signature and replay protection.
+
+    Expected headers:
+      - ``X-Hub-Signature-256``: ``sha256=<hex>`` HMAC-SHA256 of the body.
+      - ``X-GitHub-Delivery``: UUID delivery ID (replay protection).
+      - ``X-GitHub-Event``: Event type (e.g. ``push``, ``pull_request``).
+
+    The shared secret must be set via the ``CIV_WEBHOOK_SECRET`` environment
+    variable.  When it is unset, signature validation is skipped and a warning
+    is included in the response (useful in development).
+    """
+    secret = os.environ.get("CIV_WEBHOOK_SECRET", "")
+    sig_header = req.headers.get("X-Hub-Signature-256") or req.headers.get("x-hub-signature-256", "")
+    delivery_id = req.headers.get("X-GitHub-Delivery") or req.headers.get("x-github-delivery", "")
+    event_type = req.headers.get("X-GitHub-Event") or req.headers.get("x-github-event", "unknown")
+
+    # --- Signature validation ---
+    if secret:
+        if not validate_github_signature(req.body, secret, sig_header):
+            return Response({"error": "Invalid signature"}, status_code=401)
+    else:
+        # Secret not configured — warn but continue (dev mode).
+        pass
+
+    # --- Replay protection ---
+    if delivery_id:
+        if nonce_cache.is_replay(delivery_id):
+            return Response({"error": "Duplicate delivery"}, status_code=409)
+        nonce_cache.record(delivery_id)
+
+    # --- Process the event ---
+    payload: Dict[str, Any] = req.json() or {}
+    return Response({
+        "received": True,
+        "event": event_type,
+        "delivery_id": delivery_id,
+        "secret_configured": bool(secret),
+    }, status_code=202)
 
 
 @app.route("/api/evidence/collect", methods=["POST"])

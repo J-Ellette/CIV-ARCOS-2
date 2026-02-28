@@ -1,10 +1,55 @@
 """Custom web framework built on http.server."""
 import json
+import logging
 import re
+import time
 import traceback
+import uuid
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
+
+# Module-level structured logger (JSON lines to stderr).
+_logger = logging.getLogger("civ_arcos.web")
+
+
+def _make_correlation_id() -> str:
+    """Generate a short, unique correlation ID for a request."""
+    return uuid.uuid4().hex[:16]
+
+
+def _log_request(
+    correlation_id: str,
+    method: str,
+    path: str,
+    status_code: int,
+    duration_ms: float,
+) -> None:
+    """Emit a single structured JSON log line per HTTP request.
+
+    Parameters
+    ----------
+    correlation_id:
+        Unique ID for this request (propagated via X-Correlation-ID header).
+    method:
+        HTTP verb (GET, POST, …).
+    path:
+        Request path (without query string).
+    status_code:
+        HTTP response status.
+    duration_ms:
+        Wall-clock duration in milliseconds.
+    """
+    record = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "correlation_id": correlation_id,
+        "method": method,
+        "path": path,
+        "status": status_code,
+        "duration_ms": round(duration_ms, 2),
+    }
+    _logger.info(json.dumps(record))
 
 
 class Request:
@@ -17,6 +62,9 @@ class Request:
         self.body = body
         self.headers = headers
         self._json: Any = None
+        # Correlation ID injected by the HTTP handler layer; may also be set
+        # explicitly in tests.
+        self.correlation_id: str = ""
 
     def json(self) -> Any:
         if self._json is None and self.body:
@@ -91,20 +139,43 @@ class Application:
         return decorator
 
     def handle(self, method: str, path: str, query_params: Dict[str, List[str]],
-               body: bytes, headers: Dict[str, str]) -> Response:
+               body: bytes, headers: Dict[str, str],
+               correlation_id: Optional[str] = None) -> Response:
+        """Dispatch a request through the router.
+
+        Parameters
+        ----------
+        correlation_id:
+            Optional pre-assigned correlation ID (used in tests).  When
+            omitted a new one is generated automatically.
+        """
+        corr_id = (
+            correlation_id
+            or headers.get("X-Correlation-ID")
+            or headers.get("x-correlation-id")
+            or _make_correlation_id()
+        )
+        t_start = time.monotonic()
         handler, path_params = self._router.match(method, path)
         if handler is None:
-            return Response({"error": "Not Found"}, status_code=404)
+            duration = (time.monotonic() - t_start) * 1000
+            _log_request(corr_id, method, path, 404, duration)
+            resp = Response({"error": "Not Found"}, status_code=404)
+            resp.headers["X-Correlation-ID"] = corr_id
+            return resp
         try:
             req = Request(method, path, query_params, body, headers)
             req.path_params = path_params  # type: ignore[attr-defined]
+            req.correlation_id = corr_id
             result = handler(req, **path_params)
-            if isinstance(result, Response):
-                return result
-            return Response(result)
+            resp = result if isinstance(result, Response) else Response(result)
         except Exception as exc:
             traceback.print_exc()
-            return Response({"error": str(exc)}, status_code=500)
+            resp = Response({"error": str(exc)}, status_code=500)
+        duration = (time.monotonic() - t_start) * 1000
+        _log_request(corr_id, method, path, resp.status_code, duration)
+        resp.headers["X-Correlation-ID"] = corr_id
+        return resp
 
     def create_handler(self) -> type:
         app = self
@@ -130,7 +201,12 @@ class Application:
                 length = int(self.headers.get("Content-Length", 0))
                 body = self.rfile.read(length) if length else b""
                 headers = {k: v for k, v in self.headers.items()}
-                response = app.handle(method, parsed.path, query_params, body, headers)
+                # Honour a correlation ID from the caller; otherwise generate one.
+                incoming_corr = headers.get("X-Correlation-ID") or headers.get("x-correlation-id")
+                response = app.handle(
+                    method, parsed.path, query_params, body, headers,
+                    correlation_id=incoming_corr or None,
+                )
                 self.send_response(response.status_code)
                 self.send_header("Content-Type", response.content_type)
                 self.send_header("Access-Control-Allow-Origin", "*")

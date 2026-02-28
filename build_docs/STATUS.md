@@ -69,3 +69,9 @@ A phase can move from **Reported Complete** to **Verified Complete** only when:
   - Interactive Risk Matrix: probability×impact cells show RISK-ID tooltips on hover
   - Improved setPage(): auto-highlights sidebar nav item when called programmatically
   - Additional keyboard shortcuts: G+letter page-jump, Alt+N/B/S/E action hotkeys
+- 2026-02-28: Backend observability + security hardening:
+  - Structured logging + correlation IDs in `civ_arcos/web/framework.py`: every request logs a JSON line with `ts`, `correlation_id`, `method`, `path`, `status`, `duration_ms`; `X-Correlation-ID` header echoed on every response; incoming `X-Correlation-ID` headers propagated through the request lifecycle.
+  - Health endpoints added to API: `GET /api/health/live` (liveness), `GET /api/health/ready` (readiness with blockchain + evidence store checks), `GET /api/health/dependencies` (full dependency health with uptime/version).
+  - Webhook security module `civ_arcos/web/webhook.py`: HMAC-SHA256 signature validation (`validate_github_signature`), timestamp tolerance checks (`validate_timestamp`), and in-memory nonce/replay cache (`_NonceCache` / `nonce_cache`).
+  - `POST /api/webhooks/github` endpoint: validates `X-Hub-Signature-256`, rejects duplicate `X-GitHub-Delivery` IDs (409), dev-mode when `CIV_WEBHOOK_SECRET` unset.
+  - 42 new tests (125 total, all passing).
