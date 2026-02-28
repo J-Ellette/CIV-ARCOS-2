@@ -32,10 +32,12 @@ For each row:
 | V-006 | Assurance case generation/validation | `civ_arcos/assurance/*` | Unit tests | `pytest tests/unit/test_*assurance* -q` | GSN/case/template tests pass | — | NOT_RUN | Adjust pattern if file names differ |
 | V-007 | Dashboard routes render HTML | `civ_arcos/web/dashboard.py`, `civ_arcos/api.py` | Unit + route check | `pytest tests/unit/test_dashboard.py -q` | Dashboard tests pass and pages include expected sections | — | NOT_RUN | |
 | V-008 | Cache/task emulation stable under load | `civ_arcos/core/cache.py`, `civ_arcos/core/tasks.py` | Unit + concurrency tests | `pytest tests/unit/test_*cache* tests/unit/test_*task* -q` | No race-condition failures; deterministic behavior | — | NOT_RUN | Add stress benchmark |
-| V-009 | Webhook auth hardening (signature/replay) | webhook handlers | Security tests | `pytest tests -k webhook -q` | Signature validation and replay checks enforced | — | NOT_RUN | Priority security backlog item |
+| V-009 | Webhook auth hardening (signature/replay) | `civ_arcos/web/webhook.py`, `civ_arcos/api.py` | Unit + integration tests | `pytest tests/unit/test_webhook.py tests/integration/test_health_webhook.py -q` | Signature validation, replay cache, and endpoint tests pass | 2026-02-28 | PASS | 22 tests passing |
 | V-010 | Multi-tenant isolation enforced | `civ_arcos/core/tenants.py`, API layer | Unit + integration | `pytest tests/unit/test_tenants.py tests/integration/test_enterprise_api.py -q` | Tenant cross-read/write blocked | — | NOT_RUN | Add explicit negative isolation tests |
 | V-011 | Distributed ledger/network/sync features | `civ_arcos/distributed/*` | Unit + integration | `pytest tests/unit/test_federated_network.py tests/unit/test_blockchain_ledger.py tests/unit/test_sync_engine.py -q` | Core distributed tests pass | — | NOT_RUN | Some integration post endpoints historically partial |
 | V-012 | I18N + digital twin endpoints | `civ_arcos/core/i18n.py`, `civ_arcos/core/digital_twin.py` | Unit + integration | `pytest tests/unit/test_i18n.py tests/unit/test_digital_twin.py tests/integration/test_i18n_digitaltwin_api.py -q` | All endpoint behaviors validated | — | NOT_RUN | |
+| V-013 | Structured logging + correlation IDs | `civ_arcos/web/framework.py` | Unit tests | `pytest tests/unit/test_framework_logging.py -q` | JSON log lines emitted; X-Correlation-ID header on every response | 2026-02-28 | PASS | 10 tests passing |
+| V-014 | Health endpoints (live/ready/dependencies) | `civ_arcos/api.py` | Integration tests | `pytest tests/integration/test_health_webhook.py -k health -q` | All health probes return correct status codes and bodies | 2026-02-28 | PASS | 9 tests passing |
 
 ---
 

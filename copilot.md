@@ -2,6 +2,7 @@
 
 ## Current Status
 UI operational console (Carbon) fully implemented — all pages complete, plus interactive enhancements (SVG charts, command palette, settings persistence, notification panel, help modal, sidebar toggle, user menu, interactive risk matrix).
+Backend observability + security hardening: structured logging with correlation IDs, health probes, and webhook HMAC-SHA256 signature + replay protection.
 
 ## Design System Decisions
 | Surface | Design System | Notes |
@@ -39,6 +40,11 @@ UI operational console (Carbon) fully implemented — all pages complete, plus i
 - [x] **Interactive Risk Matrix** — probability×impact grid cells now have `risk-cell` class with hover tooltip listing specific RISK-IDs in each bucket; keyboard-accessible focus ring
 - [x] **Improved `setPage()` navigation** — when called programmatically (e.g., from notifications panel, user menu, keyboard shortcuts), auto-highlights the matching sidebar nav item
 - [x] **Additional keyboard shortcuts** — G+D/E/A/C/R/B/T/S/N page-jump hotkeys; Alt+N/B/S/E action shortcuts; all documented in help modal
+- [x] **Structured logging + correlation IDs** (`civ_arcos/web/framework.py`) — every HTTP request logs a JSON line (`ts`, `correlation_id`, `method`, `path`, `status`, `duration_ms`) via `civ_arcos.web` logger; `X-Correlation-ID` header echoed on every response; incoming `X-Correlation-ID` from callers is honoured and propagated
+- [x] **Health endpoints** — `GET /api/health/live` (liveness probe, always 200), `GET /api/health/ready` (readiness: checks blockchain integrity + evidence store, 200/503), `GET /api/health/dependencies` (full health with uptime/version/assurance-case count)
+- [x] **Webhook security module** (`civ_arcos/web/webhook.py`) — `validate_github_signature()` (HMAC-SHA256, constant-time compare), `validate_timestamp()` (ISO-8601 + configurable tolerance), `_NonceCache` (thread-safe in-memory replay cache with TTL eviction), module-level `nonce_cache` singleton
+- [x] **`POST /api/webhooks/github`** — accepts GitHub webhook deliveries; validates `X-Hub-Signature-256` when `CIV_WEBHOOK_SECRET` env var is set; rejects duplicate `X-GitHub-Delivery` IDs (409 Conflict); 202 Accepted on success
+- [x] **42 new tests** — `tests/unit/test_framework_logging.py` (10), `tests/unit/test_webhook.py` (17), `tests/integration/test_health_webhook.py` (15); total test count 125, all passing
 
 ## Build-Related Docs (in `build_docs/`)
 | File | Description |
