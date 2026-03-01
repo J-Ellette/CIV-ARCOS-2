@@ -43,7 +43,9 @@ def register_analysis_legacy_routes(app: Application, graph: EvidenceGraph) -> N
     def analysis_tests(req: Request) -> Response:
         body = req.json() or {}
         source_path = body.get("source_path", ".")
-        generator = TestGenerator()
+        use_ai = bool(body.get("use_ai", False))
+        llm_backend = str(body.get("llm_backend", "mock"))
+        generator = TestGenerator(use_ai=use_ai, llm_backend=llm_backend)
         suggestions_list = [
             generator.get_suggestions(fpath) for fpath in iter_python_files(source_path)
         ]
@@ -95,7 +97,9 @@ def register_analysis_v1_routes(app: Application, graph: EvidenceGraph) -> None:
     def analysis_tests_v1(req: Request) -> Response:
         body = req.json() or {}
         source_path = body.get("source_path", ".")
-        generator = TestGenerator()
+        use_ai = bool(body.get("use_ai", False))
+        llm_backend = str(body.get("llm_backend", "mock"))
+        generator = TestGenerator(use_ai=use_ai, llm_backend=llm_backend)
         suggestions_list = [
             generator.get_suggestions(fpath) for fpath in iter_python_files(source_path)
         ]

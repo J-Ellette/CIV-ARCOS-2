@@ -62,3 +62,15 @@ def test_generate_test_file_contains_import():
         assert "def test_hello" in content
     finally:
         os.unlink(path)
+
+
+def test_get_suggestions_ai_opt_in_without_env_uses_fallback_backend(monkeypatch):
+    monkeypatch.delenv("CIV_AI_ENABLE", raising=False)
+    src = "def uncovered_func(a, b):\n    return a + b\n"
+    path = _write_tmp(src)
+    try:
+        suggestions = TestGenerator(use_ai=True, llm_backend="azure_openai").get_suggestions(path)
+        assert suggestions["ai_enabled"] is False
+        assert suggestions["ai_backend"] == "mock"
+    finally:
+        os.unlink(path)

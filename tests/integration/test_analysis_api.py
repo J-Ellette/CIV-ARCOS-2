@@ -45,6 +45,28 @@ def test_analysis_tests_route_exists():
         assert "results" in data
 
 
+def test_analysis_tests_route_ai_opt_in_disabled_falls_back(monkeypatch):
+    monkeypatch.delenv("CIV_AI_ENABLE", raising=False)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with open(os.path.join(tmpdir, "mod.py"), "w") as fh:
+            fh.write("def bar(x):\n    return x * 2\n")
+        resp = handle(
+            "POST",
+            "/api/analysis/tests",
+            body={
+                "source_path": tmpdir,
+                "use_ai": True,
+                "llm_backend": "azure_openai",
+            },
+        )
+        assert resp.status_code == 200
+        data = json.loads(resp.body)
+        assert data["results"]
+        first = data["results"][0]
+        assert first["ai_enabled"] is False
+        assert first["ai_backend"] == "mock"
+
+
 def test_analysis_comprehensive_route_exists():
     with tempfile.TemporaryDirectory() as tmpdir:
         with open(os.path.join(tmpdir, "mod.py"), "w") as fh:

@@ -127,6 +127,81 @@ def test_blockchain_add_idempotency_conflict_on_different_payload():
     assert "Idempotency key" in data["error"]
 
 
+def test_sync_events_emits_block_added_event():
+    """Blockchain add should emit a sync event retrievable via polling API."""
+    from civ_arcos import api
+
+    before = api.app.handle("GET", "/api/sync/events", {}, b"", {})
+    assert before.status_code == 200
+    before_data = json.loads(before.body)
+    since_id = before_data["latest_event_id"]
+
+    payload = {"event": "sync-emission", "value": 7}
+    body = json.dumps(payload).encode()
+    added = api.app.handle(
+        "POST",
+        "/api/blockchain/add",
+        {},
+        body,
+        {
+            "Content-Type": "application/json",
+            "Content-Length": str(len(body)),
+        },
+    )
+    assert added.status_code == 201
+
+    polled = api.app.handle(
+        "GET",
+        "/api/sync/events",
+        {"since_id": [str(since_id)]},
+        b"",
+        {},
+    )
+    assert polled.status_code == 200
+    data = json.loads(polled.body)
+    assert data["mode"] == "poll"
+    assert data["count"] >= 1
+    last = data["events"][-1]
+    assert last["topic"] == "blockchain.block_added"
+    assert last["payload"]["block_index"] == json.loads(added.body)["index"]
+    assert data["next_since_id"] >= last["event_id"]
+
+
+def test_sync_events_idempotent_replay_does_not_emit_duplicate_event():
+    """Idempotent replay should not append duplicate blockchain sync events."""
+    from civ_arcos import api
+
+    before = api.app.handle("GET", "/api/sync/events", {}, b"", {})
+    assert before.status_code == 200
+    since_id = json.loads(before.body)["latest_event_id"]
+
+    key = "idem-sync-event-001"
+    payload = {"event": "sync-idem", "value": 1}
+    body = json.dumps(payload).encode()
+    headers = {
+        "Content-Type": "application/json",
+        "Content-Length": str(len(body)),
+        "Idempotency-Key": key,
+    }
+
+    first = api.app.handle("POST", "/api/blockchain/add", {}, body, headers)
+    second = api.app.handle("POST", "/api/blockchain/add", {}, body, headers)
+    assert first.status_code == 201
+    assert second.status_code == 201
+
+    polled = api.app.handle(
+        "GET",
+        "/api/sync/events",
+        {"since_id": [str(since_id)]},
+        b"",
+        {},
+    )
+    assert polled.status_code == 200
+    events = json.loads(polled.body)["events"]
+    block_added = [event for event in events if event["topic"] == "blockchain.block_added"]
+    assert len(block_added) == 1
+
+
 def test_assurance_create_idempotency_replays_case_creation():
     """Assurance create should not duplicate work on retried requests."""
     from civ_arcos import api
@@ -411,6 +486,92 @@ def test_v1_compliance_status_contract_shape():
     assert "frameworks" in data["data"]
 
 
+def test_v1_compliance_report_artifact_roundtrip_tenant_scoped():
+    """Compliance report artifacts should be create/list/get scoped per tenant."""
+    from civ_arcos import api
+
+    created = api.app.handle(
+        "POST",
+        "/api/v1/compliance/reports",
+        {},
+        b"",
+        {"X-Tenant-ID": "org_alpha"},
+    )
+    assert created.status_code == 201
+    created_data = json.loads(created.body)
+    assert created_data["contract"]["name"] == "ComplianceReportArtifact"
+    report_id = created_data["data"]["report"]["report_id"]
+    assert created_data["data"]["report"]["tenant_id"] == "org_alpha"
+
+    listed = api.app.handle(
+        "GET",
+        "/api/v1/compliance/reports",
+        {},
+        b"",
+        {"X-Tenant-ID": "org_alpha"},
+    )
+    assert listed.status_code == 200
+    listed_data = json.loads(listed.body)
+    assert listed_data["contract"]["name"] == "ComplianceReportList"
+    assert any(item["report_id"] == report_id for item in listed_data["data"]["reports"])
+
+    fetched = api.app.handle(
+        "GET",
+        f"/api/v1/compliance/reports/{report_id}",
+        {},
+        b"",
+        {"X-Tenant-ID": "org_alpha"},
+    )
+    assert fetched.status_code == 200
+    fetched_data = json.loads(fetched.body)
+    assert fetched_data["contract"]["name"] == "ComplianceReportArtifact"
+    assert fetched_data["data"]["report"]["report_id"] == report_id
+
+
+def test_v1_compliance_report_requires_tenant_header():
+    """Compliance report artifact endpoints should require tenant identity."""
+    from civ_arcos import api
+
+    create = api.app.handle("POST", "/api/v1/compliance/reports", {}, b"", {})
+    assert create.status_code == 401
+
+    listed = api.app.handle("GET", "/api/v1/compliance/reports", {}, b"", {})
+    assert listed.status_code == 401
+
+
+def test_v1_compliance_report_cross_tenant_access_denied():
+    """Tenants should not access compliance report artifacts owned by others."""
+    from civ_arcos import api
+
+    created = api.app.handle(
+        "POST",
+        "/api/v1/compliance/reports",
+        {},
+        b"",
+        {"X-Tenant-ID": "org_alpha"},
+    )
+    assert created.status_code == 201
+    report_id = json.loads(created.body)["data"]["report"]["report_id"]
+
+    denied_get = api.app.handle(
+        "GET",
+        f"/api/v1/compliance/reports/{report_id}",
+        {},
+        b"",
+        {"X-Tenant-ID": "org_beta"},
+    )
+    assert denied_get.status_code == 403
+
+    denied_filter = api.app.handle(
+        "GET",
+        "/api/v1/compliance/reports",
+        {"tenant_id": ["org_alpha"]},
+        b"",
+        {"X-Tenant-ID": "org_beta"},
+    )
+    assert denied_filter.status_code == 403
+
+
 def test_v1_analytics_trends_contract_shape():
     """V1 analytics endpoint should return contract envelope."""
     from civ_arcos import api
@@ -421,6 +582,246 @@ def test_v1_analytics_trends_contract_shape():
     assert data["contract"]["name"] == "AnalyticsTrends"
     assert "evidence_total" in data["data"]
     assert "by_type" in data["data"]
+
+
+def test_legacy_report_schedule_and_metadata_listing():
+    """Legacy report schedule endpoint should create and list metadata records."""
+    from civ_arcos import api
+
+    payload = {
+        "report_type": "executive_summary",
+        "frequency": "daily",
+        "target": "email:ops@example.com",
+    }
+    body = json.dumps(payload).encode()
+
+    created = api.app.handle(
+        "POST",
+        "/api/reports/schedule",
+        {},
+        body,
+        {
+            "Content-Type": "application/json",
+            "Content-Length": str(len(body)),
+        },
+    )
+    assert created.status_code == 201
+    created_data = json.loads(created.body)
+    job = created_data["job"]
+    assert job["report_type"] == "executive_summary"
+    assert job["frequency"] == "daily"
+    assert job["status"] == "scheduled"
+    assert "next_run_at" in job
+
+    listed = api.app.handle("GET", "/api/reports/jobs", {}, b"", {})
+    assert listed.status_code == 200
+    listed_data = json.loads(listed.body)
+    assert any(item["job_id"] == job["job_id"] for item in listed_data["jobs"])
+
+    fetched = api.app.handle("GET", f"/api/reports/jobs/{job['job_id']}", {}, b"", {})
+    assert fetched.status_code == 200
+    fetched_data = json.loads(fetched.body)
+    assert fetched_data["job"]["job_id"] == job["job_id"]
+
+
+def test_report_schedule_rejects_invalid_frequency():
+    """Report scheduling should reject unsupported frequencies."""
+    from civ_arcos import api
+
+    payload = {
+        "report_type": "executive_summary",
+        "frequency": "yearly",
+        "target": "console",
+    }
+    body = json.dumps(payload).encode()
+
+    resp = api.app.handle(
+        "POST",
+        "/api/reports/schedule",
+        {},
+        body,
+        {
+            "Content-Type": "application/json",
+            "Content-Length": str(len(body)),
+        },
+    )
+    assert resp.status_code == 400
+
+
+def test_v1_report_schedule_contract_shape():
+    """V1 report schedule endpoint should return contract envelope metadata."""
+    from civ_arcos import api
+
+    payload = {
+        "report_type": "compliance_snapshot",
+        "frequency": "weekly",
+        "target": "s3://reports-bucket",
+    }
+    body = json.dumps(payload).encode()
+
+    resp = api.app.handle(
+        "POST",
+        "/api/v1/reports/schedule",
+        {},
+        body,
+        {
+            "Content-Type": "application/json",
+            "Content-Length": str(len(body)),
+        },
+    )
+    assert resp.status_code == 201
+    data = json.loads(resp.body)
+    assert data["contract"]["name"] == "ReportSchedule"
+    assert data["contract"]["version"] == "v1"
+    assert data["data"]["job"]["frequency"] == "weekly"
+
+
+def test_legacy_quality_metrics_record_and_trends():
+    """Quality metrics record and trends endpoints should return deterministic history."""
+    from civ_arcos import api
+
+    body_one = json.dumps(
+        {
+            "score": 71.5,
+            "evidence_total": 10,
+            "risk_components": 6,
+            "source": "pytest",
+        }
+    ).encode()
+    body_two = json.dumps(
+        {
+            "score": 75.0,
+            "evidence_total": 12,
+            "risk_components": 5,
+            "source": "pytest",
+        }
+    ).encode()
+
+    headers_one = {
+        "Content-Type": "application/json",
+        "Content-Length": str(len(body_one)),
+    }
+    headers_two = {
+        "Content-Type": "application/json",
+        "Content-Length": str(len(body_two)),
+    }
+
+    first = api.app.handle(
+        "POST",
+        "/api/quality/metrics/record",
+        {},
+        body_one,
+        headers_one,
+    )
+    second = api.app.handle(
+        "POST",
+        "/api/quality/metrics/record",
+        {},
+        body_two,
+        headers_two,
+    )
+    assert first.status_code == 201
+    assert second.status_code == 201
+
+    history = api.app.handle(
+        "GET",
+        "/api/quality/metrics/history",
+        {"limit": ["5"]},
+        b"",
+        {},
+    )
+    assert history.status_code == 200
+    history_data = json.loads(history.body)
+    assert history_data["snapshots"]
+    assert "snapshot_id" in history_data["snapshots"][0]
+
+    trends = api.app.handle(
+        "GET",
+        "/api/quality/metrics/trends",
+        {"window": ["5"]},
+        b"",
+        {},
+    )
+    assert trends.status_code == 200
+    trend_data = json.loads(trends.body)
+    assert trend_data["count"] >= 2
+    assert trend_data["current_score"] is not None
+    assert "points" in trend_data
+
+
+def test_v1_quality_metrics_trends_contract_shape():
+    """V1 quality metrics trends endpoint should return contract envelope."""
+    from civ_arcos import api
+
+    resp = api.app.handle(
+        "GET",
+        "/api/v1/quality/metrics/trends",
+        {"window": ["5"]},
+        b"",
+        {},
+    )
+    assert resp.status_code == 200
+    data = json.loads(resp.body)
+    assert data["contract"]["name"] == "QualityMetricsTrends"
+    assert "count" in data["data"]
+    assert "points" in data["data"]
+
+
+def test_legacy_quality_metrics_forecast_is_deterministic():
+    """Legacy quality forecast should return deterministic projections."""
+    from civ_arcos import api
+
+    records = [
+        {"score": 61.0, "evidence_total": 5, "risk_components": 4, "source": "forecast"},
+        {"score": 66.0, "evidence_total": 6, "risk_components": 4, "source": "forecast"},
+        {"score": 71.0, "evidence_total": 7, "risk_components": 3, "source": "forecast"},
+    ]
+    for payload in records:
+        body = json.dumps(payload).encode()
+        resp = api.app.handle(
+            "POST",
+            "/api/quality/metrics/record",
+            {},
+            body,
+            {
+                "Content-Type": "application/json",
+                "Content-Length": str(len(body)),
+            },
+        )
+        assert resp.status_code == 201
+
+    forecast = api.app.handle(
+        "GET",
+        "/api/quality/metrics/forecast",
+        {"window": ["3"], "horizon": ["2"]},
+        b"",
+        {},
+    )
+    assert forecast.status_code == 200
+    data = json.loads(forecast.body)
+    assert data["count"] >= 3
+    assert data["horizon"] == 2
+    assert len(data["forecast"]) == 2
+    assert data["forecast"][0]["projected_score"] == 76.0
+    assert data["forecast"][1]["projected_score"] == 81.0
+
+
+def test_v1_quality_metrics_forecast_contract_shape():
+    """V1 quality forecast endpoint should return contract envelope."""
+    from civ_arcos import api
+
+    resp = api.app.handle(
+        "GET",
+        "/api/v1/quality/metrics/forecast",
+        {"window": ["3"], "horizon": ["2"]},
+        b"",
+        {},
+    )
+    assert resp.status_code == 200
+    data = json.loads(resp.body)
+    assert data["contract"]["name"] == "QualityMetricsForecast"
+    assert "forecast" in data["data"]
+    assert "trend_slope" in data["data"]
 
 
 def test_legacy_tenants_and_settings_routes_available():

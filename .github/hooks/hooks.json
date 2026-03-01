@@ -1,0 +1,7 @@
+{
+  "env": {
+    "GOVERNANCE_LEVEL": "standard",
+    "BLOCK_ON_THREAT": "false",
+    "LOG_LEVEL": "INFO"
+  }
+}

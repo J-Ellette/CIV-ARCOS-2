@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 import re
 import time
 import traceback
@@ -13,6 +14,32 @@ from urllib.parse import parse_qs, urlparse
 
 # Module-level structured logger (JSON lines to stderr).
 _logger = logging.getLogger("civ_arcos.web")
+
+
+def _default_security_headers() -> Dict[str, str]:
+    """Return baseline secure HTTP response headers.
+
+    The values are intentionally conservative and can be extended via
+    environment configuration where needed.
+    """
+    headers = {
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "no-referrer",
+        "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+        "Content-Security-Policy": (
+            "default-src 'self'; frame-ancestors 'none'; "
+            "base-uri 'self'; object-src 'none'"
+        ),
+    }
+    if os.environ.get("CIV_ENABLE_HSTS", "false").lower() == "true":
+        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return headers
+
+
+def _cors_allow_origin() -> str:
+    """Resolve CORS allow-origin policy from environment."""
+    return os.environ.get("CIV_CORS_ALLOW_ORIGIN", "*").strip() or "*"
 
 
 def _make_correlation_id() -> str:
@@ -186,6 +213,7 @@ class Application:
             duration = (time.monotonic() - t_start) * 1000
             _log_request(corr_id, method, path, 404, duration)
             resp = Response({"error": "Not Found"}, status_code=404)
+            resp.headers.update(_default_security_headers())
             resp.headers["X-Correlation-ID"] = corr_id
             return resp
         try:
@@ -199,6 +227,7 @@ class Application:
             resp = Response({"error": str(exc)}, status_code=500)
         duration = (time.monotonic() - t_start) * 1000
         _log_request(corr_id, method, path, resp.status_code, duration)
+        resp.headers.update(_default_security_headers())
         resp.headers["X-Correlation-ID"] = corr_id
         return resp
 
@@ -224,13 +253,17 @@ class Application:
             def _handle_options(self) -> None:
                 """Handle CORS preflight requests."""
                 self.send_response(204)
-                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Access-Control-Allow-Origin", _cors_allow_origin())
                 self.send_header(
                     "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"
                 )
                 self.send_header(
-                    "Access-Control-Allow-Headers", "Content-Type, Authorization"
+                    "Access-Control-Allow-Headers",
+                    "Content-Type, Authorization, X-Correlation-ID, "
+                    "X-Tenant-ID, Idempotency-Key",
                 )
+                for k, v in _default_security_headers().items():
+                    self.send_header(k, v)
                 self.end_headers()
 
             def _handle(self, method: str) -> None:
@@ -253,7 +286,7 @@ class Application:
                 )
                 self.send_response(response.status_code)
                 self.send_header("Content-Type", response.content_type)
-                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Access-Control-Allow-Origin", _cors_allow_origin())
                 for k, v in response.headers.items():
                     self.send_header(k, v)
                 self.end_headers()

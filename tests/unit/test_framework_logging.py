@@ -99,6 +99,21 @@ class TestCorrelationIdHeader:
         assert resp.status_code == 500
         assert "X-Correlation-ID" in resp.headers
 
+    def test_security_headers_present_on_success(self):
+        """A successful response should include secure baseline headers."""
+        app = _app_with_hello()
+        resp = app.handle("GET", "/hello", {}, b"", {})
+        assert resp.headers["X-Content-Type-Options"] == "nosniff"
+        assert resp.headers["X-Frame-Options"] == "DENY"
+        assert "default-src 'self'" in resp.headers["Content-Security-Policy"]
+
+    def test_security_headers_present_on_not_found(self):
+        """A 404 response should include secure baseline headers."""
+        app = _app_with_hello()
+        resp = app.handle("GET", "/missing", {}, b"", {})
+        assert resp.status_code == 404
+        assert resp.headers["Referrer-Policy"] == "no-referrer"
+
 
 # ---------------------------------------------------------------------------
 # Structured request logging

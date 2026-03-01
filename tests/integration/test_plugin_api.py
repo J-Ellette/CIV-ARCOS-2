@@ -135,3 +135,69 @@ def test_plugins_v1_execute_contract_shape() -> None:
     assert data["contract"]["name"] == "PluginExecution"
     assert data["data"]["success"] is True
     assert data["data"]["result"] == 11
+
+
+def test_plugins_register_and_registry_list_with_compatibility() -> None:
+    """Compatible plugin registration should persist in registry list endpoints."""
+    payload = {
+        "code": "def run():\n    return 1\n",
+        "manifest": {
+            "name": "demo.compat.plugin",
+            "version": "1.0.0",
+            "target_api_version": "v1",
+            "min_core_version": "0.1.0",
+            "max_core_version": "0.2.0",
+        },
+    }
+    body = json.dumps(payload).encode()
+
+    registered = _handle(
+        "POST",
+        "/api/plugins/register",
+        body,
+        {"Content-Type": "application/json", "Content-Length": str(len(body))},
+    )
+    assert registered.status_code == 201
+    reg_data = json.loads(registered.body)
+    assert reg_data["plugin"]["manifest"]["name"] == "demo.compat.plugin"
+    assert reg_data["validation"]["compatibility"]["compatible"] is True
+
+    listed = _handle("GET", "/api/plugins/registry")
+    assert listed.status_code == 200
+    list_data = json.loads(listed.body)
+    names = [entry["manifest"]["name"] for entry in list_data["plugins"]]
+    assert "demo.compat.plugin" in names
+
+
+def test_plugins_register_rejects_incompatible_version_constraints() -> None:
+    """Registration should fail when manifest version constraints are incompatible."""
+    payload = {
+        "code": "def run():\n    return 1\n",
+        "manifest": {
+            "name": "demo.incompatible.plugin",
+            "version": "1.0.0",
+            "target_api_version": "v1",
+            "min_core_version": "9.0.0",
+        },
+    }
+    body = json.dumps(payload).encode()
+
+    rejected = _handle(
+        "POST",
+        "/api/plugins/register",
+        body,
+        {"Content-Type": "application/json", "Content-Length": str(len(body))},
+    )
+    assert rejected.status_code == 400
+    data = json.loads(rejected.body)
+    assert "compatibility" in data["validation"]
+    assert data["validation"]["compatibility"]["compatible"] is False
+
+
+def test_plugins_v1_registry_contract_shape() -> None:
+    """V1 plugin registry endpoint should return contract envelope payload."""
+    resp = _handle("GET", "/api/v1/plugins/registry")
+    assert resp.status_code == 200
+    data = json.loads(resp.body)
+    assert data["contract"]["name"] == "PluginRegistry"
+    assert "plugins" in data["data"]

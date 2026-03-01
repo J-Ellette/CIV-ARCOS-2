@@ -1,0 +1,47 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install pip-audit
+
+      - name: Format check
+        run: python -m black --check civ_arcos tests
+
+      - name: Lint check
+        run: python -m flake8 civ_arcos tests
+
+      - name: Type check
+        run: mypy civ_arcos
+
+      - name: Tests with coverage floor
+        run: |
+          coverage run -m pytest -q
+          coverage report -m --fail-under=91
+
+      - name: Dependency security scan
+        run: |
+          python -m pip_audit -r requirements.txt
+          python -m pip_audit -r requirements-dev.txt
+
+      - name: Docs consistency gate
+        run: python scripts/docs_consistency_check.py

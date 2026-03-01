@@ -16,3 +16,6 @@ venv/
 .mypy_cache/
 .coverage
 htmlcov/
+logs/
+.civ_arcos/
+

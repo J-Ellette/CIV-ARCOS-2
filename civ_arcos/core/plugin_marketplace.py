@@ -15,9 +15,11 @@ import json
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from threading import RLock
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 FORBIDDEN_IMPORT_ROOTS = {
     "subprocess",
@@ -46,6 +48,27 @@ class PluginExecutionResult:
     timed_out: bool
     stdout: str
     stderr: str
+
+
+@dataclass
+class PluginManifest:
+    """Plugin metadata used for registration and compatibility checks."""
+
+    name: str
+    version: str
+    target_api_version: str = "v1"
+    min_core_version: str = "0.1.0"
+    max_core_version: Optional[str] = None
+
+
+@dataclass
+class PluginCompatibilityResult:
+    """Result of plugin compatibility evaluation against platform versions."""
+
+    compatible: bool
+    reasons: List[str]
+    core_version: str
+    api_version: str
 
 
 class PluginValidator:
@@ -102,6 +125,105 @@ class PluginValidator:
             checksum=self.checksum(code),
             errors=errors,
         )
+
+
+def _parse_semver(version: str) -> Optional[Tuple[int, int, int]]:
+    """Parse a semantic version string (``X.Y.Z``) into numeric tuple."""
+    parts = version.strip().split(".")
+    if len(parts) != 3:
+        return None
+    try:
+        return int(parts[0]), int(parts[1]), int(parts[2])
+    except ValueError:
+        return None
+
+
+class PluginRegistry:
+    """In-memory plugin registry with compatibility gate checks."""
+
+    def __init__(self, core_version: str = "0.1.0", api_version: str = "v1") -> None:
+        self._core_version = core_version
+        self._api_version = api_version
+        self._entries: Dict[str, Dict[str, Any]] = {}
+        self._lock = RLock()
+
+    @property
+    def core_version(self) -> str:
+        """Return the platform core version used for compatibility checks."""
+        return self._core_version
+
+    @property
+    def api_version(self) -> str:
+        """Return the platform API version used for compatibility checks."""
+        return self._api_version
+
+    def check_compatibility(self, manifest: PluginManifest) -> PluginCompatibilityResult:
+        """Evaluate manifest compatibility against core/API version constraints."""
+        reasons: List[str] = []
+
+        if manifest.target_api_version != self._api_version:
+            reasons.append(
+                "target_api_version mismatch "
+                f"(plugin={manifest.target_api_version}, platform={self._api_version})"
+            )
+
+        core_tuple = _parse_semver(self._core_version)
+        min_tuple = _parse_semver(manifest.min_core_version)
+        max_tuple = (
+            _parse_semver(manifest.max_core_version)
+            if manifest.max_core_version
+            else None
+        )
+
+        if _parse_semver(manifest.version) is None:
+            reasons.append("manifest.version must be semantic version X.Y.Z")
+        if min_tuple is None:
+            reasons.append("manifest.min_core_version must be semantic version X.Y.Z")
+        if manifest.max_core_version and max_tuple is None:
+            reasons.append("manifest.max_core_version must be semantic version X.Y.Z")
+
+        if core_tuple is not None and min_tuple is not None and core_tuple < min_tuple:
+            reasons.append(
+                f"core version {self._core_version} is below minimum "
+                f"{manifest.min_core_version}"
+            )
+        if core_tuple is not None and max_tuple is not None and core_tuple > max_tuple:
+            reasons.append(
+                f"core version {self._core_version} exceeds maximum "
+                f"{manifest.max_core_version}"
+            )
+
+        return PluginCompatibilityResult(
+            compatible=len(reasons) == 0,
+            reasons=reasons,
+            core_version=self._core_version,
+            api_version=self._api_version,
+        )
+
+    def register(
+        self,
+        manifest: PluginManifest,
+        checksum: str,
+    ) -> Dict[str, Any]:
+        """Register or update plugin manifest when compatibility checks pass."""
+        compatibility = self.check_compatibility(manifest)
+        if not compatibility.compatible:
+            raise ValueError("Plugin compatibility check failed")
+
+        entry = {
+            "manifest": asdict(manifest),
+            "checksum": checksum,
+            "registered_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        with self._lock:
+            self._entries[manifest.name] = entry
+        return entry
+
+    def list_entries(self) -> List[Dict[str, Any]]:
+        """List registered plugin entries sorted by plugin name."""
+        with self._lock:
+            return [self._entries[name] for name in sorted(self._entries.keys())]
 
 
 class PluginSandbox:

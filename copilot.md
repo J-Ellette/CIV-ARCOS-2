@@ -16,7 +16,7 @@ Backend observability + security hardening: structured logging with correlation 
 - [x] Created this `copilot.md` progress tracker
 - [x] Created comprehensive root `README.md` — project overview, architecture, feature inventory, setup/run/test instructions, endpoint catalog, `/api/v1` contract model, security/idempotency behavior, UI design-system policy, and documentation update workflow
 - [x] Expanded root `README.md` with release management sections — added **Release checklist** (verification/API/security/docs gates) and **Known limitations** (current architectural and operational constraints) to support repeatable handoffs
-- [x] Added **Roadmap next up** section to root `README.md` — compact, ordered mapping to `build_docs/improvements.md` with per-item status (`not started` / `in progress` / `implemented`) and immediate next actions
+- [x] Added **Roadmap next up** section to root `README.md` — compact, ordered mapping to `build_docs/build-guide.md` Section 18 with per-item status (`not started` / `in progress` / `implemented`) and immediate next actions
 - [x] Implemented `civ-arcos-carbon.html` — full IBM Carbon G100 shell (header, side nav, footer)
 - [x] **Dashboard page** — stat tiles, evidence feed, GSN assurance case, compliance status, risk map, blockchain ledger, platform sync, federated network, active alerts, live ticker, clock
 - [x] **Evidence Store page** — searchable/filterable Carbon data table, stat row, tabs (All/Tests/Scans/Commits/Compliance/Analysis), pagination
@@ -109,19 +109,52 @@ Backend observability + security hardening: structured logging with correlation 
 	- Verified with `pytest tests/unit/test_plugin_marketplace.py tests/integration/test_plugin_api.py tests/integration/test_api.py -q` (22 passing).
 - [x] **50 new tests (cumulative recent additions)** — `tests/unit/test_framework_logging.py` (10), `tests/unit/test_webhook.py` (17), `tests/integration/test_health_webhook.py` (15), `tests/unit/test_idempotency.py` (5), `tests/integration/test_api.py` idempotency scenarios (3); total test count 133, targeted suite passing
 - [x] **54 new tests (cumulative recent additions)** — previous 50 plus versioned contract API tests in `tests/integration/test_api.py` (4); total test count 137, targeted suite passing
+- [x] **STEP_06 slice: AI optional backend adapter (Azure OpenAI explicit opt-in)**
+	- Added `civ_arcos/analysis/llm_integration.py` with `MockBackend` default behavior and `AzureOpenAIBackend` selection path.
+	- Updated analysis test generation wiring (`civ_arcos/analysis/test_generator.py`, `civ_arcos/api_routes/analysis.py`) to accept `use_ai` and `llm_backend` while preserving deterministic fallback by default.
+	- Added/extended coverage in `tests/unit/test_llm_integration.py`, `tests/unit/test_test_generator.py`, and `tests/integration/test_analysis_api.py`.
+	- Verified with `python -m pytest tests/unit/test_llm_integration.py tests/unit/test_test_generator.py tests/integration/test_analysis_api.py -q` (14 passed).
+- [x] **STEP_07 slice: blockchain sync event stream**
+	- Added `civ_arcos/distributed/sync_events.py` with thread-safe in-memory event storage and cursor-based reads.
+	- Updated `civ_arcos/api.py` to emit `blockchain.block_added` events on `POST /api/blockchain/add` and expose `GET /api/sync/events` polling endpoint.
+	- Added integration coverage in `tests/integration/test_api.py` for publish/receive behavior and idempotent replay non-duplication.
+	- Verified with `python -m pytest tests/integration/test_api.py -k "sync_events or blockchain" -q` (5 passed).
+- [x] **STEP_08 slice: dashboard live updates path**
+	- Added live-update dashboard hooks in `civ-arcos-carbon.html` for risk + ledger widget refresh targets.
+	- Added `initDashboardLiveUpdates` polling logic consuming `GET /api/sync/events` and refresh requests to `GET /api/risk/map` and `GET /api/blockchain/chain`.
+	- Extended dashboard route integration checks in `tests/integration/test_dashboard.py` for live update hook/endpoint wiring.
+	- Verified with `python -m pytest tests/integration/test_dashboard.py tests/integration/test_api.py -k "dashboard or sync_events or blockchain" -q` (8 passed).
+- [x] **STEP_09 slice: plugin version metadata + compatibility checks**
+	- Added `PluginManifest` and `PluginRegistry` in `civ_arcos/core/plugin_marketplace.py` with semantic version compatibility checks and API target validation.
+	- Extended plugin endpoints in `civ_arcos/api_routes/plugins.py` with legacy/v1 registration and registry listing routes (`/api/plugins/register|registry`, `/api/v1/plugins/register|registry`).
+	- Added v1 contracts in `civ_arcos/contracts/v1.py`: `PluginRegistration` and `PluginRegistry`.
+	- Added compatibility matrix coverage in `tests/unit/test_plugin_marketplace.py` and integration registry checks in `tests/integration/test_plugin_api.py`.
+	- Verified with `python -m pytest tests/unit/test_plugin_marketplace.py tests/integration/test_plugin_api.py -q` (18 passed).
+- [x] **STEP_10 slice: predictive quality forecasting baseline**
+	- Added deterministic forecast generation to `civ_arcos/core/quality_metrics_history.py` via `forecast_summary(window, horizon)` using linear slope-based projections.
+	- Added legacy/v1 forecast endpoints in `civ_arcos/api_routes/platform.py`: `GET /api/quality/metrics/forecast` and `GET /api/v1/quality/metrics/forecast`.
+	- Added v1 forecast contract serializer in `civ_arcos/contracts/v1.py` (`QualityMetricsForecast`).
+	- Added integration regression checks in `tests/integration/test_api.py` for deterministic projections and contract envelope shape.
+	- Verified with `python -m pytest tests/integration/test_api.py -k "quality_metrics_forecast or quality_metrics_trends or quality_metrics_record" -q` (4 passed).
+- [x] **Governance + session hooks + docs rebuild slice**
+	- Added governance audit scripts under `.github/hooks/governance-audit/` and session logging scripts under `.github/hooks/session-logger/`.
+	- Added session prompt submit logger hook: `.github/hooks/session-logger/user-prompt-submit.sh`.
+	- Added baseline CI quality workflow: `.github/workflows/quality-gates.yml`.
+	- Recreated canonical docs: `build_docs/STATUS.md` and `build_docs/VERIFICATION_MATRIX.md`.
+	- Updated `scripts/docs_consistency_check.py` to validate against `build_docs/build-guide.md`.
+- [x] **STEP_05 bounded slice: fragments + ArgTL + ACQL core**
+	- Added `civ_arcos/assurance/fragments.py` with `AssuranceCaseFragment` and `FragmentLibrary` default patterns (`component_quality`, `component_security`, `integration`).
+	- Added `civ_arcos/assurance/argtl.py` with `compose`, `link`, `validate`, and `assemble` operation support in `ArgTLEngine`.
+	- Added `civ_arcos/assurance/acql.py` with 8 ACQL query types (`CONSISTENCY`, `COMPLETENESS`, `SOUNDNESS`, `COVERAGE`, `TRACEABILITY`, `WEAKNESSES`, `DEPENDENCIES`, `DEFEATERS`).
+	- Added focused Step 5 tests: `tests/unit/assurance/test_fragments.py`, `tests/unit/assurance/test_argtl.py`, `tests/unit/assurance/test_acql.py`.
+	- Verified with `python -m pytest tests/unit/assurance -q` (9 passed) and assurance regression `python -m pytest tests/unit/test_case.py tests/unit/test_gsn.py tests/unit/test_templates.py tests/integration/test_assurance_api.py -q` (27 passed).
 
 ## Build-Related Docs (in `build_docs/`)
 | File | Description |
 |------|-------------|
 | `build-guide.md` | Main build guide |
-| `STEP_01.md` – `STEP_10.md` | Step-by-step build steps |
-| `STEP_04.2.md`, `STEP_05-06.md`, `STEP_05.0.md`, `STEP_05.5.md`, `STEP_05_ENTERPRISE.md` | Extended build step variants |
-| `IMPLEMENTATION.md` | Implementation notes |
 | `VERIFICATION_MATRIX.md` | Verification checklist/matrix |
 | `STATUS.md` | Build/project status |
-| `compliance-module-guide.md` | Compliance module guide |
-| `improvements.md` | Planned improvements |
-| `I18N_DIGITALTWIN.md` | Internationalisation / digital twin notes |
 
 ## Remaining Stubs
 None — all pages fully implemented.

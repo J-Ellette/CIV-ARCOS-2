@@ -9,12 +9,14 @@ CIV-ARCOS adapts assurance-driven engineering patterns into a practical platform
 - Evidence graph ingestion and provenance tracking
 - Blockchain-style tamper-evident evidence ledger
 - Static analysis, security scanning, and test suggestion workflows
+- Optional Azure OpenAI-backed test suggestion adapter with explicit opt-in and safe mock fallback
 - Digital assurance case generation (GSN-oriented)
 - Badge generation APIs for quality/coverage/security reporting
 - Operational API with health probes, structured logs, correlation IDs, and webhook security
 - Idempotency controls on write endpoints
 - Versioned API contract surface (`/api/v1/*`)
 - IBM Carbon-based operational console UI (`civ-arcos-carbon.html`)
+- Dashboard live updates path for risk/ledger widgets via sync event polling
 
 ## Design system decisions
 
@@ -31,7 +33,7 @@ CIV-ARCOS adapts assurance-driven engineering patterns into a practical platform
 
 ## Roadmap next up
 
-This section mirrors `build_docs/improvements.md` (Copilot-priority implementation order) and should be updated as items move.
+This section mirrors `build_docs/build-guide.md` (Section 18: Unified Improvement Priorities) and should be updated as items move.
 
 - **1) Plugin sandbox hardening**
   - Status: implemented (baseline)
@@ -58,7 +60,7 @@ This section mirrors `build_docs/improvements.md` (Copilot-priority implementati
 
 - **6) Quality engineering upgrades**
   - Status: partially in progress
-  - Done: focused endpoint integration tests and idempotency/contract tests.
+  - Done: focused endpoint integration tests, idempotency/contract tests, explicit-opt-in AI backend fallback coverage for analysis test suggestions, and Step 5 bounded methodology unit suite for fragments/ArgTL/ACQL.
   - Next: contract coverage expansion, mutation/property testing, critical-module coverage gates.
 
 - **7) Documentation normalization + rebuild runbook + verification matrix hardening**
@@ -78,7 +80,19 @@ See also:
 
 - `copilot.md` (implementation tracker)
 - `build_docs/STATUS.md` (canonical status)
-- `build_docs/improvements.md` (priority roadmap)
+- `build_docs/VERIFICATION_MATRIX.md` (verification evidence)
+
+## Governance and session hooks
+
+- Governance audit hooks: `.github/hooks/governance-audit/`
+- Session logging hooks: `.github/hooks/session-logger/`
+- Hook environment defaults: `.github/hooks/hooks.json`
+- Logs are local-only under `logs/` and ignored by git.
+
+## CI quality gates
+
+- Workflow: `.github/workflows/quality-gates.yml`
+- Gates: format (`black`), lint (`flake8`), typing (`mypy`), tests + coverage floor, dependency security scan (`pip-audit`), docs consistency.
 
 ## Repository layout
 
@@ -180,7 +194,7 @@ mypy civ_arcos
 - `GET /api/evidence/{evidence_id}`
 - `POST /api/analysis/static`
 - `POST /api/analysis/security`
-- `POST /api/analysis/tests`
+- `POST /api/analysis/tests` (supports optional `use_ai` + `llm_backend` selector; defaults to non-AI fallback)
 - `POST /api/analysis/comprehensive`
 
 ### Assurance and quality
@@ -200,6 +214,7 @@ mypy civ_arcos
 - `GET /api/risk/map`
 - `GET /api/compliance/status`
 - `GET /api/analytics/trends`
+- `GET /api/quality/metrics/forecast`
 - `GET /api/tenants`
 - `POST /api/tenants`
 - `GET /api/settings`
@@ -210,16 +225,19 @@ mypy civ_arcos
 - `POST /api/blockchain/add`
 - `GET /api/blockchain/status`
 - `GET /api/blockchain/chain`
+- `GET /api/sync/events` (cursor-based polling stream for blockchain sync events)
 - `POST /api/webhooks/github`
 
 ### Plugin sandbox
 
 - `POST /api/plugins/validate`
 - `POST /api/plugins/execute`
+- `POST /api/plugins/register`
+- `GET /api/plugins/registry`
 
 ## Versioned API contracts (`/api/v1`)
 
-Contract endpoints currently cover Evidence and Assurance domains.
+Contract endpoints cover all currently modularized domains, including analysis, platform, admin, and plugin slices.
 
 - `GET /api/v1/contracts`
 - `GET /api/v1/evidence`
@@ -230,12 +248,15 @@ Contract endpoints currently cover Evidence and Assurance domains.
 - `GET /api/v1/risk/map`
 - `GET /api/v1/compliance/status`
 - `GET /api/v1/analytics/trends`
+- `GET /api/v1/quality/metrics/forecast`
 - `GET /api/v1/tenants`
 - `POST /api/v1/tenants`
 - `GET /api/v1/settings`
 - `POST /api/v1/settings`
 - `POST /api/v1/plugins/validate`
 - `POST /api/v1/plugins/execute`
+- `POST /api/v1/plugins/register`
+- `GET /api/v1/plugins/registry`
 
 Contract payload envelope shape:
 

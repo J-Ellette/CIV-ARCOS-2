@@ -143,6 +143,26 @@ def analytics_trends_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
     return _envelope("AnalyticsTrends", payload)
 
 
+def quality_metrics_trends_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for quality metrics trend responses."""
+    return _envelope("QualityMetricsTrends", payload)
+
+
+def quality_metrics_forecast_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for quality metrics forecast responses."""
+    return _envelope("QualityMetricsForecast", payload)
+
+
+def compliance_report_artifact_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for a compliance report artifact response."""
+    return _envelope("ComplianceReportArtifact", payload)
+
+
+def compliance_report_list_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for compliance report artifact list responses."""
+    return _envelope("ComplianceReportList", payload)
+
+
 def tenants_list_contract(tenants: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Build a versioned contract for tenant list responses."""
     return _envelope(
@@ -179,6 +199,16 @@ def plugin_execution_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
     return _envelope("PluginExecution", payload)
 
 
+def plugin_registration_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for plugin registration responses."""
+    return _envelope("PluginRegistration", payload)
+
+
+def plugin_registry_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for plugin registry list responses."""
+    return _envelope("PluginRegistry", payload)
+
+
 def contracts_registry() -> Dict[str, Any]:
     """Return discoverable contract metadata for v1 endpoints."""
     return _envelope(
@@ -200,12 +230,18 @@ def contracts_registry() -> Dict[str, Any]:
                 {"name": "RiskMap", "version": CONTRACT_VERSION},
                 {"name": "ComplianceStatus", "version": CONTRACT_VERSION},
                 {"name": "AnalyticsTrends", "version": CONTRACT_VERSION},
+                {"name": "QualityMetricsTrends", "version": CONTRACT_VERSION},
+                {"name": "QualityMetricsForecast", "version": CONTRACT_VERSION},
+                {"name": "ComplianceReportArtifact", "version": CONTRACT_VERSION},
+                {"name": "ComplianceReportList", "version": CONTRACT_VERSION},
                 {"name": "TenantsList", "version": CONTRACT_VERSION},
                 {"name": "TenantDetail", "version": CONTRACT_VERSION},
                 {"name": "SettingsState", "version": CONTRACT_VERSION},
                 {"name": "SettingsUpdate", "version": CONTRACT_VERSION},
                 {"name": "PluginValidation", "version": CONTRACT_VERSION},
                 {"name": "PluginExecution", "version": CONTRACT_VERSION},
+                {"name": "PluginRegistration", "version": CONTRACT_VERSION},
+                {"name": "PluginRegistry", "version": CONTRACT_VERSION},
             ],
         },
     )

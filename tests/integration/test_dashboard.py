@@ -26,3 +26,13 @@ class TestDashboardRoute:
         assert "<!DOCTYPE html>" in body
         assert "CIV-ARCOS — Carbon Design System" in body
         assert 'data-carbon-theme="g100"' in body
+
+    def test_dashboard_live_update_hooks_are_present(self):
+        """Dashboard HTML should include STEP_08 live-update DOM hooks and logic."""
+        resp = _handle_dashboard()
+        body = resp.body.decode("utf-8")
+
+        assert "dashboard-risk-blockchain-score" in body
+        assert "dashboard-ledger-latest-index" in body
+        assert "initDashboardLiveUpdates" in body
+        assert "/api/sync/events" in body

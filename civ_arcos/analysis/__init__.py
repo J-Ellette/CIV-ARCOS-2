@@ -4,5 +4,12 @@ from civ_arcos.analysis.static_analyzer import StaticAnalyzer
 from civ_arcos.analysis.security_scanner import SecurityScanner
 from civ_arcos.analysis.test_generator import TestGenerator
 from civ_arcos.analysis.coverage_analyzer import CoverageAnalyzer
+from civ_arcos.analysis.llm_integration import get_llm
 
-__all__ = ["StaticAnalyzer", "SecurityScanner", "TestGenerator", "CoverageAnalyzer"]
+__all__ = [
+	"StaticAnalyzer",
+	"SecurityScanner",
+	"TestGenerator",
+	"CoverageAnalyzer",
+	"get_llm",
+]

@@ -2390,7 +2390,7 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
             <span class="cds-tile-title-accent error" aria-hidden="true"></span>
             Component Risk
           </div>
-          <span class="cds-tile-meta">6 components</span>
+          <span id="dashboard-risk-meta" class="cds-tile-meta">6 components</span>
         </div>
         <div class="cds-risk-list">
           <div class="cds-risk-row">
@@ -2406,9 +2406,9 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
             <span class="cds-tag cds-tag--warm">HIGH</span>
           </div>
           <div class="cds-risk-row">
-            <span class="cds-risk-row__label">blockchain</span>
-            <div class="cds-risk-row__track"><div class="cds-risk-row__fill" style="width:48%; background:var(--cds-support-warning);"></div></div>
-            <span class="cds-risk-row__score" style="color:var(--cds-support-warning);">48</span>
+            <span id="dashboard-risk-blockchain-label" class="cds-risk-row__label">blockchain</span>
+            <div class="cds-risk-row__track"><div id="dashboard-risk-blockchain-fill" class="cds-risk-row__fill" style="width:48%; background:var(--cds-support-warning);"></div></div>
+            <span id="dashboard-risk-blockchain-score" class="cds-risk-row__score" style="color:var(--cds-support-warning);">48</span>
             <span class="cds-tag cds-tag--warm">HIGH</span>
           </div>
           <div class="cds-risk-row">
@@ -2439,19 +2439,19 @@ a:hover { color: var(--cds-link-primary-hover); text-decoration: underline; }
             <span class="cds-tile-title-accent" aria-hidden="true"></span>
             Immutable Ledger
           </div>
-          <span class="cds-tile-meta mono">Block #2,841</span>
+          <span id="dashboard-ledger-meta" class="cds-tile-meta mono">Block #2,841</span>
         </div>
         <div class="cds-chain">
           <div class="cds-block">
             <div class="cds-block__dot cds-block__dot--filled" aria-hidden="true"></div>
             <div class="cds-block__card">
               <div class="cds-block__header">
-                <span class="cds-block__index">Block #2,841</span>
-                <span class="cds-block__time">2m ago</span>
+                <span id="dashboard-ledger-latest-index" class="cds-block__index">Block #2,841</span>
+                <span id="dashboard-ledger-latest-time" class="cds-block__time">2m ago</span>
               </div>
-              <div class="cds-block__hash">0x8a3f2c9d1e4b7a…f2c9d1e4b</div>
+              <div id="dashboard-ledger-latest-hash" class="cds-block__hash">0x8a3f2c9d1e4b7a…f2c9d1e4b</div>
               <div class="cds-block__footer">
-                <span class="cds-block__ev">12 evidence items</span>
+                <span id="dashboard-ledger-latest-ev" class="cds-block__ev">12 evidence items</span>
                 <span class="cds-tag cds-tag--green">✓ VALID</span>
               </div>
             </div>
@@ -5271,6 +5271,134 @@ document.addEventListener('keydown', e => {
   const ep = document.getElementById('help-api-endpoint');
   if (ep && saved.apiEndpoint) ep.textContent = saved.apiEndpoint;
 })();
+
+// === DASHBOARD LIVE UPDATES (STEP_08 SLICE) ===
+let _dashboardSyncCursor = 0;
+
+function _dashboardApiBaseUrl() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('civArcos_settings') || '{}'); } catch (e) { saved = {}; }
+  const configured = (saved.apiEndpoint || '').trim();
+  if (configured) return configured.replace(/\/$/, '');
+  if (window.location && window.location.origin && window.location.origin.startsWith('http')) {
+    return window.location.origin;
+  }
+  return '';
+}
+
+function _scoreColor(score) {
+  if (score >= 75) return 'var(--cds-support-error)';
+  if (score >= 50) return 'var(--cds-support-warning)';
+  if (score >= 25) return 'var(--cds-interactive)';
+  return 'var(--cds-support-success)';
+}
+
+function _formatRelativeTimeFromIso(timestamp) {
+  const parsed = Date.parse(timestamp || '');
+  if (Number.isNaN(parsed)) return 'just now';
+  const deltaSeconds = Math.max(0, Math.floor((Date.now() - parsed) / 1000));
+  if (deltaSeconds < 60) return `${deltaSeconds}s ago`;
+  const deltaMinutes = Math.floor(deltaSeconds / 60);
+  if (deltaMinutes < 60) return `${deltaMinutes}m ago`;
+  const deltaHours = Math.floor(deltaMinutes / 60);
+  return `${deltaHours}h ago`;
+}
+
+async function refreshDashboardRiskWidget(baseUrl) {
+  const response = await fetch(`${baseUrl}/api/risk/map`);
+  if (!response.ok) return;
+  const payload = await response.json();
+  const items = Array.isArray(payload.items) ? payload.items : [];
+
+  const meta = document.getElementById('dashboard-risk-meta');
+  if (meta) meta.textContent = `${payload.total_components || items.length} components`;
+
+  let blockchainItem = items.find(item => String(item.component || '').toLowerCase().includes('blockchain'));
+  if (!blockchainItem && items.length > 0) blockchainItem = items[0];
+  if (!blockchainItem) return;
+
+  const score = Number(blockchainItem.score || 0);
+  const label = document.getElementById('dashboard-risk-blockchain-label');
+  const fill = document.getElementById('dashboard-risk-blockchain-fill');
+  const scoreEl = document.getElementById('dashboard-risk-blockchain-score');
+  const color = _scoreColor(score);
+
+  if (label) label.textContent = String(blockchainItem.component || 'blockchain');
+  if (fill) {
+    fill.style.width = `${Math.max(0, Math.min(100, score))}%`;
+    fill.style.background = color;
+  }
+  if (scoreEl) {
+    scoreEl.textContent = String(score);
+    scoreEl.style.color = color;
+  }
+}
+
+async function refreshDashboardLedgerWidget(baseUrl) {
+  const response = await fetch(`${baseUrl}/api/blockchain/chain?limit=1`);
+  if (!response.ok) return;
+  const payload = await response.json();
+  const blocks = Array.isArray(payload.blocks) ? payload.blocks : [];
+  if (blocks.length === 0) return;
+  const latest = blocks[0];
+
+  const meta = document.getElementById('dashboard-ledger-meta');
+  const idx = document.getElementById('dashboard-ledger-latest-index');
+  const time = document.getElementById('dashboard-ledger-latest-time');
+  const hash = document.getElementById('dashboard-ledger-latest-hash');
+  const ev = document.getElementById('dashboard-ledger-latest-ev');
+
+  if (meta) meta.textContent = `Block #${latest.index}`;
+  if (idx) idx.textContent = `Block #${latest.index}`;
+  if (time) time.textContent = _formatRelativeTimeFromIso(latest.timestamp);
+  if (hash) hash.textContent = String(latest.hash || '').slice(0, 18) + '…';
+  const evidenceCount = latest.data && Array.isArray(latest.data.evidence_ids)
+    ? latest.data.evidence_ids.length
+    : (latest.data ? Object.keys(latest.data).length : 0);
+  if (ev) ev.textContent = `${evidenceCount} evidence items`;
+}
+
+async function pollDashboardSyncEvents() {
+  const baseUrl = _dashboardApiBaseUrl();
+  if (!baseUrl) return;
+
+  const response = await fetch(`${baseUrl}/api/sync/events?since_id=${_dashboardSyncCursor}&limit=25`);
+  if (!response.ok) return;
+  const payload = await response.json();
+  const events = Array.isArray(payload.events) ? payload.events : [];
+  if (events.length === 0) {
+    _dashboardSyncCursor = Number(payload.latest_event_id || _dashboardSyncCursor);
+    return;
+  }
+
+  _dashboardSyncCursor = Number(payload.next_since_id || _dashboardSyncCursor);
+  const hasBlockchainUpdate = events.some(event => event.topic === 'blockchain.block_added');
+  if (!hasBlockchainUpdate) return;
+
+  await Promise.all([
+    refreshDashboardRiskWidget(baseUrl),
+    refreshDashboardLedgerWidget(baseUrl),
+  ]);
+}
+
+function initDashboardLiveUpdates() {
+  const poll = async () => {
+    try {
+      await pollDashboardSyncEvents();
+    } catch (e) {
+      // Intentionally silent for static-file/offline dashboard mode.
+    }
+  };
+
+  poll();
+  setInterval(poll, 5000);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDashboardLiveUpdates);
+} else {
+  initDashboardLiveUpdates();
+}
 </script>
 </body>
 </html>

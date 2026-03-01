@@ -27,8 +27,16 @@ from civ_arcos.api_routes.plugins import (
     register_plugin_v1_routes,
 )
 from civ_arcos.core.config import get_config
-from civ_arcos.core.plugin_marketplace import PluginSandbox, PluginValidator
+from civ_arcos.core.compliance_reports import ComplianceReportStore
+from civ_arcos.core.plugin_marketplace import (
+    PluginRegistry,
+    PluginSandbox,
+    PluginValidator,
+)
+from civ_arcos.core.quality_metrics_history import QualityMetricsHistory
+from civ_arcos.core.report_scheduler import ReportScheduler
 from civ_arcos.distributed.blockchain_ledger import BlockchainLedger
+from civ_arcos.distributed.sync_events import SyncEventStream
 from civ_arcos.evidence.collector import EvidenceStore
 from civ_arcos.storage.graph import EvidenceGraph
 from civ_arcos.web.badges import BadgeGenerator
@@ -70,9 +78,14 @@ _idempotency_cache = IdempotencyCache(
     ttl_secs=int(os.environ.get("CIV_IDEMPOTENCY_TTL_SECS", "86400"))
 )
 _plugin_validator = PluginValidator()
+_plugin_registry = PluginRegistry(core_version="0.1.0", api_version="v1")
 _plugin_sandbox = PluginSandbox(
     timeout_secs=float(os.environ.get("CIV_PLUGIN_TIMEOUT_SECS", "2.0"))
 )
+_report_scheduler = ReportScheduler()
+_quality_metrics_history = QualityMetricsHistory()
+_compliance_report_store = ComplianceReportStore()
+_sync_events = SyncEventStream()
 
 
 def _get_dashboard_html() -> bytes:
@@ -157,12 +170,18 @@ register_platform_legacy_routes(
     store=_store,
     ledger=_ledger,
     assurance_cases=_assurance_cases,
+    report_scheduler=_report_scheduler,
+    quality_metrics_history=_quality_metrics_history,
 )
 register_platform_v1_routes(
     app,
     store=_store,
     ledger=_ledger,
     assurance_cases=_assurance_cases,
+    report_scheduler=_report_scheduler,
+    quality_metrics_history=_quality_metrics_history,
+    compliance_report_store=_compliance_report_store,
+    tenants=_tenants,
 )
 register_admin_legacy_routes(
     app,
@@ -181,6 +200,7 @@ register_admin_v1_routes(
 register_plugin_legacy_routes(
     app,
     validator=_plugin_validator,
+    registry=_plugin_registry,
     sandbox=_plugin_sandbox,
     idempotency_precheck=_idempotency_precheck,
     idempotency_store=_idempotency_store,
@@ -188,6 +208,7 @@ register_plugin_legacy_routes(
 register_plugin_v1_routes(
     app,
     validator=_plugin_validator,
+    registry=_plugin_registry,
     sandbox=_plugin_sandbox,
     idempotency_precheck=_idempotency_precheck,
     idempotency_store=_idempotency_store,
@@ -466,12 +487,53 @@ def blockchain_add(req: Request) -> Response:
 
     data = req.json() or {}
     block = _ledger.add_block(data)
+    _sync_events.emit(
+        topic="blockchain.block_added",
+        payload={
+            "block_index": block.index,
+            "hash": block.hash,
+            "timestamp": block.timestamp,
+        },
+    )
     resp = Response(
         {"index": block.index, "hash": block.hash, "timestamp": block.timestamp},
         status_code=201,
     )
     _idempotency_store(req, resp)
     return resp
+
+
+@app.route("/api/sync/events", methods=["GET"])
+def sync_events(req: Request) -> Response:
+    """Return recent blockchain sync events with cursor-based polling."""
+    try:
+        since_id = int(req.query("since_id", "0"))
+    except ValueError:
+        since_id = 0
+    try:
+        limit = int(req.query("limit", "50"))
+    except ValueError:
+        limit = 50
+
+    events = _sync_events.list_events(since_id=since_id, limit=limit)
+    serialized = [
+        {
+            "event_id": event.event_id,
+            "topic": event.topic,
+            "emitted_at": event.emitted_at,
+            "payload": event.payload,
+        }
+        for event in events
+    ]
+    return Response(
+        {
+            "mode": "poll",
+            "events": serialized,
+            "count": len(serialized),
+            "latest_event_id": _sync_events.latest_event_id(),
+            "next_since_id": serialized[-1]["event_id"] if serialized else since_id,
+        }
+    )
 
 
 @app.route("/api/blockchain/status", methods=["GET"])

@@ -4,6 +4,8 @@ import ast
 import os
 from typing import Any, Dict, List, Optional
 
+from civ_arcos.analysis.llm_integration import LLMClient, get_llm
+
 
 def _parse_functions_and_classes(path: str):
     """Return (functions, classes) lists from a Python source file."""
@@ -82,6 +84,13 @@ def _collect_test_names(path: str, tested: set) -> None:
 class TestGenerator:
     """Generate pytest test templates for Python source files."""
 
+    __test__ = False
+
+    def __init__(self, use_ai: bool = False, llm_backend: str = "mock") -> None:
+        self.use_ai = use_ai
+        self.llm_backend = llm_backend
+        self.llm: LLMClient = get_llm(backend_type=llm_backend, use_ai=use_ai)
+
     def analyze_source(self, path: str) -> Dict[str, Any]:
         functions, classes = _parse_functions_and_classes(path)
         tested = _gather_tested_names(path)
@@ -156,6 +165,12 @@ class TestGenerator:
     def get_suggestions(self, path: str) -> Dict[str, Any]:
         analysis = self.analyze_source(path)
         suggestions: List[Dict[str, Any]] = []
+        source = ""
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as fh:
+                source = fh.read()
+        except OSError:
+            source = ""
 
         for func in analysis["untested_functions"]:
             suggestions.append(
@@ -164,6 +179,11 @@ class TestGenerator:
                     "type": "function",
                     "template": self.generate_test_template(
                         func["name"], func["params"]
+                    ),
+                    "ai_suggestion": (
+                        self.llm.generate_test_cases(source, func["name"])
+                        if self.use_ai
+                        else None
                     ),
                 }
             )
@@ -178,6 +198,11 @@ class TestGenerator:
                             "template": self.generate_test_template(
                                 method["name"], method["params"], cls["name"]
                             ),
+                            "ai_suggestion": (
+                                self.llm.generate_test_cases(source, method["name"])
+                                if self.use_ai
+                                else None
+                            ),
                         }
                     )
 
@@ -185,5 +210,7 @@ class TestGenerator:
             "functions_found": len(analysis["functions"]),
             "classes_found": len(analysis["classes"]),
             "total_test_suggestions": len(suggestions),
+            "ai_enabled": self.llm.ai_enabled,
+            "ai_backend": self.llm.backend_name,
             "suggestions": suggestions,
         }

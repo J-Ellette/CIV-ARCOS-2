@@ -11,6 +11,23 @@ from civ_arcos.assurance.gsn import (
     GSNJustification,
 )
 from civ_arcos.assurance.case import AssuranceCase, AssuranceCaseBuilder
+from civ_arcos.assurance.fragments import AssuranceCaseFragment, FragmentLibrary
+from civ_arcos.assurance.argtl import ArgTLEngine, ArgTLOperation
+from civ_arcos.assurance.acql import ACQLEngine, ACQLQueryType
+from civ_arcos.assurance.reasoning import (
+    ArgumentTheory,
+    Defeater,
+    DefeaterType,
+    ReasoningEngine,
+)
+from civ_arcos.assurance.architecture import ArchitectureMapper, DiscrepancySeverity
+from civ_arcos.assurance.dependency_tracker import (
+    Dependency,
+    DependencyTracker,
+    DependencyType,
+    Resource,
+    ResourceType,
+)
 
 __all__ = [
     "GSNNodeType",
@@ -23,4 +40,21 @@ __all__ = [
     "GSNJustification",
     "AssuranceCase",
     "AssuranceCaseBuilder",
+    "AssuranceCaseFragment",
+    "FragmentLibrary",
+    "ArgTLEngine",
+    "ArgTLOperation",
+    "ACQLEngine",
+    "ACQLQueryType",
+    "ArgumentTheory",
+    "Defeater",
+    "DefeaterType",
+    "ReasoningEngine",
+    "ArchitectureMapper",
+    "DiscrepancySeverity",
+    "ResourceType",
+    "DependencyType",
+    "Resource",
+    "Dependency",
+    "DependencyTracker",
 ]
