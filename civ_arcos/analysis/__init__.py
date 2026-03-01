@@ -7,9 +7,9 @@ from civ_arcos.analysis.coverage_analyzer import CoverageAnalyzer
 from civ_arcos.analysis.llm_integration import get_llm
 
 __all__ = [
-	"StaticAnalyzer",
-	"SecurityScanner",
-	"TestGenerator",
-	"CoverageAnalyzer",
-	"get_llm",
+    "StaticAnalyzer",
+    "SecurityScanner",
+    "TestGenerator",
+    "CoverageAnalyzer",
+    "get_llm",
 ]

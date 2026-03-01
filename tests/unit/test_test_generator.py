@@ -69,7 +69,9 @@ def test_get_suggestions_ai_opt_in_without_env_uses_fallback_backend(monkeypatch
     src = "def uncovered_func(a, b):\n    return a + b\n"
     path = _write_tmp(src)
     try:
-        suggestions = TestGenerator(use_ai=True, llm_backend="azure_openai").get_suggestions(path)
+        suggestions = TestGenerator(
+            use_ai=True, llm_backend="azure_openai"
+        ).get_suggestions(path)
         assert suggestions["ai_enabled"] is False
         assert suggestions["ai_backend"] == "mock"
     finally:

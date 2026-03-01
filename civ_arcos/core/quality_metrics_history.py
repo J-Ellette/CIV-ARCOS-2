@@ -21,6 +21,7 @@ class QualityMetricSnapshot:
     evidence_total: int
     risk_components: int
     source: str
+    tenant_id: str = ""
 
 
 class QualityMetricsHistory:
@@ -40,6 +41,7 @@ class QualityMetricsHistory:
         evidence_total: int,
         risk_components: int,
         source: str,
+        tenant_id: str = "",
     ) -> Dict[str, Any]:
         """Persist a quality metrics snapshot and return serialized metadata."""
         snapshot = QualityMetricSnapshot(
@@ -49,22 +51,41 @@ class QualityMetricsHistory:
             evidence_total=int(evidence_total),
             risk_components=int(risk_components),
             source=source,
+            tenant_id=tenant_id.strip(),
         )
         with self._lock:
             self._snapshots.append(snapshot)
             self._save()
         return asdict(snapshot)
 
-    def list_snapshots(self, limit: int = 50) -> List[Dict[str, Any]]:
+    def list_snapshots(
+        self,
+        limit: int = 50,
+        tenant_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         """Return latest persisted snapshots ordered by timestamp descending."""
         safe_limit = max(1, limit)
+        normalized_tenant = tenant_id.strip() if tenant_id is not None else None
         with self._lock:
-            ordered = sorted(self._snapshots, key=lambda s: s.timestamp, reverse=True)
+            ordered = sorted(
+                [
+                    snapshot
+                    for snapshot in self._snapshots
+                    if normalized_tenant is None
+                    or snapshot.tenant_id == normalized_tenant
+                ],
+                key=lambda s: s.timestamp,
+                reverse=True,
+            )
             return [asdict(s) for s in ordered[:safe_limit]]
 
-    def trend_summary(self, window: int = 10) -> Dict[str, Any]:
+    def trend_summary(
+        self,
+        window: int = 10,
+        tenant_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Return deterministic trend summary over the latest window of snapshots."""
-        points = self.list_snapshots(limit=max(2, window))
+        points = self.list_snapshots(limit=max(2, window), tenant_id=tenant_id)
         if not points:
             return {
                 "count": 0,
@@ -96,11 +117,16 @@ class QualityMetricsHistory:
             "points": points,
         }
 
-    def forecast_summary(self, window: int = 10, horizon: int = 3) -> Dict[str, Any]:
+    def forecast_summary(
+        self,
+        window: int = 10,
+        horizon: int = 3,
+        tenant_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Return a deterministic linear quality forecast from recent snapshots."""
         safe_window = max(2, int(window))
         safe_horizon = max(1, min(int(horizon), 12))
-        points = self.list_snapshots(limit=safe_window)
+        points = self.list_snapshots(limit=safe_window, tenant_id=tenant_id)
 
         if not points:
             return {
@@ -150,8 +176,11 @@ class QualityMetricsHistory:
         if not self._storage_path.exists():
             return
 
-        raw = self._storage_path.read_text(encoding="utf-8")
-        data_obj: Any = json.loads(raw)
+        try:
+            raw = self._storage_path.read_text(encoding="utf-8")
+            data_obj: Any = json.loads(raw)
+        except (OSError, json.JSONDecodeError):
+            return
         if not isinstance(data_obj, list):
             return
 
@@ -182,6 +211,9 @@ class QualityMetricsHistory:
                 continue
             if not isinstance(item["source"], str):
                 continue
+            tenant_id_obj = item.get("tenant_id", "")
+            if not isinstance(tenant_id_obj, str):
+                continue
 
             self._snapshots.append(
                 QualityMetricSnapshot(
@@ -191,6 +223,7 @@ class QualityMetricsHistory:
                     evidence_total=cast(int, item["evidence_total"]),
                     risk_components=cast(int, item["risk_components"]),
                     source=cast(str, item["source"]),
+                    tenant_id=cast(str, tenant_id_obj),
                 )
             )
 

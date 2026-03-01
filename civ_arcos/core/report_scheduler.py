@@ -22,6 +22,7 @@ class ReportJob:
     created_at: str
     next_run_at: str
     status: str = "scheduled"
+    tenant_id: str = ""
 
 
 class ReportScheduler:
@@ -45,6 +46,7 @@ class ReportScheduler:
         report_type: str,
         frequency: str,
         target: str,
+        tenant_id: str = "",
     ) -> ReportJob:
         """Create and persist a scheduled report job metadata record."""
         normalized_frequency = frequency.lower()
@@ -65,6 +67,7 @@ class ReportScheduler:
             created_at=now.isoformat(),
             next_run_at=next_run.isoformat(),
             status="scheduled",
+            tenant_id=tenant_id.strip(),
         )
 
         with self._lock:
@@ -73,26 +76,43 @@ class ReportScheduler:
 
         return job
 
-    def list_jobs(self) -> List[Dict[str, str]]:
+    def list_jobs(self, tenant_id: Optional[str] = None) -> List[Dict[str, str]]:
         """Return scheduled report job metadata sorted by creation timestamp."""
+        normalized_tenant = tenant_id.strip() if tenant_id is not None else None
         with self._lock:
-            jobs = [asdict(job) for job in self._jobs.values()]
+            jobs = [
+                asdict(job)
+                for job in self._jobs.values()
+                if normalized_tenant is None or job.tenant_id == normalized_tenant
+            ]
         jobs.sort(key=lambda item: item["created_at"], reverse=True)
         return jobs
 
-    def get_job(self, job_id: str) -> Optional[Dict[str, str]]:
+    def get_job(
+        self,
+        job_id: str,
+        tenant_id: Optional[str] = None,
+    ) -> Optional[Dict[str, str]]:
         """Return a single scheduled report job metadata record by ID."""
+        normalized_tenant = tenant_id.strip() if tenant_id is not None else None
         with self._lock:
             job = self._jobs.get(job_id)
-            return asdict(job) if job else None
+            if job is None:
+                return None
+            if normalized_tenant is not None and job.tenant_id != normalized_tenant:
+                return None
+            return asdict(job)
 
     def _load(self) -> None:
         """Load persisted report metadata from disk when present."""
         if not self._storage_path.exists():
             return
 
-        raw = self._storage_path.read_text(encoding="utf-8")
-        data_obj: Any = json.loads(raw)
+        try:
+            raw = self._storage_path.read_text(encoding="utf-8")
+            data_obj: Any = json.loads(raw)
+        except (OSError, json.JSONDecodeError):
+            return
         if not isinstance(data_obj, list):
             return
         data_list = cast(List[object], data_obj)
@@ -122,6 +142,10 @@ class ReportScheduler:
             created_at = cast(str, item["created_at"])
             next_run_at = cast(str, item["next_run_at"])
             status = cast(str, item["status"])
+            tenant_id_obj = item.get("tenant_id", "")
+            if not isinstance(tenant_id_obj, str):
+                continue
+            tenant_id = cast(str, tenant_id_obj)
 
             job = ReportJob(
                 job_id=job_id,
@@ -131,6 +155,7 @@ class ReportScheduler:
                 created_at=created_at,
                 next_run_at=next_run_at,
                 status=status,
+                tenant_id=tenant_id,
             )
             self._jobs[job.job_id] = job
 

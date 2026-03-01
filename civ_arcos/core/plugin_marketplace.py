@@ -157,7 +157,9 @@ class PluginRegistry:
         """Return the platform API version used for compatibility checks."""
         return self._api_version
 
-    def check_compatibility(self, manifest: PluginManifest) -> PluginCompatibilityResult:
+    def check_compatibility(
+        self, manifest: PluginManifest
+    ) -> PluginCompatibilityResult:
         """Evaluate manifest compatibility against core/API version constraints."""
         reasons: List[str] = []
 

@@ -81,8 +81,11 @@ class ComplianceReportStore:
         if not self._storage_path.exists():
             return
 
-        raw = self._storage_path.read_text(encoding="utf-8")
-        data_obj: Any = json.loads(raw)
+        try:
+            raw = self._storage_path.read_text(encoding="utf-8")
+            data_obj: Any = json.loads(raw)
+        except (OSError, json.JSONDecodeError):
+            return
         if not isinstance(data_obj, list):
             return
 

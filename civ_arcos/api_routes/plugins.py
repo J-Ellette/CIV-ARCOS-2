@@ -67,7 +67,9 @@ def _execute_payload(
     manifest_data: Dict[str, Any] | None = None,
 ) -> tuple[int, Dict[str, Any]]:
     """Execute plugin code and return status code + structured payload."""
-    validation = _validate_payload(validator, registry, code, manifest_data=manifest_data)
+    validation = _validate_payload(
+        validator, registry, code, manifest_data=manifest_data
+    )
     if not validation["valid"]:
         return 400, {
             "error": "Plugin validation failed",
@@ -131,7 +133,9 @@ def register_plugin_legacy_routes(
                 status_code=400,
             )
 
-        validation = _validate_payload(validator, registry, code, manifest_data=manifest)
+        validation = _validate_payload(
+            validator, registry, code, manifest_data=manifest
+        )
         if not validation["valid"]:
             return Response(
                 {"error": "Plugin validation failed", "validation": validation},
@@ -154,7 +158,9 @@ def register_plugin_legacy_routes(
                 manifest.get("target_api_version", registry.api_version)
             ).strip(),
             min_core_version=str(manifest.get("min_core_version", "0.1.0")).strip(),
-            max_core_version=(str(manifest.get("max_core_version", "")).strip() or None),
+            max_core_version=(
+                str(manifest.get("max_core_version", "")).strip() or None
+            ),
         )
         try:
             entry = registry.register(plugin_manifest, checksum=validation["checksum"])
@@ -249,7 +255,9 @@ def register_plugin_v1_routes(
                 status_code=400,
             )
 
-        validation = _validate_payload(validator, registry, code, manifest_data=manifest)
+        validation = _validate_payload(
+            validator, registry, code, manifest_data=manifest
+        )
         if not validation["valid"]:
             return Response(
                 {"error": "Plugin validation failed", "validation": validation},
@@ -272,7 +280,9 @@ def register_plugin_v1_routes(
                 manifest.get("target_api_version", registry.api_version)
             ).strip(),
             min_core_version=str(manifest.get("min_core_version", "0.1.0")).strip(),
-            max_core_version=(str(manifest.get("max_core_version", "")).strip() or None),
+            max_core_version=(
+                str(manifest.get("max_core_version", "")).strip() or None
+            ),
         )
         try:
             entry = registry.register(plugin_manifest, checksum=validation["checksum"])

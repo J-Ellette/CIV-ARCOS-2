@@ -178,7 +178,8 @@ class ReasoningEngine:
             defeater_type=DefeaterType.COUNTEREXAMPLE,
             description="Critical vulnerabilities are reported in context",
             severity=0.30,
-            evaluator=lambda _case, ctx: int(ctx.get("critical_vulnerabilities", 0)) > 0,
+            evaluator=lambda _case, ctx: int(ctx.get("critical_vulnerabilities", 0))
+            > 0,
         )
 
     def _coverage_ratio(self, case: AssuranceCase) -> float:
@@ -192,9 +193,7 @@ class ReasoningEngine:
     def _goal_support_ratio(self, case: AssuranceCase) -> float:
         """Return ratio of goal nodes that have at least one child."""
         goals = [
-            node
-            for node in case.nodes.values()
-            if node.node_type == GSNNodeType.GOAL
+            node for node in case.nodes.values() if node.node_type == GSNNodeType.GOAL
         ]
         if not goals:
             return 0.0
@@ -230,9 +229,13 @@ class ReasoningEngine:
             elif defeater["defeater_id"] == "uncovered_assumptions":
                 recommendations.append("Justify or evidence all assumption nodes.")
             elif defeater["defeater_id"] == "critical_vulnerabilities":
-                recommendations.append("Mitigate critical vulnerabilities before release.")
+                recommendations.append(
+                    "Mitigate critical vulnerabilities before release."
+                )
 
         if not recommendations:
-            recommendations.append("Maintain current evidence quality and monitor drift.")
+            recommendations.append(
+                "Maintain current evidence quality and monitor drift."
+            )
 
         return recommendations

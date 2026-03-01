@@ -138,9 +138,34 @@ def compliance_status_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
     return _envelope("ComplianceStatus", payload)
 
 
+def compliance_frameworks_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for compliance frameworks responses."""
+    return _envelope("ComplianceFrameworks", payload)
+
+
+def compliance_evaluate_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for single-framework compliance evaluation."""
+    return _envelope("ComplianceEvaluate", payload)
+
+
+def compliance_evaluate_all_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for multi-framework compliance evaluation."""
+    return _envelope("ComplianceEvaluateAll", payload)
+
+
 def analytics_trends_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Build a versioned contract for analytics trends responses."""
     return _envelope("AnalyticsTrends", payload)
+
+
+def analytics_benchmark_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for analytics benchmark responses."""
+    return _envelope("AnalyticsBenchmark", payload)
+
+
+def analytics_risks_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for analytics risk prediction responses."""
+    return _envelope("AnalyticsRisks", payload)
 
 
 def quality_metrics_trends_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -148,9 +173,34 @@ def quality_metrics_trends_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
     return _envelope("QualityMetricsTrends", payload)
 
 
+def quality_metrics_history_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for quality metrics history responses."""
+    return _envelope("QualityMetricsHistory", payload)
+
+
+def quality_metrics_record_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for quality metrics record responses."""
+    return _envelope("QualityMetricsRecord", payload)
+
+
 def quality_metrics_forecast_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Build a versioned contract for quality metrics forecast responses."""
     return _envelope("QualityMetricsForecast", payload)
+
+
+def report_schedule_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for report schedule responses."""
+    return _envelope("ReportSchedule", payload)
+
+
+def report_jobs_list_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for report job list responses."""
+    return _envelope("ReportJobsList", payload)
+
+
+def report_job_detail_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a versioned contract for report job detail responses."""
+    return _envelope("ReportJobDetail", payload)
 
 
 def compliance_report_artifact_contract(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -229,9 +279,19 @@ def contracts_registry() -> Dict[str, Any]:
                 {"name": "AnalysisComprehensive", "version": CONTRACT_VERSION},
                 {"name": "RiskMap", "version": CONTRACT_VERSION},
                 {"name": "ComplianceStatus", "version": CONTRACT_VERSION},
+                {"name": "ComplianceFrameworks", "version": CONTRACT_VERSION},
+                {"name": "ComplianceEvaluate", "version": CONTRACT_VERSION},
+                {"name": "ComplianceEvaluateAll", "version": CONTRACT_VERSION},
                 {"name": "AnalyticsTrends", "version": CONTRACT_VERSION},
+                {"name": "AnalyticsBenchmark", "version": CONTRACT_VERSION},
+                {"name": "AnalyticsRisks", "version": CONTRACT_VERSION},
                 {"name": "QualityMetricsTrends", "version": CONTRACT_VERSION},
+                {"name": "QualityMetricsHistory", "version": CONTRACT_VERSION},
+                {"name": "QualityMetricsRecord", "version": CONTRACT_VERSION},
                 {"name": "QualityMetricsForecast", "version": CONTRACT_VERSION},
+                {"name": "ReportSchedule", "version": CONTRACT_VERSION},
+                {"name": "ReportJobsList", "version": CONTRACT_VERSION},
+                {"name": "ReportJobDetail", "version": CONTRACT_VERSION},
                 {"name": "ComplianceReportArtifact", "version": CONTRACT_VERSION},
                 {"name": "ComplianceReportList", "version": CONTRACT_VERSION},
                 {"name": "TenantsList", "version": CONTRACT_VERSION},

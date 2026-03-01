@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from civ_arcos.assurance.case import AssuranceCase
 from civ_arcos.assurance.fragments import AssuranceCaseFragment

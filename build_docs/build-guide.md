@@ -1619,10 +1619,10 @@ Last updated: 2026-02-28
 
 | ID | Goal | Command | Status | Notes |
 |---|---|---|---|---|
-| Q-001 | Linting baseline | `python -m flake8 civ_arcos tests` | PASS | 0 errors |
-| Q-002 | Formatting baseline | `python -m black --check civ_arcos tests` | PASS | 64 files unchanged |
-| Q-003 | Type safety | `mypy civ_arcos` | PASS | 0 critical errors |
-| Q-004 | Coverage baseline | `coverage run -m pytest -q && coverage report -m` | PASS | 169 tests, 91% coverage |
+| Q-001 | Linting baseline | `python -m flake8 civ_arcos tests` | PASS | No lint findings after remediation slice |
+| Q-002 | Formatting baseline | `python -m black --check civ_arcos tests` | PASS | Black check clean (85 files unchanged) |
+| Q-003 | Type safety | `mypy civ_arcos` | PASS | mypy clean: no issues in 52 source files |
+| Q-004 | Coverage baseline | `coverage run -m pytest -q && coverage report -m` | PASS | 305 tests, 93% coverage |
 | Q-005 | Docs consistency | `python scripts/docs_consistency_check.py` | PASS | Cross-doc Q-row parity validated |
 
 ---
@@ -1633,6 +1633,9 @@ Mark all as complete before a formal release candidate:
 
 - [ ] All `V-*` rows for in-scope features are `PASS` or explicitly `DEFERRED` with owner and milestone
 - [ ] All `Q-*` rows are `PASS`
+- [x] **Q-001** open item: resolve flake8 findings (`python -m flake8 civ_arcos tests`)
+- [x] **Q-002** open item: apply formatting to pass black check (`python -m black --check civ_arcos tests`)
+- [x] **Q-003** open item: resolve mypy errors in architecture module (`mypy civ_arcos`)
 - [ ] `STATUS.md` updated with current confidence level and verification date
 - [ ] All deferred items documented with owner and target milestone
 - [ ] `README.md` updated with all active endpoints and features

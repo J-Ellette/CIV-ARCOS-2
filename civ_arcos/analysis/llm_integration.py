@@ -24,7 +24,9 @@ class LLMBackend:
         """Return backend readiness state."""
         return False
 
-    def generate(self, prompt: str, max_tokens: int = 400, temperature: float = 0.2) -> str:
+    def generate(
+        self, prompt: str, max_tokens: int = 400, temperature: float = 0.2
+    ) -> str:
         """Generate text from prompt content."""
         raise NotImplementedError
 
@@ -37,7 +39,9 @@ class MockBackend(LLMBackend):
     def is_available(self) -> bool:
         return True
 
-    def generate(self, prompt: str, max_tokens: int = 400, temperature: float = 0.2) -> str:
+    def generate(
+        self, prompt: str, max_tokens: int = 400, temperature: float = 0.2
+    ) -> str:
         preview = prompt.strip().splitlines()[0] if prompt.strip() else "request"
         return (
             "Fallback suggestion (mock backend): create basic, edge-case, and error-path "
@@ -60,7 +64,9 @@ class AzureOpenAIBackend(LLMBackend):
     def is_available(self) -> bool:
         return bool(self.endpoint and self.deployment and self.api_key)
 
-    def generate(self, prompt: str, max_tokens: int = 400, temperature: float = 0.2) -> str:
+    def generate(
+        self, prompt: str, max_tokens: int = 400, temperature: float = 0.2
+    ) -> str:
         if not self.is_available():
             raise RuntimeError("Azure OpenAI backend is not configured")
 
@@ -108,7 +114,9 @@ class AzureOpenAIBackend(LLMBackend):
 class LLMClient:
     """LLM wrapper with deterministic fallback behavior."""
 
-    def __init__(self, backend: LLMBackend, fallback: Optional[LLMBackend] = None) -> None:
+    def __init__(
+        self, backend: LLMBackend, fallback: Optional[LLMBackend] = None
+    ) -> None:
         self._backend = backend
         self._fallback = fallback or MockBackend()
 

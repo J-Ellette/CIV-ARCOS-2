@@ -140,7 +140,8 @@ class ACQLEngine:
             target=target,
             passed=passed,
             summary=(
-                "Case is complete" if passed
+                "Case is complete"
+                if passed
                 else "Case has missing coverage/evidence elements"
             ),
             details={"warnings": warnings, "errors": validation["errors"]},
@@ -254,8 +255,7 @@ class ACQLEngine:
             target=target,
             passed=passed,
             summary=(
-                "No active defeaters" if passed else
-                "Potential defeaters identified"
+                "No active defeaters" if passed else "Potential defeaters identified"
             ),
             details={"defeaters": defeaters},
         )
